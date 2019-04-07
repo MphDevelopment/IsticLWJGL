@@ -10,6 +10,9 @@ import Graphics.Drawable;
 import System.GlObject;
 
 public abstract class BufferObject extends GlObject implements Drawable {
+    /**
+     * Modification frequency modes
+     */
     public enum BindMode {
         STREAM_DRAW(GL_STREAM_DRAW),
         STREAM_READ(GL_STREAM_READ),
@@ -21,13 +24,13 @@ public abstract class BufferObject extends GlObject implements Drawable {
         DYNAMIC_READ(GL_DYNAMIC_READ),
         DYNAMIC_COPY(GL_DYNAMIC_COPY);
 
-        private int v;
+        private int mode;
         BindMode(int type){
-            this.v = type;
+            this.mode = type;
         }
 
         public final int asInteger() {
-            return v;
+            return mode;
         }
     }
 
@@ -36,7 +39,7 @@ public abstract class BufferObject extends GlObject implements Drawable {
     protected int count;
 
     public BufferObject(BindMode mode){
-        bindMode = mode.v;
+        bindMode = mode.mode;
     }
 
     public BufferObject(int mode){
@@ -46,12 +49,15 @@ public abstract class BufferObject extends GlObject implements Drawable {
     //abstract public void bind();
 
     /**
-     * Clear method release memory used into the RAM
+     * Releases memory used into the RAM
      */
     abstract public void clear() ;
 
     abstract public void draw() ;
 
+    /**
+     * Frees memory used into the DRAM (GPU)
+     */
     @Override
     public void free(){
         glBindBuffer((int)glId, 0);

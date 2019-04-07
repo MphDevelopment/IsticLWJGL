@@ -1,6 +1,13 @@
 package Graphics;
 
-
+/**
+ * Drawable is a graphic component that can be drawn by a Renderer.
+ *
+ */
 public interface Drawable {
+    /**
+     * Draws graphic component within a previously designated Frame Buffer.
+     * An OpenGL context must be initialized before the call.
+     */
     void draw();
 }

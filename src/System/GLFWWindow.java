@@ -28,7 +28,7 @@ public class GLFWWindow extends RenderTarget {
     private boolean running = false;
 
 
-    // window event
+    // window event values
     private int textEntered;
     private boolean textEvent = false;
     private int keyPressed;
@@ -266,6 +266,10 @@ public class GLFWWindow extends RenderTarget {
         return running;
     }
 
+    /**
+     * Generates an event associated with its specific case values.
+     * @return event caught by the window callbacks methods
+     */
     private Event pollEvent() {
         if (glfwWindowShouldClose(this.getGlId())) {
             return new Event(Event.Type.CLOSE);
@@ -321,6 +325,10 @@ public class GLFWWindow extends RenderTarget {
         return null;
     }
 
+    /**
+     * Poll GLFW events and generate the last event caught associated with its specific case values.
+     * @return event caught by the window callbacks methods
+     */
     final public Event pollEvents() {
         if (!running) return null;
 
@@ -329,6 +337,10 @@ public class GLFWWindow extends RenderTarget {
         return pollEvent();
     }
 
+    /**
+     * Waits GLFW events then generate the event caught associated with its specific case values.
+     * @return event caught by the window callbacks methods
+     */
     final public Event waitEvent() {
         if (!running) return null;
 

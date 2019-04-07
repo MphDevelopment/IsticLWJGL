@@ -11,16 +11,11 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**http://schabby.de/opengl-shader-example/*/
-
 public class Shader extends GlObject {
     public static final int FRAGMENT = 1 << 0;
     public static final int VERTEX = 1 << 1;
 
     private int type = 0;
-
-    public Shader(String file, int type) throws IOException {
-        this.type = type;
-    }
 
     public Shader(String vert, String frag) throws IOException {
         this.type = FRAGMENT | VERTEX;
@@ -85,7 +80,7 @@ public class Shader extends GlObject {
     }
 
     /**
-     * Load a text file and return it as a String.
+     * Loads a text file and return it as a String.
      */
     private String loadFile(String filename) {
         StringBuilder vertexCode = new StringBuilder();
@@ -107,14 +102,23 @@ public class Shader extends GlObject {
         return vertexCode.toString();
     }
 
+    /**
+     * Sets 'this' as the current shader program
+     */
     public void bind(){
         GL20.glUseProgram((int)this.glId);
     }
 
+    /**
+     *
+     */
     public static void unbind(){
         GL20.glUseProgram(0);
     }
 
+    /**
+     * Frees the shader from the GPU.
+     */
     @Override
     public void free() {
         glLinkProgram((int)glId);

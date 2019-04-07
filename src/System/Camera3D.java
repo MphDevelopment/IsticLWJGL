@@ -21,10 +21,20 @@ public class Camera3D {
     protected float _zfar = 1000;
     protected float _aspectRatio = 3.f/4.f;
 
+    /**
+     * Generates Camera with default settings
+     * center = (0,0,0)
+     * eye = (0,0,1)
+     * up = (0,1,0)
+     * fov = (90)
+     * znear = 1;
+     * zfar = 1000;
+     * aspectRatio = 3/4
+     */
     public Camera3D(){}
 
     /**
-     *
+     * Generates Camera using specific settings
      * @param fov field of view in degree
      * @param znear near depth buffer limit
      * @param zfar far depth buffer limit
@@ -38,7 +48,7 @@ public class Camera3D {
     }
 
     /**
-     *
+     * Generates Camera using specific settings
      * @param fov field of view in degree
      * @param znear near depth buffer limit
      * @param zfar far depth buffer limit
@@ -104,7 +114,7 @@ public class Camera3D {
     }
 
     /**
-     * Set the orientation of the camera where it look to
+     * Sets the orientation of the camera where it look to
      * @see Camera3D#lookAt(Vector3f)
      * @param eye
      */
@@ -113,7 +123,7 @@ public class Camera3D {
     }
 
     /**
-     * Set the position where the camera look to
+     * Sets the position where the camera look to
      * @see Camera3D#look(Vector3f)
      * @param target
      */
@@ -126,6 +136,10 @@ public class Camera3D {
         _up = up.unit();
     }
 
+    /**
+     * Sets up MVP matrice to a GLFWWindow
+     * @param window
+     */
     public void apply(GLFWWindow window) {
         if (!window.isOpen()) return;
 
@@ -145,8 +159,8 @@ public class Camera3D {
     }
 
     /**
-    * VBO GlContext M/V/P Matrices set up
-    * @param shader context
+    * Applies M/V/P Matrices to shader
+    * @param shader target
     * @param model model matrix
     * @param view view matrix
     * @param projection projection matrix
@@ -155,11 +169,20 @@ public class Camera3D {
         this.glUniformMVP(shader, model, view, projection);
     }
 
+    /**
+     * Sets up MVP matrix using GLSL matrix name
+     * @param shader target
+     * @param mvp MVP matrix name
+     */
     public void glUniformMVP(Shader shader, String mvp) {
         final int MVP = glGetUniformLocation((int)shader.getGlId(), mvp);
         this.glUniformMVP(MVP);
     }
 
+    /**
+     * Sets up MVP matrix using GLSL matrix uniform location
+     * @param mvpUniform
+     */
     public void glUniformMVP(int mvpUniform) {
         if (mvpUniform < 0) {
             System.out.println("MVP Uniform matrix do not exist in the shader.");
@@ -169,6 +192,13 @@ public class Camera3D {
         GL20.glUniformMatrix4fv(mvpUniform, false, GLM.toFloatArray((Matrix4f.mul(getProjectionMatrix(), Matrix4f.mul(getViewMatrix(), getModelMatrix(), new Matrix4f()), new Matrix4f()))));
     }
 
+    /**
+     * Sets up MVP matrices using GLSL matrices names
+     * @param shader target
+     * @param model
+     * @param view
+     * @param projection
+     */
     public void glUniformMVP(Shader shader, String model, String view, String projection) {
         final int M = glGetUniformLocation((int)shader.getGlId(), model);
         final int V = glGetUniformLocation((int)shader.getGlId(), view);
@@ -176,6 +206,12 @@ public class Camera3D {
         this.glUniformMVP(M,V,P);
     }
 
+    /**
+     * Sets MVP matrices using GLSL matrices uniform locations
+     * @param modelUniform
+     * @param viewUniform
+     * @param projectionLayout
+     */
     public void glUniformMVP(int modelUniform, int viewUniform, int projectionLayout){
         if (modelUniform < 0 || viewUniform < 0 || projectionLayout < 0) {
             System.out.println("MVP Uniform matrix do not exist in the shader.");

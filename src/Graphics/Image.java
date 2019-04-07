@@ -9,6 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+/**
+ * Image represents a 2D graphic RGBA8 image that can be edit by the CPU.
+ * Contrary to Texture it can not be sent to the GPU to be drawn.
+ * Contrary to Texture data are saved into the RAM.
+ * @apiNote RAM only
+ * @see Graphics.Texture DRAM only
+ */
 public class Image {
     private static final int bpp = 4;
 

@@ -20,15 +20,15 @@ public class Keyboard {
     private String layout = AZERTY;
 
     /**
-     * Generate a keyboard associated to a window
-     * @param window the keyboard will be associate to this window
+     * Generates a keyboard associated to a window
+     * @param window the keyboard will be associated to this window
      */
     public Keyboard(GLFWWindow window) {
         this.window = window;
     }
 
     /**
-     * Check if the keyboard key is pressed or not
+     * Checks if the keyboard key is pressed or not
      * @param key tested keyboard key
      * @return true if the keyboard key is pressed else false
      */
@@ -38,9 +38,9 @@ public class Keyboard {
     }
 
     /**
-     *
-     * @param layout
-     * @throws IOException
+     * Applies a new keyboard layout to specific country keyboard
+     * @param layout chosen keyboard layout
+     * @throws IOException thrown when the keyboard layout is not well known
      */
     public void setLayout(String layout) throws IOException {
         String[] layouts = getLocalLayouts();
@@ -55,28 +55,39 @@ public class Keyboard {
     }
 
     /**
-     *
-     * @param window
+     * Sets up a new GLFW context for keyboard listening
+     * @param window the keyboard will be associated to this window
      */
     public static void setContext(GLFWWindow window) {
         System.out.println("Keyboard input context:"+InputContext.getInstance().getLocale());
         context = window;
     }
 
+    /**
+     * Checks if the keyboard key is pressed or not
+     * @param key tested keyboard key
+     * @return true if the keyboard key is pressed else false
+     */
     public static boolean isKeyPressed_(int key) {
         int state = glfwGetKey(context.getGlId(), toLocalLayout(defaultLayout, key));
         return (state == GLFW_PRESS);
     }
 
+    /**
+     * Checks if the keyboard key is pressed or not
+     * @param key tested keyboard key
+     * @param window the keyboard is associated to this window
+     * @return true if the keyboard key is pressed else false
+     */
     public static boolean isKeyPressed(int key, GLFWWindow window) {
         int state = glfwGetKey(window.getGlId(), toLocalLayout(defaultLayout, key));
         return (state == GLFW_PRESS);
     }
 
     /**
-     *
-     * @param layout
-     * @throws IOException
+     * Applies a new keyboard layout to specific country keyboard
+     * @param layout chosen keyboard layout
+     * @throws IOException thrown when the keyboard layout is not well known
      */
     public static void setDefaultLayout(String layout) throws IOException {
         String[] layouts = getLocalLayouts();

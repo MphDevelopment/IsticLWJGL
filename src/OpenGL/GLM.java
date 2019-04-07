@@ -3,9 +3,11 @@ package OpenGL;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
+/**
+ * OpenGL Mathematics
+ */
 public class GLM {
 
     @Deprecated
@@ -31,10 +33,14 @@ public class GLM {
         buffer.put(m.m22);
         buffer.put(m.m23);
 
-        buffer.flip();
-
         return buffer;
     }
+
+    /**
+     * Converts a matrix to float[]
+     * @param m converted matrix
+     * @return array with matrix values
+     */
     public static float[] toFloatArray(Matrix4f m) {
         return new float[]{
                 m.m00,
@@ -59,7 +65,16 @@ public class GLM {
         };
     }
 
-
+    /**
+     * Sets up a orthogonal projection matrix
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param zNear
+     * @param zFar
+     * @return
+     */
     public static Matrix4f ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
 
         Matrix4f m = new Matrix4f();
@@ -74,6 +89,16 @@ public class GLM {
         return m;
     }
 
+    /**
+     *
+     * @param left
+     * @param right
+     * @param bottom
+     * @param top
+     * @param zNear
+     * @param zFar
+     * @return
+     */
     public static Matrix4f frustum(float left, float right, float bottom, float top, float zNear, float zFar) {
 
         Matrix4f m = new Matrix4f();
@@ -89,6 +114,14 @@ public class GLM {
         return m;
     }
 
+    /**
+     * Sets up a perspective projection matrix
+     * @param fovy
+     * @param aspect
+     * @param zNear
+     * @param zFar
+     * @return
+     */
     public static Matrix4f perspective(float fovy, float aspect, float zNear, float zFar) {
 
         float range = (float) Math.tan(Math.toRadians(fovy / 2)) * zNear;
@@ -108,6 +141,13 @@ public class GLM {
         return m;
     }
 
+    /**
+     * Sets up a view matrix
+     * @param eye
+     * @param center
+     * @param up
+     * @return
+     */
     public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up) {
 
         Vector3f forward = Vector3f.sub(center, eye, null);

@@ -8,11 +8,17 @@ public class Clock {
         NANOSECONDS_ACCURACY,
         MILLISECONDS_ACCURACY
     }
+
+    /**
+     * Computes last timestamp according to computer timestamp with specific time accuracy
+     * @param mode specified time accuracy
+     * @return computer timestamp
+     */
     private static long ClockFunction(Mode mode) {
         switch (mode) {
-            case NANOSECONDS_ACCURACY:return System.nanoTime();
-            case MILLISECONDS_ACCURACY:return System.currentTimeMillis() * 1000000;
-            default:return 0L;
+            case NANOSECONDS_ACCURACY: return System.nanoTime();
+            case MILLISECONDS_ACCURACY: return System.currentTimeMillis() * 1000000;
+            default: return -1;
         }
     }
 
@@ -20,24 +26,41 @@ public class Clock {
     private long t1 = 0;
     private long t2 = 0;
 
+    /**
+     * Generates a clock that start to run with specific mode.
+     * @param mode specified mode
+     */
     public Clock(Mode mode) {
         this.mode = mode;
-        t1 = ClockFunction(mode);
+        t1 = t2 = ClockFunction(mode);
     }
 
+    /**
+     * Generates a clock that start to run with NANOSECONDS_ACCURACY.
+     * Default accuracy is NANOSECONDS_ACCURACY.
+     */
     public Clock(){
-        t1 = ClockFunction(mode);//System.nanoTime();
+        t1 = t2 = ClockFunction(mode);
     }
 
+    /**
+     * Restarts the clock.
+     * Compute the elapsed time between two timestamps.
+     * @return elapsed time between now and the previous timestamp.
+     */
     public Time restart(){
-        t2 = ClockFunction(mode);//System.nanoTime();
+        t2 = ClockFunction(mode);
         long elapsed = t2 - t1;
         t1 = t2;
         return new Time(elapsed);
     }
 
+    /**
+     * Computes the elapsed time between two timestamps.
+     * @return elapsed time between now and the previous timestamp.
+     */
     public Time getElapsed(){
-        t2 = ClockFunction(mode);//System.nanoTime();
+        t2 = ClockFunction(mode);
         long elapsed = t2 - t1;
         return new Time(elapsed);
     }

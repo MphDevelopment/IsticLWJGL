@@ -1,15 +1,19 @@
 package Graphics;
 
-
+/**
+ * Transformable is a 2D component that can be transformed using translation, scaling and rotating
+ */
 public abstract class Transformable {
-    protected float x=0, y=0;
-    protected float ox=0, oy=0;
-    protected float sx=1,sy=1;
+    protected float x=0, y=0; // position coordinates
+    protected float ox=0, oy=0; // origin coordinates
+    protected float sx=1,sy=1; // scale factors
+    protected float radian; // rotation angle
 
     public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
     }
+
     public void move(float x, float y) {
         this.x += x;
         this.y += y;
@@ -22,6 +26,12 @@ public abstract class Transformable {
         this.sx = x;
         this.sy = y;
     }
+    public void setRotation(float radian) {
+        this.radian = radian;
+    }
+    public void rotate(float radian) {
+        this.radian += radian;
+    }
 
     public float getX() { return x;}
     public float getY() { return y;}
@@ -29,6 +39,7 @@ public abstract class Transformable {
     public float getOriginY() { return oy;}
     public float getScaleX() { return sx;}
     public float getScaleY() { return sy;}
+    public float getRotation() { return radian;}
 
     public Vector2f getPosition(){
         return new Vector2f(x, y);
