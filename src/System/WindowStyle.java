@@ -3,7 +3,8 @@ package System;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 
 /**
- * WindowStyle provides interface to allow or not some GLFWWindow styles
+ * WindowStyle provides interface to allow or not some GLFWWindow styles.
+ * Issue 1: No title bar and the window become not resizable.
  */
 public class WindowStyle {
     /// Default list of styles

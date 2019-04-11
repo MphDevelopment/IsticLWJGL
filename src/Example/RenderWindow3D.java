@@ -128,10 +128,10 @@ public class RenderWindow3D extends GLFWWindow {
         final int uniformView = glGetUniformLocation((int)shader.getGlId(), "viewMatrix");
         final int uniformProjection = glGetUniformLocation((int)shader.getGlId(), "projectionMatrix");
 
-        Time elapsedSinceeginning = Time.Zero;
+        Time elapsedSinceBeginning = Time.Zero;
         while (window.isOpen()) {
             Time elapsed = clk.restart();
-            elapsedSinceeginning.add(elapsed);
+            elapsedSinceBeginning.add(elapsed);
 
             //System.out.println("fps:"+1.0/elapsed.asSeconds());
             //System.out.println("seconds:"+elapsed.asSeconds());
@@ -143,7 +143,6 @@ public class RenderWindow3D extends GLFWWindow {
                     System.exit(0);
                 } else if (event.type == Event.Type.RESIZE) {
                     camera.setAspectRatio((float)event.resizex/(float)event.resizey);
-                    camera.setDimension(new Vector2f(event.resizex, event.resizey));
                 }
             }
 
@@ -164,9 +163,9 @@ public class RenderWindow3D extends GLFWWindow {
                 glBegin(GL_TRIANGLES);
 
                 glColor3d(1, 0, 0);
-                glVertex3d(0+(float)elapsedSinceeginning.asMilliseconds()/10, 0, 0);
-                glVertex3f(0+(float)elapsedSinceeginning.asMilliseconds()/10, 50, 0);
-                glVertex3f(50+(float)elapsedSinceeginning.asMilliseconds()/10, 50, 0);
+                glVertex3d(0+(float)elapsedSinceBeginning.asMilliseconds()/10, 0, 0);
+                glVertex3f(0+(float)elapsedSinceBeginning.asMilliseconds()/10, 50, 0);
+                glVertex3f(50+(float)elapsedSinceBeginning.asMilliseconds()/10, 50, 0);
 
                 glColor3d(0,1,0);
                 glVertex3d(50, 50, 50);

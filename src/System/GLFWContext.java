@@ -5,9 +5,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
-/**
- *
- */
+
 public final class GLFWContext {
     private static int contextCount = 0;
 

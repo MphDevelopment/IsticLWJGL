@@ -71,6 +71,7 @@ public class RenderWindow extends GLFWWindow {
 
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
+        shape.setOrigin(5,5);
         shape.setFillColor(Color.Red);
 
         Sprite sprite = new Sprite(texture);
@@ -88,16 +89,19 @@ public class RenderWindow extends GLFWWindow {
         Mouse mouse = new Mouse(window);
 
         Camera2D camera = new Camera2D(window);
-        //camera.setZoom(0.25f);
-        //camera.setRotation(2*(float)PI);
-        camera.setRotation(0.5f);
-        Camera2D screenCamera = new Camera2D(renderTexture);
-        Camera2D screenCamera2 = new Camera2D(renderTexture2);
+        /*Camera2D screenCamera = new Camera2D(renderTexture);
+        Camera2D screenCamera2 = new Camera2D(renderTexture2);*/
 
         RectangleShape background = new RectangleShape(200,200);
         background.setFillColor(Color.Blue);
 
+        RectangleShape fullBackground = new RectangleShape(900,900);
+        fullBackground.move(-300,-300);
+        fullBackground.setFillColor(Color.Cyan);
+
         Clock clk = new Clock();
+
+        Viewport viewport = new Viewport(new FloatRect(50,50, 400,400), window);
 
         while (window.isOpen()) {
             Time elapsed = clk.restart();
@@ -146,35 +150,41 @@ public class RenderWindow extends GLFWWindow {
                 }
             }
 
+            //viewport update
+            viewport.update(window);
+            camera.setDimension(viewport.getDimension());
+
 
             shape.move(+1f,+1f);
+            fullBackground.move(1,1);
             screen.move(0.5f,0);
             screen2.move(0.25f,0);
 
             renderTexture.bind();
-            screenCamera.apply(renderTexture);
+            //screenCamera.apply(renderTexture);
             renderTexture.clear(Color.Blue);
             sprite.draw();
             shape.draw();
             renderTexture.unbind();
 
             renderTexture2.bind();
-            screenCamera2.apply(renderTexture2);
+            //screenCamera2.apply(renderTexture2);
             renderTexture2.clear(Color.Yellow);
             background.draw();
             sprite.draw();
             shape.draw();
             renderTexture2.unbind();
 
-            //camera.moveView(new Vector2f(0.5f,0f));
             camera.setCenter(shape.getPosition());
-            //camera.setZoom(2);
-            //camera.setRotation(1f);
+            //window.initGl();
+            viewport.apply();
             camera.apply(window);
-            window.clear(Color.Transparent);
+            window.clear(Color.Green);
+            fullBackground.draw();
             screen.draw();
             screen2.draw();
             shape.draw();
+
             window.display();
 
 

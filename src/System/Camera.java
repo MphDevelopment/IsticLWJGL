@@ -1,35 +1,19 @@
 package System;
 
 
-import Graphics.FloatRect;
 import Graphics.Shader;
-import Graphics.Vector2f;
 import OpenGL.GLM;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**
- * A camera decides how graphics will be draw by transforming their coordinates according to camera settings.
+ * A camera decides how graphics will be draw by transforming their coordinates according to camera settings/properties.
  * @see Viewport
  */
 public abstract class Camera {
-    protected Vector2f screenDimension;
-
-    public Camera(Vector2f dimension) {
-        this.screenDimension = dimension;
-    }
-
-    public void setDimension(Vector2f dimension) {
-        this.screenDimension.x = dimension.x;
-        this.screenDimension.y = dimension.y;
-    }
-
-    public Vector2f getDimension() {
-        return new Vector2f(screenDimension.x, screenDimension.y);
-    }
+    public Camera(){}
 
     public abstract Matrix4f getModelMatrix() ;
 
@@ -37,20 +21,20 @@ public abstract class Camera {
 
     public abstract Matrix4f getProjectionMatrix() ;
 
-    public float[] getModelBuffer() {
+    public final float[] getModelBuffer() {
         return GLM.toFloatArray(getModelMatrix());
     }
 
-    public float[] getViewBuffer() {
+    public final float[] getViewBuffer() {
         return GLM.toFloatArray(getViewMatrix());
     }
 
-    public float[] getProjectionBuffer() {
+    public final float[] getProjectionBuffer() {
         return GLM.toFloatArray(getProjectionMatrix());
     }
 
     /**
-     * Sets up MVP matrice to a RenderTarget for Display list
+     * Sets up MVP matrices to a RenderTarget for Display list
      * @param target
      */
     public abstract void apply(RenderTarget target) ;
@@ -62,7 +46,7 @@ public abstract class Camera {
      * @param view view matrix
      * @param projection projection matrix
      */
-    public void apply(Shader shader, String model, String view, String projection) {
+    public final void apply(Shader shader, String model, String view, String projection) {
         this.glUniformMVP(shader, model, view, projection);
     }
 
@@ -71,7 +55,7 @@ public abstract class Camera {
      * @param shader target
      * @param mvp MVP matrix name
      */
-    public void glUniformMVP(Shader shader, String mvp) {
+    public final void apply(Shader shader, String mvp) {
         final int MVP = glGetUniformLocation((int)shader.getGlId(), mvp);
         this.glUniformMVP(MVP);
     }
@@ -80,7 +64,7 @@ public abstract class Camera {
      * Sets up MVP matrix using GLSL matrix uniform location
      * @param mvpUniform
      */
-    public void glUniformMVP(int mvpUniform) {
+    public final void glUniformMVP(int mvpUniform) {
         if (mvpUniform < 0) {
             System.out.println("MVP Uniform matrix do not exist in the shader.");
             return;
@@ -96,7 +80,7 @@ public abstract class Camera {
      * @param view
      * @param projection
      */
-    public void glUniformMVP(Shader shader, String model, String view, String projection) {
+    public final void glUniformMVP(Shader shader, String model, String view, String projection) {
         final int M = glGetUniformLocation((int)shader.getGlId(), model);
         final int V = glGetUniformLocation((int)shader.getGlId(), view);
         final int P = glGetUniformLocation((int)shader.getGlId(), projection);
@@ -109,7 +93,7 @@ public abstract class Camera {
      * @param viewUniform
      * @param projectionLayout
      */
-    public void glUniformMVP(int modelUniform, int viewUniform, int projectionLayout){
+    public final void glUniformMVP(int modelUniform, int viewUniform, int projectionLayout){
         if (modelUniform < 0 || viewUniform < 0 || projectionLayout < 0) {
             System.out.println("MVP Uniform matrix do not exist in the shader.");
             return;

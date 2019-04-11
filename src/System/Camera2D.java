@@ -8,19 +8,29 @@ import org.lwjgl.util.vector.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
+//TODO orthogonal matrices must concider zoom and angle
 public class Camera2D extends Camera {
-    private Vector2f center = new Vector2f(0,0);
+    private Vector2f screenDimension;
+    private Vector2f center;
     private float zoom = 1;
     private float angle = 0;
 
     public Camera2D(Vector2f dimension){
-        super(dimension);
-        center.x = dimension.x / 2 ;
-        center.y = dimension.y / 2 ;
+        screenDimension = dimension;
+        center = new Vector2f(dimension.x / 2,dimension.y / 2);
     }
 
     public Camera2D(RenderTarget target){
         this(new Vector2f(target.getDimension()));
+    }
+
+    public void setDimension(Vector2f dimension) {
+        this.screenDimension.x = dimension.x;
+        this.screenDimension.y = dimension.y;
+    }
+
+    public Vector2f getDimension() {
+        return new Vector2f(screenDimension.x, screenDimension.y);
     }
 
     @Override
@@ -40,18 +50,6 @@ public class Camera2D extends Camera {
     @Override
     public Matrix4f getProjectionMatrix() {
         return GLM.ortho(center.x - screenDimension.x/2, center.x + screenDimension.x/2, center.y + screenDimension.y/2, center.y - screenDimension.y/2, -1f, 1.f);
-    }
-
-    private float transformX(float v) {
-        float t = (float)(Math.cos(angle) * v);
-        return t;
-        //return t/zoom;
-    }
-
-    private float transformY(float v) {
-        float t = (float)(Math.sin(angle) * v);
-        return t;
-        //return t/zoom;
     }
 
     public void move(Vector2f motion) {
@@ -92,7 +90,7 @@ public class Camera2D extends Camera {
     public void apply(RenderTarget target) {
         glDisable(GL_DEPTH_TEST);
 
-        glViewport(0, 0, (int)screenDimension.x, (int)screenDimension.y);
+        //glViewport(0, 0, (int)screenDimension.x, (int)screenDimension.y);
 
         /// change fov
         glMatrixMode(GL_PROJECTION);

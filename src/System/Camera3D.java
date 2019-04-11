@@ -37,9 +37,7 @@ public class Camera3D extends Camera {
      * zfar = 1000;
      * aspectRatio = 3/4
      */
-    public Camera3D(){
-        super(new Vector2f(0,0));
-    }
+    public Camera3D(){}
 
     /**
      * Generates Camera using specific settings
@@ -49,7 +47,6 @@ public class Camera3D extends Camera {
      * @param window for view aspect
      */
     public Camera3D(float fov, float znear, float zfar, GLFWWindow window) {
-        super(new Vector2f(window.getDimension()));
         this._fov = fov;
         this._znear = znear;
         this._zfar = zfar;
@@ -63,8 +60,7 @@ public class Camera3D extends Camera {
      * @param zfar far depth buffer limit
      * @param aspect view aspect
      */
-    public Camera3D(float fov, float znear, float zfar, float aspect, Vector2f dimension){
-        super(dimension);
+    public Camera3D(float fov, float znear, float zfar, float aspect){
         this._fov = fov;
         this._znear = znear;
         this._zfar = zfar;
@@ -169,7 +165,7 @@ public class Camera3D extends Camera {
 
         glEnable(GL_DEPTH_TEST);
 
-        glViewport(0, 0, (int)screenDimension.x, (int)screenDimension.y);
+        //glViewport(0, 0, (int)screenDimension.x, (int)screenDimension.y);
 
         /// change fov
         glMatrixMode(GL_PROJECTION);

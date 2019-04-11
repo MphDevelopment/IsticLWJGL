@@ -4,13 +4,13 @@ package System;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 
 /**
- * CallbackMode provides interface to allow or not some GLFWWindow Callback modes
+ * CallbackMode provides interface to allow or not some GLFWWindow Callback functions
  */
 public class CallbackMode {
     /**
      * Default callback modes coming from GLFW lib
      */
-    public static CallbackMode DEFAULT = new CallbackMode(~0);
+    public static final CallbackMode DEFAULT = new CallbackMode(~0);
     public static final CallbackMode KEY = new CallbackMode(1 << 0);
     public static final CallbackMode CHAR = new CallbackMode(1 << 1);
     public static final CallbackMode CURSORENTER = new CallbackMode(1 << 2);

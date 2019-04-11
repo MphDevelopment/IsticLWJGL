@@ -21,15 +21,18 @@ import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
+/**
+ * Interface to manage a Graphics Window.
+ */
 public class GLFWWindow extends RenderTarget {
     // window settings
     private int width;
     private int height;
     private boolean running = false;
 
-    private float[] view;
-    private float[] model;
-    private float[] projection;
+
+    //Camera camera;
+    //Viewport viewport;
 
 
     // window event values
@@ -156,10 +159,12 @@ public class GLFWWindow extends RenderTarget {
     }
 
     /**
-     * Default initialization of window parameters
+     * Default initialization of window's MVP and Viewport and enabled gl states
      */
     //TODO on doit faire en sorte que les matrices se mettent a jour entre chaque different bind de RenderTarget
     protected void initGl() {
+        //TODO RenderTargets must own their own view (Camera) and viewport (Viewport).
+
         glViewport(0, 0, width, height);
 
         glMatrixMode(GL_PROJECTION);
@@ -173,6 +178,13 @@ public class GLFWWindow extends RenderTarget {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+
+    //TODO RenderTargets must own their own view enabled gl states called each time the RenderTarget is bound
+    private void initGlEnable() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
 
     /**
      * Create a window with a title bar, title.
@@ -317,7 +329,7 @@ public class GLFWWindow extends RenderTarget {
         }
         if (joystickEvent) {
             joystickEvent = false;
-            return new Event(Event.Type.JOYSTICK);
+            return new Event(Event.Type.JOYSTICK, new int[]{joystick, joystickTriggeredEvent});
         }
         if (resizeEvent) {
             resizeEvent = false;

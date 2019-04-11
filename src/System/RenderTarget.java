@@ -6,6 +6,7 @@ import Graphics.Drawable;
 import Graphics.Image;
 import Graphics.Vector2i;
 
+//TODO RenderTargets must own their own view (Camera) and viewport (Viewport).
 public abstract class RenderTarget extends GlObject {
     private static RenderTarget currentRenderer = null;
 

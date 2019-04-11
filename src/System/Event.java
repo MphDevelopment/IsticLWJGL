@@ -24,6 +24,7 @@ public final class Event {
     public float scrollY;
     public String drop[];
     public int joystick;
+    public int joystickEvent;
     public int resizex;
     public int resizey;
     public int posx;
@@ -62,7 +63,7 @@ public final class Event {
             case RESIZE: resizex = values[0]; resizey = values[1]; break;
             case MOVE: posx = values[0]; posy = values[1]; break;
 
-            case JOYSTICK: joystick = values[1]; break;
+            case JOYSTICK: joystick = values[0]; joystickEvent = values[1]; break;
         }
     }
 
@@ -85,26 +86,26 @@ public final class Event {
     }
 
     public enum Type {
-        CLOSE,
-        RESIZE,
-        FOCUS,
-        UNFOCUS,
-        MOVE,
+        CLOSE, // Window close button has been released
+        RESIZE, // Window has been resized
+        FOCUS,  // Window has been selected as current window
+        UNFOCUS, // Window is not current window anymore
+        MOVE, // Window has been moved
 
-        KEYPRESSED,
-        KEYRELEASED,
-        TEXTENTERED,
+        KEYPRESSED, // Keyboard key has been pressed when Window was current window
+        KEYRELEASED, // Keyboard key has been released when Window was current window
+        TEXTENTERED, // Text has been entered when Window was current window
 
-        BUTTONPRESSED,
-        BUTTONRELEASED,
+        BUTTONPRESSED, // Mouse button has been pressed when Window was current window
+        BUTTONRELEASED, // Mouse button has been released when Window was current window
 
-        MOUSEENTER,
-        MOUSELEAVE,
+        MOUSEENTER, // Mouse cursor just enter Window area
+        MOUSELEAVE, // Mouse cursor just leave Window area
 
-        MOUSESCROLL,
+        MOUSESCROLL, // Mouse has been scrolling when Window was current window
 
-        MOUSEDROP,
+        MOUSEDROP, // User dropped items into window deposit
 
-        JOYSTICK
+        JOYSTICK // Joystick event
     }
 }

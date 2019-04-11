@@ -1,6 +1,11 @@
- public class Example2D {
+package Example;
+
+import Graphics.*;
+import System.*;
+
+public final class Example2D {
    public static void main(String[] args) {
-      GLFWWindow window = new RenderWindow(VideoMode.getDesktopMode().width / 10,VideoMode.getDesktopMode().height / 10, "OpenGL", WindowStyle.DEFAULT);
+      GLFWWindow window = new RenderWindow(new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT);
       RectangleShape shape = new RectangleShape(10,10, 10,10);
       shape.setFillColor(Color.Red);
 
