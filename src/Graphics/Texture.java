@@ -48,9 +48,8 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 import System.GlObject;
 
 /**
- * Texture represents a 2D graphic RGBA8 image that can be displayed by GPU.
- * @apiNote DRAM only
- * @see Graphics.Image RAM only
+ * Texture represents a 2D graphic RGBA8 image that can be displayed by GPU. DRAM only.
+ * @see Graphics.Image Image (RAM only)
  */
 public class Texture extends GlObject {
     // Current bound texture
@@ -85,9 +84,9 @@ public class Texture extends GlObject {
     /**
      * Load a texture using a PNG file path
      * @param file PNG file path
-     * @apiNote    filter mode is by default GL_NEAREST
-     * @apiNote    wrap mode is by default GL_CLAMP_TO_EDGE
-     * @throws IOException throws when texture is not correctly loaded because the file do not exist or because of internal OpenGL issues
+     *             filter mode is by default GL_NEAREST
+     *             wrap mode is by default GL_CLAMP_TO_EDGE
+     * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
      */
     public Texture(String file) throws IOException {
         this(file, GL_NEAREST);
@@ -97,8 +96,8 @@ public class Texture extends GlObject {
      * Load a texture using a PNG file path with a specific Filter
      * @param file PNG file path
      * @param filter OpenGL native filter mode
-     * @apiNote      wrap mode is by default GL_CLAMP_TO_EDGE
-     * @throws IOException throws when texture is not correctly loaded because the file do not exist or because of internal OpenGL issues
+     *               wrap mode is by default GL_CLAMP_TO_EDGE.
+     * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
      */
     public Texture(String file, int filter) throws IOException {
         this(file, filter, GL_CLAMP_TO_EDGE);
@@ -109,7 +108,7 @@ public class Texture extends GlObject {
      * @param file PNG file path
      * @param filter OpenGL native filter mode
      * @param wrap OpenGL native wrap mode
-     * @throws IOException throws when texture is not correctly loaded because the file do not exist or because of internal OpenGL issues
+     * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
      */
     public Texture(String file, int filter, int wrap) throws IOException {
         InputStream input = null;
@@ -166,21 +165,21 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Set this (glId) as the current Texture
+     * Sets this (glId) as the current Texture
      */
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, (int)glId);
     }
 
     /**
-     * Remove last bound texture as current texture
+     * Removes last bound texture as current texture
      */
     public static void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     /**
-     * Current texture with in pixels
+     * Current texture's width in pixels
      * @return image pixel width
      */
     public int getWidth(){
@@ -188,7 +187,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Current texture height in pixels
+     * Current texture's height in pixels
      * @return image pixel height
      */
     public int getHeight(){
@@ -196,7 +195,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * If enabled GPU will repeat texture if the texture coordinates exceeds the texture dimensin
+     * If enabled GPU will repeat texture if the texture coordinates exceeds the texture dimension
      * @param repeated enable/disable repetition
      */
     public void setRepeated(boolean repeated) {
@@ -228,7 +227,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Define a specific OpenGL filter mode for the texture
+     * Defines a specific OpenGL filter mode for the texture
      * @param filter the specified filter
      */
     public void setFilterMode(int filter){
@@ -243,7 +242,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Define a specific OpenGL wrap mode for the texture
+     * Defines a specific OpenGL wrap mode for the texture
      * @param wrap the specified wrap mode
      */
     public void setWrapMode(int wrap){
@@ -266,7 +265,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Free the texture from GPU memory.
+     * Frees the texture from GPU memory.
      */
     @Override
     public void free(){
@@ -276,8 +275,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Test if two textures are same by comparing their 'glId'.
-     * @required both texture must be into DRAM
+     * Tests if two textures are same by comparing their 'glId'. Both texture must be into DRAM (it means that their 'glId' must be different to 0).
      * @param o comparison object
      * @return true if both texture are into DRAM and have same 'glId'
      */

@@ -1,23 +1,16 @@
 package Example;
 
-import Graphics.Sprite;
-import Graphics.Texture;
-import Graphics.Color;
-import Graphics.Shader;
+import Graphics.*;
 import Graphics.VBO.BufferObject;
 import Graphics.VBO.BumpVBO;
 import Graphics.VBO.CubeVBO;
 import Graphics.VBO.TexturedVBO;
-import Graphics.Vector3f;
-import OpenGL.GLM;
 import System.*;
 import System.CameraMode.Camera3DMode;
 import System.CameraMode.FPSCamera3DMode;
 import System.Event;
 import System.Camera3D;
-import org.lwjgl.util.vector.Matrix4f;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,15 +20,16 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 /**http://schabby.de/opengl-shader-example/*/
 
 public class RenderWindow3D extends GLFWWindow {
-    private static final double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-    private static final double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 
     public RenderWindow3D(){
-        super((int)width/3,(int)height/3, "3D Example Test");
+        super(new VideoMode((int)(VideoMode.getDesktopMode().width/3.f), (int)(VideoMode.getDesktopMode().height/3.f)), "3D Example Test");
+        initGl();
     }
 
     //@Override
     protected void initGl() {
+        glViewport(0, 0, super.getDimension().x, super.getDimension().y);
+
         glClearDepth(1.f);
         glEnable(GL_DEPTH_TEST);
         glDepthMask(true);
@@ -56,14 +50,15 @@ public class RenderWindow3D extends GLFWWindow {
     @Override
     public void clear() {
         if (!this.isOpen()) return ;
+        glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     @Override
     public void clear(Color color) {
         if (!this.isOpen()) return ;
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(color.r, color.g, color.b, color.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public static void main(String[] args) {
@@ -121,7 +116,7 @@ public class RenderWindow3D extends GLFWWindow {
 
         Camera3D camera = new Camera3D(80.f, 1,1000, window);
         camera.setUpVector(new Vector3f(0,1,0));
-        //camera.setPosition(new Vector3f(0,0,-50));
+
         camera.apply(window);
         Clock clk = new Clock(Clock.Mode.NANOSECONDS_ACCURACY);
 
@@ -133,16 +128,22 @@ public class RenderWindow3D extends GLFWWindow {
         final int uniformView = glGetUniformLocation((int)shader.getGlId(), "viewMatrix");
         final int uniformProjection = glGetUniformLocation((int)shader.getGlId(), "projectionMatrix");
 
+        Time elapsedSinceeginning = Time.Zero;
         while (window.isOpen()) {
             Time elapsed = clk.restart();
+            elapsedSinceeginning.add(elapsed);
 
             //System.out.println("fps:"+1.0/elapsed.asSeconds());
             //System.out.println("seconds:"+elapsed.asSeconds());
 
-            Event event = null;
+            Event event;
             while ((event = window.pollEvents()) != null) {
                 if (event.type == Event.Type.CLOSE) {
                     window.close();
+                    System.exit(0);
+                } else if (event.type == Event.Type.RESIZE) {
+                    camera.setAspectRatio((float)event.resizex/(float)event.resizey);
+                    camera.setDimension(new Vector2f(event.resizex, event.resizey));
                 }
             }
 
@@ -161,10 +162,12 @@ public class RenderWindow3D extends GLFWWindow {
                 sprite.draw();
 
                 glBegin(GL_TRIANGLES);
+
                 glColor3d(1, 0, 0);
-                glVertex3d(0, 0, 0);
-                glVertex3f(0, 50, 0);
-                glVertex3f(50, 50, 0);
+                glVertex3d(0+(float)elapsedSinceeginning.asMilliseconds()/10, 0, 0);
+                glVertex3f(0+(float)elapsedSinceeginning.asMilliseconds()/10, 50, 0);
+                glVertex3f(50+(float)elapsedSinceeginning.asMilliseconds()/10, 50, 0);
+
                 glColor3d(0,1,0);
                 glVertex3d(50, 50, 50);
                 glVertex3f(0, -50, 50);

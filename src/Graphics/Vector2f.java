@@ -2,21 +2,30 @@ package Graphics;
 
 
 /**
- * Represents a 2D point/vector/dimension
+ * Represents a 2D point/vector/dimension.
  */
 public class Vector2f {
     public float x;
     public float y;
+
+    public Vector2f(){
+        this.x = this.y = 0;
+    }
 
     public Vector2f(float x, float y){
         this.x = x;
         this.y = y;
     }
 
-    public Vector2f(){
-        this.x = this.y = 0;
+    public Vector2f(Vector2f v) {
+        x = v.x;
+        y = v.y;
     }
 
+    public Vector2f(Vector2i v) {
+        x = v.x;
+        y = v.y;
+    }
 
     // self-operation
     public Vector2f add(Vector2f vec2) {

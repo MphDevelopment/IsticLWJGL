@@ -42,7 +42,7 @@ public class Sprite extends Shape {
 
             glEnable(GL_TEXTURE_2D);
 
-            glBegin(GL_QUADS);
+            /*glBegin(GL_QUADS);
             glColor3d(color.r,color.g,color.b);
             glTexCoord2d(tx, ty);
             glVertex2d(x - ox, y - oy);
@@ -51,7 +51,19 @@ public class Sprite extends Shape {
             glTexCoord2d(tx + tw, ty + th);
             glVertex2d(x + width*sx - ox, y + height*sy - oy);
             glTexCoord2d(tx, ty + th);
+            glVertex2d(x - ox, y + height*sy - oy);*/
+
+            glBegin(GL_QUADS);
+            glColor3d(color.r,color.g,color.b);
+
+            glTexCoord2d(tx, ty);
             glVertex2d(x - ox, y + height*sy - oy);
+            glTexCoord2d(tx + tw, ty);
+            glVertex2d(x + width*sx - ox, y + height*sy - oy);
+            glTexCoord2d(tx + tw, ty + th);
+            glVertex2d(x + width*sx - ox, y - oy);
+            glTexCoord2d(tx, ty + th);
+            glVertex2d(x - ox, y - oy);
 
             glEnd();
 

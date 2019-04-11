@@ -1,7 +1,7 @@
 package Graphics;
 
 /**
- * Represents a 3D point/vector/dimension
+ * Represents a 3D point/vector/dimension.
  */
 public class Vector3f implements Comparable<Vector3f> {
     public float x;
@@ -9,7 +9,7 @@ public class Vector3f implements Comparable<Vector3f> {
     public float z;
 
     /**
-     * Generates a vector placed at (x,y,z)
+     * Generates a vector placed at (x,y,z).
      * @param x x coordinates
      * @param y y coordinates
      * @param z z coordinates
@@ -21,7 +21,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Generates a vector placed at (v.x,v.y,v.z)
+     * Generates a vector placed at (v.x,v.y,v.z).
      * @param v copied vector
      */
     public Vector3f(Vector3f v) {
@@ -31,8 +31,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Default constructor.
-     * Generate a vector placed at (0,0,0)
+     * Default constructor. Generate a vector placed at (0,0,0).
      */
     public Vector3f(){
         this.x = this.y = this.z = 0;
@@ -41,7 +40,7 @@ public class Vector3f implements Comparable<Vector3f> {
     // self-operation
 
     /**
-     * Translates the coordinates
+     * Translates the coordinates.
      * @param vec3 added coordinates
      * @return this
      */
@@ -53,7 +52,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Multiplies the coordinates by a factor
+     * Multiplies the coordinates by a factor.
      * @param f factor
      * @return this
      */
@@ -67,7 +66,7 @@ public class Vector3f implements Comparable<Vector3f> {
     /**
      * The vector will be normalized.
      * Means that the length will be equals to 1.
-     * @requires coordinates must be different to (0,0,0)
+     * Coordinates must be different to (0,0,0).
      * @return this
      */
     public Vector3f normalize() {
@@ -79,7 +78,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * The vector will be inverted
+     * The vector will be inverted.
      * @return this
      */
     public Vector3f negate(){
@@ -90,7 +89,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Builds an inverted vector using negative 'this' coordinates
+     * Builds an inverted vector using negative 'this' coordinates.
      * @return inverted vector
      */
     public Vector3f neg(){
@@ -98,7 +97,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Builds a vector with a norm 'f' times longer
+     * Builds a vector with a norm 'f' times longer.
      * @param f specified factor
      * @return a vector with a norm 'f' times longer
      */
@@ -107,7 +106,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Builds a new translated vector
+     * Builds a new translated vector.
      * @param v3 added coordinates
      * @return sum of two vectors
      */
@@ -120,9 +119,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Builds a normalized vector using 'this' coordinates
-     * Means that the length of the returned vector will be equals to 1.
-     * @requires coordinates must be different to (0,0,0)
+     * Builds a normalized vector using 'this' coordinates. Means that the length of the returned vector will be equals to 1. Coordinates must be different to (0,0,0).
      * @return normalized vector
      */
     public Vector3f unit() {
@@ -131,7 +128,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Computes the squared length of 'this'
+     * Computes the squared length of 'this'.
      * @return squared length of 'this'
      */
     public double slength() {
@@ -139,7 +136,7 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Computes the length of 'this'
+     * Computes the length of 'this'.
      * @return length of the vector
      */
     public double length(){
@@ -147,20 +144,20 @@ public class Vector3f implements Comparable<Vector3f> {
     }
 
     /**
-     * Computes the scalar of two vectors
+     * Computes the scalar of two vectors.
      * @param v1
      * @param v2
-     * @return
+     * @return scalar of v1 and v2 (v1 * v2)
      */
     public static float scalar(Vector3f v1, Vector3f v2){
         return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;
     }
 
     /**
-     * Computes the normal of two distinct vectors
-     * @param v1
-     * @param v2
-     * @return
+     * Computes the normal of two distinct vectors.
+     * @param v1 first vector
+     * @param v2 second vector
+     * @return product of v1 and v2 (v1 ^ v2)
      */
     public static Vector3f product(Vector3f v1, Vector3f v2) {
         Vector3f vt = new Vector3f((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y * v2.x));
@@ -168,20 +165,57 @@ public class Vector3f implements Comparable<Vector3f> {
         return vt;
     }
 
-
     /**
-     * Converts to native lwjgl vector
-     * @return
+     * Converts to native LWJGL vector
+     * @return vector conversion
      */
     public org.lwjgl.util.vector.Vector3f toLwjgl() {
         return new org.lwjgl.util.vector.Vector3f(x,y,z);
     }
 
+    /**
+     * Copy vector coordinates
+     * @return vector copy
+     */
+    @Override
+    public Vector3f clone() {
+        return new Vector3f(x,y,z);
+    }
 
+    /**
+     * Checks if two vectors are equal
+     * @param o compared object
+     * @return if both vectors are equal
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Vector3f) {
+            Vector3f v = (Vector3f)o;
+            return x == v.x && y == v.y && z == v.z;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Compare two 3D vectors
+     * @param o comparable
+     * @return 0 if both vectors are equal or -1 if 'this' is lower or 1 if 'this' is greater
+     */
     @Override
     public int compareTo(Vector3f o) {
-        if (o.x == this.x && o.y == this.y && o.z == this.z)
-            return 0;
-        else return 1;
+        if (o.x < this.x) return 1;
+        else if (o.x > this.x) return -1;
+        else {
+            if (o.y < this.y) return 1;
+            else if (o.y > this.y) return -1;
+            else {
+                if (o.z < this.z) return 1;
+                else if (o.z > this.z) return -1;
+                else {
+                    return 0;
+                }
+            }
+        }
     }
 }

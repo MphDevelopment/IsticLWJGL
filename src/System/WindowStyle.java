@@ -1,18 +1,56 @@
 package System;
 
+import jdk.nashorn.internal.ir.annotations.Immutable;
 
-public enum WindowStyle {
+/**
+ * WindowStyle provides interface to allow or not some GLFWWindow styles
+ */
+public class WindowStyle {
+    /// Default list of styles
+    /** VISIBLE : The displayed window will appear directly after creation */
+    public static final WindowStyle VISIBLE = new WindowStyle(1 << 0);
+    /** TOPMOST : The displayed window will always be displayed above second plan windows*/
+    public static final WindowStyle TOPMOST = new WindowStyle(1 << 1);
+    /** TITLEBAR : The displayed window will appear with a title bar, close button, reduce button, and maximize button */
+    public static final WindowStyle TITLEBAR = new WindowStyle(1 << 2);
+    /** RESIZABLE : The displayed window will be resizable, if not the maximize button from title bar will be removed */
+    public static final WindowStyle RESIZABLE = new WindowStyle(1 << 3);
+    /** MAXIMIZED : The displayed window will be maximized when created */
+    public static final WindowStyle MAXIMIZED = new WindowStyle(1 << 4);
 
-    VISIBLE (1 << 0),
-    TOPMOST (1 << 1),
-    TITLEBAR (1 << 2),
-    RESIZABLE (1 << 3),
-    FULLSCREEN (1 << 4 + VISIBLE.bits),
-    DEFAULT(VISIBLE.bits + RESIZABLE.bits + TITLEBAR.bits);
+    /** DEFAULT : VISIBLE + RESIZABLE + TITLEBAR */
+    public static final WindowStyle DEFAULT = new WindowStyle(VISIBLE.bits | RESIZABLE.bits | TITLEBAR.bits);
+    /** FULLSCREEN : the displayed window will be in fullscreen mode */
+    public static final WindowStyle FULLSCREEN = new WindowStyle(1 << 5 | VISIBLE.bits);
+    /** NONE : the displayed window will appear as pop-up window */
+    public static final WindowStyle NONE = new WindowStyle(VISIBLE.bits);
 
     public final int bits;
-    WindowStyle(int bitwise){
-        bits = bitwise;
+
+    /**
+     * Constructor is private to provide only existing styles that are functional
+     * @param styles chosen styles
+     */
+    @Immutable
+    private WindowStyle(int styles){
+        bits = styles;
     }
 
+    /**
+     * Adds styles to current
+     * @param styles added styles
+     * @return new style
+     */
+    public WindowStyle add(WindowStyle styles) {
+        return new WindowStyle(styles.bits | this.bits);
+    }
+
+    /**
+     * Removes styles to current
+     * @param styles removed styles
+     * @return new style
+     */
+    public WindowStyle remove(WindowStyle styles) {
+        return new WindowStyle(this.bits ^ (this.bits & styles.bits));
+    }
 }

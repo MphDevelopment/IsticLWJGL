@@ -2,6 +2,7 @@ package System;
 
 import Graphics.*;
 import OpenGL.GLM;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -16,16 +17,19 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.system.MemoryUtil.memByteBufferNT1;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
 public class GLFWWindow extends RenderTarget {
-    public static final ByteBuffer NO_ICON[] = new ByteBuffer[0];
-
     // window settings
     private int width;
     private int height;
     private boolean running = false;
+
+    private float[] view;
+    private float[] model;
+    private float[] projection;
 
 
     // window event values
@@ -58,35 +62,45 @@ public class GLFWWindow extends RenderTarget {
     private boolean focusEvent = false;
     private boolean focus;
 
-    private void initCallbacks() {
-        glfwSetKeyCallback(this.glId, (window, key, scancode, action, mods) -> {
+    /**
+     * Enable callbacks according to 'modes' parameter
+     * @param modes chosen modes
+     */
+    private void initCallbacks(CallbackMode modes) {
+        if (modes.enable(CallbackMode.KEY))
+            glfwSetKeyCallback(this.glId, (window, key, scancode, action, mods) -> {
             switch (action) {
                 case GLFW_PRESS: keyPressed = key; keyPressedEvent = true; break;
                 case GLFW_RELEASE: keyReleased = key; keyReleasedEvent = true; break;
                 default: break;
             }
         });
-        glfwSetCharCallback(this.glId, (window, unicode) -> {
+        if (modes.enable(CallbackMode.CHAR))
+            glfwSetCharCallback(this.glId, (window, unicode) -> {
             textEntered = unicode;
             textEvent = true;
         });
-        glfwSetCursorEnterCallback(this.glId, (window, state) -> {
+        if (modes.enable(CallbackMode.CURSORENTER))
+            glfwSetCursorEnterCallback(this.glId, (window, state) -> {
             mouseCollisionEvent = true;
             mouseCollision = state;
         });
-        glfwSetMouseButtonCallback(this.glId, (window, button, action, mods) -> {
+        if (modes.enable(CallbackMode.BUTTON))
+            glfwSetMouseButtonCallback(this.glId, (window, button, action, mods) -> {
             switch (action) {
                 case GLFW_PRESS: buttonPressed = button; buttonPressedEvent = true; break;
                 case GLFW_RELEASE: buttonReleased = button; buttonReleasedEvent = true; break;
                 default: break;
             }
         });
-        glfwSetScrollCallback(this.glId, (window, offsetx, offsety) -> {
+        if (modes.enable(CallbackMode.SCROLL))
+            glfwSetScrollCallback(this.glId, (window, offsetx, offsety) -> {
             scrollEvent = true;
             scrollX = (float)offsetx;
             scrollY = (float)offsety;
         });
-        glfwSetDropCallback(this.glId, (window,count, names) -> {
+        if (modes.enable(CallbackMode.MOUSEDROP))
+            glfwSetDropCallback(this.glId, (window,count, names) -> {
             dropEvent = true;
             drop = new String[count];
 
@@ -95,12 +109,14 @@ public class GLFWWindow extends RenderTarget {
                 drop[i] = org.lwjgl.system.MemoryUtil.memASCII(nameBuffer.get(i));
             }
         });
-        glfwSetJoystickCallback((joystick, event) -> {
+        if (modes.enable(CallbackMode.JOYSTICK))
+            glfwSetJoystickCallback((joystick, event) -> {
             joystickEvent = true;
             this.joystick = joystick;
             joystickTriggeredEvent = event;
         });
-        glfwSetWindowSizeCallback(this.glId, (window, w, h) -> {
+        if (modes.enable(CallbackMode.RESIZE))
+            glfwSetWindowSizeCallback(this.glId, (window, w, h) -> {
             resizeEvent = true;
             resizex = w;
             resizey = h;
@@ -111,86 +127,89 @@ public class GLFWWindow extends RenderTarget {
             glViewport(0,0, this.width, this.height);
             this.initGl();
         });
-        glfwSetWindowPosCallback(this.glId, (window, xpos, ypos) -> {
+        if (modes.enable(CallbackMode.MOVE))
+            glfwSetWindowPosCallback(this.glId, (window, xpos, ypos) -> {
             moveEvent = true;
             posx = xpos;
             posy = ypos;
         });
-        glfwSetWindowFocusCallback(this.glId, (window, focus)->{
+        if (modes.enable(CallbackMode.FOCUS))
+            glfwSetWindowFocusCallback(this.glId, (window, focus)->{
             focusEvent = true;
             this.focus = focus;
         });
     }
 
-    private void initHints(WindowStyle style) {
+    /**
+     * Enable styles according to 'styles' parameter
+     * @param styles chosen styles
+     */
+    private void initHints(WindowStyle styles) {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
-        glfwWindowHint(GLFW_VISIBLE, ((style.bits & WindowStyle.VISIBLE.bits) == WindowStyle.VISIBLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will stay hidden after creation
-        glfwWindowHint(GLFW_RESIZABLE, ((style.bits & WindowStyle.RESIZABLE.bits) == WindowStyle.RESIZABLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will be resizable
-        glfwWindowHint(GLFW_DECORATED, ((style.bits & WindowStyle.TITLEBAR.bits) == WindowStyle.TITLEBAR.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will have title bar
-        glfwWindowHint(GLFW_FLOATING, ((style.bits & WindowStyle.TOPMOST.bits) == WindowStyle.TOPMOST.bits) ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_VISIBLE, ((styles.bits & WindowStyle.VISIBLE.bits) == WindowStyle.VISIBLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will stay hidden after creation
+        glfwWindowHint(GLFW_RESIZABLE, ((styles.bits & WindowStyle.RESIZABLE.bits) == WindowStyle.RESIZABLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will be resizable
+        glfwWindowHint(GLFW_DECORATED, ((styles.bits & WindowStyle.TITLEBAR.bits) == WindowStyle.TITLEBAR.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will have title bar
+        glfwWindowHint(GLFW_FLOATING, ((styles.bits & WindowStyle.TOPMOST.bits) == WindowStyle.TOPMOST.bits) ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_MAXIMIZED, ((styles.bits & WindowStyle.MAXIMIZED.bits) == WindowStyle.MAXIMIZED.bits) ? GLFW_TRUE : GLFW_FALSE);
+
         //glfwWindowHint(GLFW_STEREO, GLFW_TRUE);
     }
 
-    private void initVideoMode() {
+    /**
+     * Default initialization of window parameters
+     */
+    //TODO on doit faire en sorte que les matrices se mettent a jour entre chaque different bind de RenderTarget
+    protected void initGl() {
+        glViewport(0, 0, width, height);
 
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        Matrix4f ortho = GLM.ortho(0.f, this.getDimension().x, this.getDimension().y, 0.f, -1f, 1.f);
+        glLoadMatrixf(GLM.toFloatArray(ortho));
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    protected GLFWWindow(int width, int height, String title) {
-        super();
-
-        this.width = width;
-        this.height = height;
-
-        //////////////////////// Set up window //////////////////////////////
-        // Configure our window
-        this.initHints(WindowStyle.DEFAULT);
-
-        // Create the window
-        this.glId = glfwCreateWindow(this.width, this.height, title, 0, 0);
-        if (this.glId == 0)
-            throw new RuntimeException("Failed to create the GLFW window");
-
-        // Make the OpenGL context current
-        glfwMakeContextCurrent(this.glId);
-
-        // create a current thread context
-        GL.createCapabilities();
-
-        ////////////////////// Set up event handle //////////////////////////
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        this.initCallbacks();
-
-        /////////////////////  Set up params ////////////////////
-        // Get the resolution of the primary monitor
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        // Center our window
-        glfwSetWindowPos(
-                this.glId,
-                (vidmode.width() - this.width) / 2,
-                (vidmode.height() - this.height) / 2
-        );
-
-
-        // Enable v-sync
-        //glfwSwapInterval(1);
-        glfwSwapInterval(1);
-
-        // Make the window visible
-        glfwShowWindow(this.glId);
-
-        this.running = true;
-
-        this.initGl();
-
-        Keyboard.setContext(this);
-        Mouse.setContext(this);
+    /**
+     * Create a window with a title bar, title.
+     * By default it enable all callbacks methods.
+     * @param videoMode window's dimension
+     * @param title  window's title
+     */
+    protected GLFWWindow(VideoMode videoMode, String title) {
+        this(videoMode, title, WindowStyle.DEFAULT);
     }
 
-    protected GLFWWindow(int width, int height, String title, WindowStyle style) {
+    /**
+     * Create a window with a specific style.
+     * By default it enable all callbacks methods.
+     * @param videoMode window's dimension
+     * @param title window's title
+     * @param style window's style
+     */
+    protected GLFWWindow(VideoMode videoMode, String title, WindowStyle style) {
+        this(videoMode, title, style, CallbackMode.DEFAULT);
+    }
+
+    /**
+     * Create a window with a specific style and specific callback modes.
+     * @param videoMode window's dimension
+     * @param title window's title
+     * @param style window's style
+     * @param modes window's callback modes
+     */
+    protected GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
         super();
 
-        this.width = width;
-        this.height = height;
+        // initialized glfw if glfw is not initialized
+        GLFWContext.createContext();
+
+        this.width = videoMode.width;
+        this.height = videoMode.height;
 
         //////////////////////// Set up window //////////////////////////////
         // Configure our window
@@ -209,23 +228,19 @@ public class GLFWWindow extends RenderTarget {
 
 
         ////////////////////// Set up event handle //////////////////////////
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        this.initCallbacks();
+        // Setup a key callback.
+        this.initCallbacks(modes);
 
         /////////////////////  Set up params ////////////////////
         // Get the resolution of the primary monitor
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         // Center our window
-        glfwSetWindowPos(
-                this.glId,
-                (vidmode.width() - this.width) / 2,
-                (vidmode.height() - this.height) / 2
-        );
+        glfwSetWindowPos(this.glId, (vidmode.width() - this.width) / 2, (vidmode.height() - this.height) / 2);
 
 
         // Enable v-sync
-        //glfwSwapInterval(1);
         glfwSwapInterval(1);
+        //glfwSwapInterval(1);
 
         // Make the window visible
         glfwShowWindow(this.glId);
@@ -239,29 +254,23 @@ public class GLFWWindow extends RenderTarget {
         Mouse.setContext(this);
     }
 
-    protected void initGl() {
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        Matrix4f ortho = GLM.ortho(0.f, this.getDimension().x, this.getDimension().y, 0.f, -1f, 1.f);
-        glLoadMatrixf(GLM.toFloatArray(ortho));
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
 
+    /**
+     * Close and destroy the window.
+     * @see GLFWWindow#isOpen return now false
+     */
     public void close() {
         if (!running) return;
 
-        running = false;
-
-        glfwFreeCallbacks(this.glId);
-        glfwDestroyWindow(this.glId);
-        glfwTerminate();
+        this.free();
     }
 
+    /**
+     * Checks if the window is running
+     * @return true if the window is running
+     */
     public boolean isOpen() {
         return running;
     }
@@ -352,8 +361,13 @@ public class GLFWWindow extends RenderTarget {
     public void clear(){
         if (!this.isOpen()) return ;
 
+        glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT);
-        glClearColor(0,0,0,0);
+    }
+
+    @Override
+    public void bind() {
+        this.initGl();
     }
 
     @Override
@@ -379,25 +393,33 @@ public class GLFWWindow extends RenderTarget {
 
     @Override
     public void free() {
+        running = false;
 
+        glfwFreeCallbacks(this.glId);
+        glfwDestroyWindow(this.glId);
+
+        // destroy glfw if glfw is initialized and there is no GLFWContext anymore
+        GLFWContext.deleteContext();
+
+        this.glId = 0;
     }
 
-    public void setPosition(Vector2f position){
-        glfwSetWindowPos(this.glId, (int)position.x, (int)position.y);
+    public void setPosition(Vector2i position){
+        glfwSetWindowPos(this.glId, position.x, position.y);
     }
 
-    public void setDimension(Vector2f dimension){
-        this.width = (int)dimension.x;
-        this.height = (int)dimension.y;
-        glfwSetWindowSize(this.glId, (int)dimension.x, (int)dimension.y);
+    public void setDimension(VideoMode dimension){
+        this.width = dimension.width;
+        this.height = dimension.height;
+        glfwSetWindowSize(this.glId, dimension.width, dimension.height);
     }
 
-    public Vector2f getPosition() {
-        return new Vector2f(0,0);
+    public Vector2i getPosition() {
+        return new Vector2i(0,0);
     }
 
-    public Vector2f getDimension() {
-        return new Vector2f(width, height);
+    public Vector2i getDimension() {
+        return new Vector2i(width, height);
     }
 
     public void hide() {
@@ -409,7 +431,7 @@ public class GLFWWindow extends RenderTarget {
     }
 
     public static void main(String[] args) {
-        GLFWWindow window = new GLFWWindow(2144, 1206, "OpenGL", WindowStyle.FULLSCREEN);
+        GLFWWindow window = new GLFWWindow(VideoMode.getDesktopMode(), "OpenGL", WindowStyle.FULLSCREEN);
 
         //RenderTexture renderTexture = null;
         Texture texture = null;
@@ -472,4 +494,19 @@ public class GLFWWindow extends RenderTarget {
         }
     }
 
+    public Image capture() {
+        final int bpp = 4;
+
+        this.bind();
+
+        glReadBuffer(GL_FRONT);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp);
+
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+        return new Image(buffer, width, height);
+    }
+
 }
+
+

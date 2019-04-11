@@ -2,8 +2,15 @@ package System;
 
 import Annotation.*;
 
+/**
+ * Interface used (by GLFWWindow) to describe a callback event and used to let the user known the description of the callback event outside callbacks.
+ * Each parameter of Event corresponds to callbacks parameters. Each event must used it own values corresponding to its event type.
+ * For example, when the event's type is 'TEXTENTERED', user must use the corresponding attribute 'textEntered'.
+ * @see GLFWWindow#pollEvents()
+ * @see GLFWWindow#waitEvent()
+ */
 public final class Event {
-    public Type type;
+    public final Type type;
 
     // window event values
     // TODO instead of using multiple variable we must use C Union-like type to decrease memory use

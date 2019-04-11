@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
  * Image represents a 2D graphic RGBA8 image that can be edit by the CPU.
  * Contrary to Texture it can not be sent to the GPU to be drawn.
  * Contrary to Texture data are saved into the RAM.
- * @apiNote RAM only
- * @see Graphics.Texture DRAM only
+ * RAM only.
+ * @see Graphics.Texture Texture (DRAM only)
  */
 public class Image {
     private static final int bpp = 4;
@@ -41,6 +41,13 @@ public class Image {
         for (int i=0 ; i < buffer.length ; ++i) {
             buffer[0] = 0;
         }
+    }
+
+    public Image(ByteBuffer buffer, int w, int h) {
+        width = w;
+        height = h;
+
+        this.buffer = buffer.asFloatBuffer().array();
     }
 
     public void loadFromFile(String file) throws IOException {

@@ -3,6 +3,9 @@ package System;
 
 import java.awt.*;
 
+/**
+ * Represents a 2D dimension that can be applied to a window. Must be positives values.
+ */
 public class VideoMode {
     public final int width;
     public final int height;
@@ -33,6 +36,12 @@ public class VideoMode {
         desktopMode = new VideoMode((int)width, (int)height);
     }
 
+    /**
+     * Create a dimension useful for windows
+     * @param w width
+     * @param h height
+     * @throws RuntimeException thrown when dimensions used are negatives
+     */
     public VideoMode(int w, int h) throws RuntimeException {
         if (w < 0 || h < 0) {
             throw new RuntimeException("Screen resolution must have positive values");

@@ -59,7 +59,7 @@ public class Keyboard {
      * @param window the keyboard will be associated to this window
      */
     public static void setContext(GLFWWindow window) {
-        System.out.println("Keyboard input context:"+InputContext.getInstance().getLocale());
+        //System.out.println("Keyboard input context:"+InputContext.getInstance().getLocale());
         context = window;
     }
 

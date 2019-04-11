@@ -3,7 +3,13 @@ package System;
 
 import java.util.function.Function;
 
+/**
+ * Clock interface computing elapsed time between two timestamps.
+ */
 public class Clock {
+    /**
+     * Clock accuracy.
+     */
     public enum Mode {
         NANOSECONDS_ACCURACY,
         MILLISECONDS_ACCURACY
