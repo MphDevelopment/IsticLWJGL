@@ -15,7 +15,7 @@ public final class Color {
         this.r = r;
         this.g = g;
         this.b = b;
-        this.a = 255;
+        this.a = 1;
     }
 
     /**
