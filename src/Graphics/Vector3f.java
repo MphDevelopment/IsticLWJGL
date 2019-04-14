@@ -37,8 +37,6 @@ public class Vector3f implements Comparable<Vector3f> {
         this.x = this.y = this.z = 0;
     }
 
-    // self-operation
-
     /**
      * Translates the coordinates.
      * @param vec3 added coordinates
@@ -65,7 +63,7 @@ public class Vector3f implements Comparable<Vector3f> {
 
     /**
      * The vector will be normalized.
-     * Means that the length will be equals to 1.
+     * Means that the length will be equal to 1.
      * Coordinates must be different to (0,0,0).
      * @return this
      */
@@ -90,6 +88,7 @@ public class Vector3f implements Comparable<Vector3f> {
 
     /**
      * Builds an inverted vector using negative 'this' coordinates.
+     * "this" remains unchanged.
      * @return inverted vector
      */
     public Vector3f neg(){
@@ -98,8 +97,9 @@ public class Vector3f implements Comparable<Vector3f> {
 
     /**
      * Builds a vector with a norm 'f' times longer.
+     * "this" remains unchanged.
      * @param f specified factor
-     * @return a vector with a norm 'f' times longer
+     * @return a vector with a norm 'f' times longer than 'this'
      */
     public Vector3f mul(float f) {
         return new Vector3f(this.x * f, this.y * f, this.z * f);
@@ -107,6 +107,7 @@ public class Vector3f implements Comparable<Vector3f> {
 
     /**
      * Builds a new translated vector.
+     * "this" remains unchanged.
      * @param v3 added coordinates
      * @return sum of two vectors
      */
@@ -120,6 +121,7 @@ public class Vector3f implements Comparable<Vector3f> {
 
     /**
      * Builds a normalized vector using 'this' coordinates. Means that the length of the returned vector will be equals to 1. Coordinates must be different to (0,0,0).
+     * "this" remains unchanged.
      * @return normalized vector
      */
     public Vector3f unit() {
