@@ -18,6 +18,9 @@ public abstract class RenderTarget extends GlObject {
         currentRenderer = this;
     }
 
+    //protected Camera camera;
+    //protected Viewport viewport;
+
     public RenderTarget(){
         super();
     }

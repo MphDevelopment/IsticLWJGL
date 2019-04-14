@@ -10,19 +10,19 @@ public class CallbackMode {
     /**
      * Default callback modes coming from GLFW lib
      */
-    public static final CallbackMode DEFAULT = new CallbackMode(~0);
-    public static final CallbackMode KEY = new CallbackMode(1 << 0);
-    public static final CallbackMode CHAR = new CallbackMode(1 << 1);
-    public static final CallbackMode CURSORENTER = new CallbackMode(1 << 2);
-    public static final CallbackMode BUTTON = new CallbackMode(1 << 3);
-    public static final CallbackMode SCROLL = new CallbackMode(1 << 4);
-    public static final CallbackMode MOUSEDROP = new CallbackMode(1 << 5);
-    public static final CallbackMode JOYSTICK = new CallbackMode(1 << 6);
-    public static final CallbackMode RESIZE = new CallbackMode(1 << 7);
-    public static final CallbackMode MOVE = new CallbackMode(1 << 8);
-    public static final CallbackMode FOCUS = new CallbackMode(1 << 9);
+    public static final CallbackMode DEFAULT = new CallbackMode(~0);                   // All callbacks functions enabled
+    public static final CallbackMode KEY = new CallbackMode(1 << 0);            // Key pressed and released callback enabled
+    public static final CallbackMode CHAR = new CallbackMode(1 << 1);           // Text entered callback enabled
+    public static final CallbackMode CURSORENTER = new CallbackMode(1 << 2);    // Mouse cursor entered callback enabled
+    public static final CallbackMode BUTTON = new CallbackMode(1 << 3);         // Button pressed and released callback enabled
+    public static final CallbackMode SCROLL = new CallbackMode(1 << 4);         // Mouse scroll callback enabled
+    public static final CallbackMode MOUSEDROP = new CallbackMode(1 << 5);      // Mouse drop callback enabled
+    public static final CallbackMode JOYSTICK = new CallbackMode(1 << 6);       // Joystick callback enabled
+    public static final CallbackMode RESIZE = new CallbackMode(1 << 7);         // Window resize callback enabled
+    public static final CallbackMode MOVE = new CallbackMode(1 << 8);           // Window moved callback enabled
+    public static final CallbackMode FOCUS = new CallbackMode(1 << 9);          // Window focus/unfocus callback enabled
 
-
+    /** enabled modes */
     public final long modes;
 
     /**

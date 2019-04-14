@@ -33,6 +33,14 @@ public class Camera2D extends Camera {
         return new Vector2f(screenDimension.x, screenDimension.y);
     }
 
+    public float getAngle() {
+        return angle;
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+
     @Override
     public Matrix4f getModelMatrix() {
         return (Matrix4f) new Matrix4f().setIdentity();
@@ -89,8 +97,6 @@ public class Camera2D extends Camera {
     @Override
     public void apply(RenderTarget target) {
         glDisable(GL_DEPTH_TEST);
-
-        //glViewport(0, 0, (int)screenDimension.x, (int)screenDimension.y);
 
         /// change fov
         glMatrixMode(GL_PROJECTION);

@@ -7,7 +7,7 @@ public abstract class Transformable {
     protected float x=0, y=0; // position coordinates
     protected float ox=0, oy=0; // origin coordinates
     protected float sx=1,sy=1; // scale factors
-    protected float radian; // rotation angle
+    protected float radian = 0; // rotation angle
 
     public void setPosition(float x, float y) {
         this.x = x;

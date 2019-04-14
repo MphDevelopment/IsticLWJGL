@@ -165,8 +165,6 @@ public class Camera3D extends Camera {
 
         glEnable(GL_DEPTH_TEST);
 
-        //glViewport(0, 0, (int)screenDimension.x, (int)screenDimension.y);
-
         /// change fov
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf(getProjectionBuffer());

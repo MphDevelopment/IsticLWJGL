@@ -128,6 +128,8 @@ public class RenderWindow3D extends GLFWWindow {
         final int uniformView = glGetUniformLocation((int)shader.getGlId(), "viewMatrix");
         final int uniformProjection = glGetUniformLocation((int)shader.getGlId(), "projectionMatrix");
 
+        Viewport viewport = new Viewport(new FloatRect(50,50, 400,400));
+
         Time elapsedSinceBeginning = Time.Zero;
         while (window.isOpen()) {
             Time elapsed = clk.restart();
@@ -154,9 +156,14 @@ public class RenderWindow3D extends GLFWWindow {
 
                 mode.apply(camera, elapsed);
 
-                camera.apply(window);
 
-                window.clear();
+                //viewport update
+                //viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/100, (float)elapsedSinceBeginning.asMilliseconds()/100));
+                camera.setAspectRatio(viewport.getDimension().x/viewport.getDimension().y);
+                camera.apply(window);
+                viewport.apply(window);
+
+                window.clear(new Color(0.1f,0.1f,0.1f));
 
                 sprite.draw();
 
@@ -200,8 +207,6 @@ public class RenderWindow3D extends GLFWWindow {
                 vbot.draw();
 
                 Shader.unbind();
-
-
 
                 window.display();
             }

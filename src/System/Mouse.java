@@ -37,11 +37,15 @@ public class Mouse {
         return (state == GLFW_PRESS);
     }
 
-    public Vector2f getPosition() {
+    public Vector2f getRelativePosition() {
         double xpos[] = new double[1];
         double ypos[] = new double[1];
         glfwGetCursorPos(window.getGlId(), xpos, ypos);
         return new Vector2f((float)xpos[0], (float)ypos[0]);
+    }
+
+    public Vector2f getAbsolutePosition() {
+        return getRelativePosition().add(new Vector2f(window.getPosition()));
     }
 
     public void setPosition(Vector2f position){

@@ -29,8 +29,8 @@ public class Clock {
     }
 
     private Mode mode = Mode.NANOSECONDS_ACCURACY;
-    private long t1 = 0;
-    private long t2 = 0;
+    private long t1 = 0; // first timestamp
+    private long t2 = 0; // second timestamp
 
     /**
      * Generates a clock that start to run with specific mode.

@@ -10,4 +10,7 @@ public abstract class Shape extends Transformable implements Drawable {
     public void setFillColor(Color color) {
         this.color = color;
     }
+
+    //public abstract Vector2f getRectangle() ;
+
 }

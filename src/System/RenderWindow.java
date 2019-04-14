@@ -6,7 +6,6 @@ import Graphics.Color;
 
 import java.io.IOException;
 
-import static java.lang.Math.PI;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderWindow extends GLFWWindow {
@@ -58,17 +57,26 @@ public class RenderWindow extends GLFWWindow {
         RenderTexture renderTexture2;
 
         Texture texture;
+        FontFamily font;
         try {
             renderTexture = new RenderTexture(200,200);
             renderTexture2 = new RenderTexture(200,200);
 
             texture = new Texture("dalle.png");
             texture.setWrapMode(Texture.REPEAT);
+
+            font = new FontFamily("default.ttf", 40);
+            //font = new FontFamily("asmelina.ttf", 24);
         } catch (IOException e) {
             window.close();
+            e.printStackTrace();
             return ;
         }
 
+        Text text = new Text(font, "PHRASE ITALIQUE!", Text.ITALIC);
+        Text text2 = new Text(font, "PHRASE NORMALE!", Text.REGULAR);
+        text.setFillColor(Color.Black);
+        text2.setFillColor(new Color(1, 0.59f, 0.2f));
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
         shape.setOrigin(5,5);
@@ -101,17 +109,25 @@ public class RenderWindow extends GLFWWindow {
 
         Clock clk = new Clock();
 
-        Viewport viewport = new Viewport(new FloatRect(50,50, 400,400), window);
+        Viewport viewport = new Viewport(new FloatRect(50,50, 400,400));
 
+
+        Time elapsedSinceBeginning = Time.seconds(0);
         while (window.isOpen()) {
             Time elapsed = clk.restart();
+            elapsedSinceBeginning.add(elapsed);
             //System.out.println(1.0/elapsed.asSeconds());
+            //System.out.println("abs:" + mouse.getAbsolutePosition().x + ":" + mouse.getAbsolutePosition().y);
+            //System.out.println("rel:" + mouse.getRelativePosition().x + ":" + mouse.getRelativePosition().y);
 
             Event event;
             while ((event = window.pollEvents()) != null) {
                 if (event.type == Event.Type.CLOSE) {
                     window.close();
                     System.exit(0);
+                }
+                if (event.type == Event.Type.KEYREPEAT) {
+                    System.out.println(event.keyRepeated);
                 }
                 if (event.type == Event.Type.MOUSELEAVE) {
                     System.out.print("l");
@@ -151,7 +167,9 @@ public class RenderWindow extends GLFWWindow {
             }
 
             //viewport update
-            viewport.update(window);
+            //viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/10, (float)elapsedSinceBeginning.asMilliseconds()/10));
+            viewport.setTopleftCorner(new Vector2f(15,15));
+            viewport.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
             camera.setDimension(viewport.getDimension());
 
 
@@ -175,15 +193,34 @@ public class RenderWindow extends GLFWWindow {
             shape.draw();
             renderTexture2.unbind();
 
+            //test viewport 1
             camera.setCenter(shape.getPosition());
             //window.initGl();
-            viewport.apply();
             camera.apply(window);
+            viewport.apply(window);
+
             window.clear(Color.Green);
             fullBackground.draw();
             screen.draw();
+            text.setPosition(shape.getPosition().x, shape.getPosition().y);
+            text2.setPosition(shape.getPosition().x, shape.getPosition().y + 100);
+            text.draw();
+            text2.draw();
             screen2.draw();
+            //font.drawText("HELLO WORLD!", Color.Black, shape.getPosition().x, shape.getPosition().y);
+
             shape.draw();
+
+            /*//test viewport 2
+            camera.setCenter(shape.getPosition());
+            //camera.rotate(0.1f);
+            //window.initGl();
+            camera.apply(window);
+            viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/10 + 400, (float)elapsedSinceBeginning.asMilliseconds()/10));
+            viewport.apply(window);
+            screen.draw();
+            screen2.draw();
+            shape.draw();*/
 
             window.display();
 

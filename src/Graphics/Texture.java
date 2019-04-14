@@ -48,7 +48,8 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 import System.GlObject;
 
 /**
- * Texture represents a 2D graphic RGBA8 image that can be displayed by GPU. DRAM only.
+ * Texture represents a 2D graphic RGBA image that can be displayed by GPU.
+ * Contrary to Image, data are saved into the DRAM.
  * @see Graphics.Image Image (RAM only)
  */
 public class Texture extends GlObject {
@@ -82,7 +83,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Load a texture using a PNG file path
+     * Loads a texture using a PNG file path
      * @param file PNG file path
      *             filter mode is by default GL_NEAREST
      *             wrap mode is by default GL_CLAMP_TO_EDGE
@@ -93,7 +94,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Load a texture using a PNG file path with a specific Filter
+     * Loads a texture using a PNG file path with a specific Filter
      * @param file PNG file path
      * @param filter OpenGL native filter mode
      *               wrap mode is by default GL_CLAMP_TO_EDGE.
@@ -104,7 +105,7 @@ public class Texture extends GlObject {
     }
 
     /**
-     * Load a texture using a PNG file path with a specific Filter and a specific Wrap Mode
+     * Loads a texture using a PNG file path with a specific Filter and a specific Wrap Mode
      * @param file PNG file path
      * @param filter OpenGL native filter mode
      * @param wrap OpenGL native wrap mode

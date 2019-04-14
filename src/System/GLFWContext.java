@@ -35,6 +35,9 @@ public final class GLFWContext {
         }
     }
 
+    /**
+     * We can't initialize GLFWContext
+     */
     private GLFWContext(){}
 
 }

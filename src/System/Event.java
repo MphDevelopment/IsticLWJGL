@@ -17,6 +17,7 @@ public final class Event {
     public int textEntered;
     public int keyPressed;
     public int keyReleased;
+    public int keyRepeated;
     public int buttonPressed;
     public int buttonReleased;
     public boolean mouseCollision;
@@ -57,6 +58,8 @@ public final class Event {
 
             case BUTTONPRESSED: buttonPressed = values[0]; break;
             case BUTTONRELEASED: buttonReleased = values[0]; break;
+
+            case KEYREPEAT: keyRepeated = values[0]; break;
             case KEYPRESSED: keyPressed = values[0]; break;
             case KEYRELEASED: keyReleased = values[0]; break;
 
@@ -92,11 +95,12 @@ public final class Event {
         UNFOCUS, // Window is not current window anymore
         MOVE, // Window has been moved
 
-        KEYPRESSED, // Keyboard key has been pressed when Window was current window
+        KEYREPEAT, // Keyboard key is pressed when Window was current window
+        KEYPRESSED, // Keyboard key has been pressed for the first time when Window was current window
         KEYRELEASED, // Keyboard key has been released when Window was current window
         TEXTENTERED, // Text has been entered when Window was current window
 
-        BUTTONPRESSED, // Mouse button has been pressed when Window was current window
+        BUTTONPRESSED, // Mouse button has been pressed for the first time when Window was current window
         BUTTONRELEASED, // Mouse button has been released when Window was current window
 
         MOUSEENTER, // Mouse cursor just enter Window area
