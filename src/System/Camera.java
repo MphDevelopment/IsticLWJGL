@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**
  * A camera decides how graphics will be draw by transforming their coordinates according to camera settings/properties.
+ * Camera is an interface designed to control RenderTarget Views.
  * @see Viewport
  */
 public abstract class Camera {
@@ -35,9 +36,8 @@ public abstract class Camera {
 
     /**
      * Sets up MVP matrices to a RenderTarget for Display list
-     * @param target
      */
-    public abstract void apply(RenderTarget target) ;
+    public abstract void apply() ;
 
     /**
      * Applies M/V/P Matrices to shader using M/V/P matrices names

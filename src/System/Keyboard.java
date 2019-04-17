@@ -7,24 +7,40 @@ import java.io.IOException;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Keyboard {
-    public static final String AZERTY = "AZERTY";
-    public static final String QWERTY = "QWERTY";
-    public static final String QWERTZ = "QWERTZ";
+    public static final int AZERTY = 0;
+    public static final int QWERTY = 1;
+    public static final int QWERTZ = 2;
 
     /**Default context values can be use if only one window is generated*/
-    private static GLFWWindow context = null;
-    private static String defaultLayout = AZERTY;
+    /*private static GLFWWindow context = null;
+    private static String defaultLayout = AZERTY;*/
 
     /**Context values*/
     private GLFWWindow window;
-    private String layout = AZERTY;
+    private int layout = QWERTY;
 
     /**
-     * Generates a keyboard associated to a window
+     * Generates a keyboard associated to a window.
+     * Default layout is QWERTY.
      * @param window the keyboard will be associated to this window
      */
     public Keyboard(GLFWWindow window) {
         this.window = window;
+    }
+
+    /**
+     * Generates a keyboard associated to a window using a specific layout.
+     * If failed to set layout, the default layout become QWERTY.
+     * @param window the keyboard will be associated to this window
+     */
+    public Keyboard(GLFWWindow window, int layout) {
+        this.window = window;
+        try {
+            this.setLayout(layout);
+        } catch (IOException e) {
+            this.layout = QWERTY;
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -33,7 +49,7 @@ public class Keyboard {
      * @return true if the keyboard key is pressed else false
      */
     public boolean isKeyPressed(int key) {
-        int state = glfwGetKey(window.getGlId(), key);
+        int state = glfwGetKey(window.getGlId(), toLocalLayout(layout, key));
         return (state == GLFW_PRESS);
     }
 
@@ -42,58 +58,11 @@ public class Keyboard {
      * @param layout chosen keyboard layout
      * @throws IOException thrown when the keyboard layout is not well known
      */
-    public void setLayout(String layout) throws IOException {
-        String[] layouts = getLocalLayouts();
+    public void setLayout(int layout) throws IOException {
+        int[] layouts = getLocalLayouts();
         for (int i=0 ; i < layouts.length ; ++i) {
-            if (layouts[i].equals(layout)) {
+            if (layouts[i] == layout) {
                 this.layout = layout;
-                return ;
-            }
-        }
-
-        throw new IOException("Unknown keyboard layout");
-    }
-
-    /**
-     * Sets up a new GLFW context for keyboard listening
-     * @param window the keyboard will be associated to this window
-     */
-    public static void setContext(GLFWWindow window) {
-        //System.out.println("Keyboard input context:"+InputContext.getInstance().getLocale());
-        context = window;
-    }
-
-    /**
-     * Checks if the keyboard key is pressed or not
-     * @param key tested keyboard key
-     * @return true if the keyboard key is pressed else false
-     */
-    public static boolean isKeyPressed_(int key) {
-        int state = glfwGetKey(context.getGlId(), toLocalLayout(defaultLayout, key));
-        return (state == GLFW_PRESS);
-    }
-
-    /**
-     * Checks if the keyboard key is pressed or not
-     * @param key tested keyboard key
-     * @param window the keyboard is associated to this window
-     * @return true if the keyboard key is pressed else false
-     */
-    public static boolean isKeyPressed(int key, GLFWWindow window) {
-        int state = glfwGetKey(window.getGlId(), toLocalLayout(defaultLayout, key));
-        return (state == GLFW_PRESS);
-    }
-
-    /**
-     * Applies a new keyboard layout to specific country keyboard
-     * @param layout chosen keyboard layout
-     * @throws IOException thrown when the keyboard layout is not well known
-     */
-    public static void setDefaultLayout(String layout) throws IOException {
-        String[] layouts = getLocalLayouts();
-        for (int i=0 ; i < layouts.length ; ++i) {
-            if (layouts[i].equals(layout)) {
-                defaultLayout = layout;
                 return ;
             }
         }
@@ -105,19 +74,16 @@ public class Keyboard {
      * List of layout containing some keyboard default layout as AZERTY or QWERTY
      * @return keyboard key layout depending on which country the user is
      */
-    private static String[] getLocalLayouts() {
-        return new String[]{AZERTY, QWERTY, QWERTZ};
+    private static int[] getLocalLayouts() {
+        return new int[]{AZERTY, QWERTY, QWERTZ};
     }
 
-    private static int toLocalLayout(String layout, int key) {
-        if (layout.equals("AZERTY")) {
-            return toAzertyLayout(key);
-        } else if (layout.equals("QWERTY")) {
-            return toQwertyLayout(key);
-        } else if (layout.equals("QWERTZ")) {
-            return toQwertzLayout(key);
-        } else {
-            return 0;
+    private static int toLocalLayout(int layout, int key) {
+        switch (layout) {
+            case AZERTY: return AzertyToQwerty(key);
+            case QWERTY: return toQwertyLayout(key);
+            case QWERTZ: return QwertzToQwerty(key);
+            default: return key;
         }
     }
 
@@ -125,7 +91,7 @@ public class Keyboard {
         return glfwKeyCode;
     }
 
-    private static int toQwertzLayout(int glfwKeyCode) {
+    private static int QwertzToQwerty(int glfwKeyCode) {
         switch( glfwKeyCode ) {
             case GLFW_KEY_Z             : return GLFW_KEY_Y;
             case GLFW_KEY_Y             : return GLFW_KEY_Z;
@@ -133,15 +99,67 @@ public class Keyboard {
         }
     }
 
-    private static int toAzertyLayout(int glfwKeyCode) {
-        switch( glfwKeyCode ) {
+    private static int AzertyToQwerty(int qwertyGlfwKeyCode) {
+        switch( qwertyGlfwKeyCode ) {
+            //local                       qwerty
             case GLFW_KEY_A             : return GLFW_KEY_Q;
             case GLFW_KEY_Q             : return GLFW_KEY_A;
             case GLFW_KEY_W             : return GLFW_KEY_Z;
             case GLFW_KEY_Z             : return GLFW_KEY_W;
-            // ....... and so one
-            default                     : return glfwKeyCode;
+
+            //case GLFW_KEY_M             : return GLFW_KEY_COMMA;
+            case GLFW_KEY_M             : return GLFW_KEY_SEMICOLON;
+            case GLFW_KEY_COMMA         : return GLFW_KEY_M;
+
+            default                     : return qwertyGlfwKeyCode;
         }
     }
 
 }
+
+/**
+ * Sets up a new GLFW context for keyboard listening
+ * @param window the keyboard will be associated to this window
+ */
+    /*public static void setContext(GLFWWindow window) {
+        //System.out.println("Keyboard input context:"+InputContext.getInstance().getLocale());
+        context = window;
+    }*/
+
+/**
+ * Checks if the keyboard key is pressed or not
+ * @param key tested keyboard key
+ * @return true if the keyboard key is pressed else false
+ */
+    /*public static boolean isKeyPressed_(int key) {
+        int state = glfwGetKey(context.getGlId(), toLocalLayout(defaultLayout, key));
+        return (state == GLFW_PRESS);
+    }*/
+
+/**
+ * Checks if the keyboard key is pressed or not
+ * @param key tested keyboard key
+ * @param window the keyboard is associated to this window
+ * @return true if the keyboard key is pressed else false
+ */
+    /*public static boolean isKeyPressed(int key, GLFWWindow window) {
+        int state = glfwGetKey(window.getGlId(), toLocalLayout(defaultLayout, key));
+        return (state == GLFW_PRESS);
+    }*/
+
+/**
+ * Applies a new keyboard layout to specific country keyboard
+ * @param layout chosen keyboard layout
+ * @throws IOException thrown when the keyboard layout is not well known
+ */
+    /*public static void setDefaultLayout(String layout) throws IOException {
+        String[] layouts = getLocalLayouts();
+        for (int i=0 ; i < layouts.length ; ++i) {
+            if (layouts[i].equals(layout)) {
+                defaultLayout = layout;
+                return ;
+            }
+        }
+
+        throw new IOException("Unknown keyboard layout");
+    }*/

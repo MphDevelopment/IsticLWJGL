@@ -4,9 +4,10 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex2d;
 
+/**
+ * "Display list" rectangle shape
+ */
 public class RectangleShape extends Shape {
-    private float width=0,height=0;
-
     public RectangleShape(){}
 
     public RectangleShape(float w, float h){
@@ -27,6 +28,11 @@ public class RectangleShape extends Shape {
     }
 
     @Override
+    protected void update(){
+
+    }
+
+    @Override
     public void draw() {
         glBegin(GL_QUADS);
         glColor3d(color.r,color.g,color.b);
@@ -35,5 +41,10 @@ public class RectangleShape extends Shape {
         glVertex2d(x + width - ox, y + height - oy);
         glVertex2d(x + width - ox, y - oy);
         glEnd();
+    }
+
+    @Override
+    public FloatRect getBounds() {
+        return new FloatRect(x - ox, y - oy, width * sx, height * sy);
     }
 }

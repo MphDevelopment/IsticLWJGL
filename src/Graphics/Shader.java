@@ -15,10 +15,8 @@ public class Shader extends GlObject {
     public static final int FRAGMENT = 1 << 0;
     public static final int VERTEX = 1 << 1;
 
-    private int type = 0;
-
     public Shader(String vert, String frag) throws IOException {
-        this.type = FRAGMENT | VERTEX;
+        //this.type = FRAGMENT | VERTEX;
 
         // create the shader program. If OK, create vertex and fragment shaders
         glId = glCreateProgram();

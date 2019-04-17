@@ -8,7 +8,11 @@ import org.lwjgl.util.vector.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
-//TODO orthogonal matrices must concider zoom and angle
+/**
+ * Camera2D is an interface designed to control RenderTarget Views.
+ * @see Camera2D
+ */
+//TODO orthogonal matrices must consider zoom and angle
 public class Camera2D extends Camera {
     private Vector2f screenDimension;
     private Vector2f center;
@@ -95,7 +99,7 @@ public class Camera2D extends Camera {
 
 
     @Override
-    public void apply(RenderTarget target) {
+    public void apply() {
         glDisable(GL_DEPTH_TEST);
 
         /// change fov

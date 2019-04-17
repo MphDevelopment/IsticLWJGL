@@ -17,6 +17,8 @@ public abstract class BufferObject extends GlObject implements Drawable {
         STREAM_DRAW(GL_STREAM_DRAW),
         STREAM_READ(GL_STREAM_READ),
         STREAM_COPY(GL_STREAM_COPY),
+
+
         STATIC_DRAW(GL_STATIC_DRAW),
         STATIC_READ(GL_STATIC_READ),
         STATIC_COPY(GL_STATIC_COPY),
@@ -31,6 +33,10 @@ public abstract class BufferObject extends GlObject implements Drawable {
 
         public final int asInteger() {
             return mode;
+        }
+
+        public final boolean isEditable() {
+            return this == DYNAMIC_DRAW || this == DYNAMIC_READ || this == DYNAMIC_COPY;
         }
     }
 

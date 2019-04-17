@@ -58,7 +58,7 @@ public class Image {
     }
 
     /**
-     * Creates an image with a byte buffer.
+     * Creates an image from a byte buffer.
      * @param buffer byte buffer with 4 component RGBA for each pixel and with [0 to 255] range value for each components. The byte buffer must contains w * h * 4 bytes.
      * @param w image width.
      * @param h image height.
@@ -67,7 +67,21 @@ public class Image {
         width = w;
         height = h;
 
-        this.buffer = buffer.array();
+        this.buffer = new byte[w*h*bpp];
+        buffer.get(this.buffer);
+    }
+
+    /**
+     * Creates an image from a byte array.
+     * @param buffer byte array with 4 component RGBA for each pixel and with [0 to 255] range value for each components. The byte buffer must contains w * h * 4 bytes.
+     * @param w image width.
+     * @param h image height.
+     */
+    public Image(byte[] buffer, int w, int h) {
+        width = w;
+        height = h;
+
+        this.buffer = buffer;
     }
 
     /**

@@ -1,7 +1,5 @@
 package System;
 
-import Annotation.*;
-
 /**
  * Interface used (by GLFWWindow) to describe a callback event and used to let the user known the description of the callback event outside callbacks.
  * Each parameter of Event corresponds to callbacks parameters. Each event must used it own values corresponding to its event type.
@@ -26,15 +24,15 @@ public final class Event {
     public String drop[];
     public int joystick;
     public int joystickEvent;
-    public int resizex;
-    public int resizey;
-    public int posx;
-    public int posy;
+    public int resizeX;
+    public int resizeY;
+    public int posX;
+    public int posY;
 
+    // TODO instead of using multiple constructors, GLFWWindow may use attributes assignment
 
+    // Constructors are only called by GLFWWindow and must not be called otherwise
 
-
-    @OnlyGLFWWindowCallable
     public Event(Type type) {
         this.type = type;
 
@@ -44,12 +42,10 @@ public final class Event {
         }
     }
 
-    @OnlyGLFWWindowCallable
     public Event(Type type, boolean[] values) {
         this(type);
     }
 
-    @OnlyGLFWWindowCallable
     public Event(Type type, int[] values){
         this(type);
 
@@ -63,14 +59,13 @@ public final class Event {
             case KEYPRESSED: keyPressed = values[0]; break;
             case KEYRELEASED: keyReleased = values[0]; break;
 
-            case RESIZE: resizex = values[0]; resizey = values[1]; break;
-            case MOVE: posx = values[0]; posy = values[1]; break;
+            case RESIZE: resizeX = values[0]; resizeY = values[1]; break;
+            case MOVE: posX = values[0]; posY = values[1]; break;
 
             case JOYSTICK: joystick = values[0]; joystickEvent = values[1]; break;
         }
     }
 
-    @OnlyGLFWWindowCallable
     public Event(Type type, float[] values){
         this(type);
 
@@ -79,7 +74,6 @@ public final class Event {
         }
     }
 
-    @OnlyGLFWWindowCallable
     public Event(Type type, String[] values) {
         this(type);
 
@@ -89,27 +83,27 @@ public final class Event {
     }
 
     public enum Type {
-        CLOSE, // Window close button has been released
-        RESIZE, // Window has been resized
-        FOCUS,  // Window has been selected as current window
-        UNFOCUS, // Window is not current window anymore
-        MOVE, // Window has been moved
+        CLOSE,          // Window close button has been released             | no attributes
+        RESIZE,         // Window has been resized                           | resizeX, resizeY
+        FOCUS,          // Window has been selected as current window        | no attributes
+        UNFOCUS,        // Window is not current window anymore              | no attributes
+        MOVE,           // Window has been moved                             | posX, posY
 
-        KEYREPEAT, // Keyboard key is pressed when Window was current window
-        KEYPRESSED, // Keyboard key has been pressed for the first time when Window was current window
-        KEYRELEASED, // Keyboard key has been released when Window was current window
-        TEXTENTERED, // Text has been entered when Window was current window
+        KEYREPEAT,      // Keyboard key is pressed when Window was current window                               | keyRepeated
+        KEYPRESSED,     // Keyboard key has been pressed for the first time when Window was current window      | keyPressed
+        KEYRELEASED,    // Keyboard key has been released when Window was current window                        | keyReleased
+        TEXTENTERED,    // Text has been entered when Window was current window                                 | textEntered
 
-        BUTTONPRESSED, // Mouse button has been pressed for the first time when Window was current window
-        BUTTONRELEASED, // Mouse button has been released when Window was current window
+        BUTTONPRESSED,  // Mouse button has been pressed for the first time when Window was current window      | buttonPressed
+        BUTTONRELEASED, // Mouse button has been released when Window was current window                        | buttonReleased
 
-        MOUSEENTER, // Mouse cursor just enter Window area
-        MOUSELEAVE, // Mouse cursor just leave Window area
+        MOUSEENTER,     // Mouse cursor just enter Window area                          | no attributes
+        MOUSELEAVE,     // Mouse cursor just leave Window area                          | no attributes
 
-        MOUSESCROLL, // Mouse has been scrolling when Window was current window
+        MOUSESCROLL,    // Mouse has been scrolling when Window was current window      | scrollX, scrollY
 
-        MOUSEDROP, // User dropped items into window deposit
+        MOUSEDROP,      // User dropped items into window deposit                       | drop
 
-        JOYSTICK // Joystick event
+        JOYSTICK        // Joystick event                                               | joystickEvent
     }
 }

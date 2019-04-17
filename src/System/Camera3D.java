@@ -15,7 +15,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**
+ * Camera3D is an interface designed to control RenderTarget Views.
  * Camera3D enables GL_DEPTH_TEST.
+ * @see Camera2D
  */
 public class Camera3D extends Camera {
 
@@ -28,7 +30,7 @@ public class Camera3D extends Camera {
     private float _aspectRatio = 3.f/4.f;
 
     /**
-     * Generates Camera with default settings
+     * Generates Camera with default settings :
      * center = (0,0,0)
      * eye = (0,0,1)
      * up = (0,1,0)
@@ -101,7 +103,7 @@ public class Camera3D extends Camera {
     }
     @Override
     public Matrix4f getViewMatrix() {
-        return GLM.lookAt(_center.toLwjgl(), _eye.sum(_center).toLwjgl(),  _up.toLwjgl());
+        return GLM.lookAt(_center/*.toLwjgl()*/, _eye.sum(_center)/*.toLwjgl()*/,  _up/*.toLwjgl()*/);
     }
     @Override
     public Matrix4f getProjectionMatrix() {
@@ -160,8 +162,8 @@ public class Camera3D extends Camera {
     }
 
     @Override
-    public void apply(RenderTarget target) {
-        target.bind();
+    public void apply() {
+        //target.bind();
 
         glEnable(GL_DEPTH_TEST);
 

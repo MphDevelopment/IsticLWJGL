@@ -43,7 +43,7 @@ public class VideoMode {
      * @throws RuntimeException thrown when dimensions used are negatives
      */
     public VideoMode(int w, int h) throws RuntimeException {
-        if (w < 0 || h < 0) {
+        if (w <= 0 || h <= 0) {
             throw new RuntimeException("Screen resolution must have positive values");
         }
 
@@ -51,6 +51,10 @@ public class VideoMode {
         height = h;
     }
 
+    /**
+     * Returns current display screen dimension in pixel.
+     * @return current display screen dimension in pixel.
+     */
     public static VideoMode getDesktopMode() {
         return desktopMode;
     }

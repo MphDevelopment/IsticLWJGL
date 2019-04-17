@@ -1,7 +1,5 @@
 package Graphics;
 
-import System.GlObject;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -24,14 +22,14 @@ public class FontFamily {
         put(0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         put(1, "abcdefghijklmnopqrstuvwxyz");
         put(2, "0123456789");
-        put(3, "ÄÖÜäöüßéèçà");
-        put(4, " $+-*/=%\"'#@&_(),.;:?!\\|<>[]§`^~");
+        put(3, "ÄÖÜäöüßéèçàù");
+        put(4, " $+-*/=%\"'#@&_(),.;:?!\\|<>[]§`^~µ%'{}¤£");
     }};
 
     //Variables
     private java.awt.Font font;
     private FontMetrics fontMetrics;
-    private BufferedImage bufferedImage;
+    //private BufferedImage bufferedImage;
     private int fontTextureId;
 
     //Getters
@@ -67,6 +65,8 @@ public class FontFamily {
             throw new IOException("Font must be True Type Font (*.ttf).");
         }
 
+        BufferedImage bufferedImage;
+
         //Generate buffered image
         GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
         Graphics2D graphics = gc.createCompatibleImage(1, 1, Transparency.TRANSLUCENT).createGraphics();
@@ -80,7 +80,7 @@ public class FontFamily {
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, fontTextureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,(int) getFontImageWidth(),(int) getFontImageHeight(),0, GL_RGBA, GL_UNSIGNED_BYTE, asByteBuffer());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,(int) getFontImageWidth(),(int) getFontImageHeight(),0, GL_RGBA, GL_UNSIGNED_BYTE, asByteBuffer(bufferedImage));
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -91,7 +91,7 @@ public class FontFamily {
     }
 
     //Conversions
-    private ByteBuffer asByteBuffer() {
+    private ByteBuffer asByteBuffer(BufferedImage bufferedImage) {
         ByteBuffer byteBuffer;
 
         //Draw the characters on our image

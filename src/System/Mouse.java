@@ -24,7 +24,7 @@ public class Mouse {
             this.id = buttonId;
         }
     }
-    private static GLFWWindow context = null;
+    //private static GLFWWindow context = null;
 
     private GLFWWindow window;
 
@@ -52,55 +52,12 @@ public class Mouse {
         glfwSetCursorPos(window.getGlId(), position.x, position.y);
     }
 
-    public static void setContext(GLFWWindow window) {
-        context = window;
-    }
-
-    public static boolean isButtonPressed_(int button) {
-        int state = glfwGetMouseButton(context.getGlId(), button);
-        return (state == GLFW_PRESS);
-    }
-
-    public static boolean isButtonPressed(int button, GLFWWindow window) {
-        int state = glfwGetMouseButton(window.getGlId(), button);
-        return (state == GLFW_PRESS);
-    }
-
-    public static Vector2f getMousePosition_() {
-        double xpos[] = new double[2];
-        double ypos[] = new double[2];
-        glfwGetCursorPos(context.getGlId(), xpos, ypos);
-        return new Vector2f((float)xpos[0], (float)ypos[0]);
-    }
-
-    public static Vector2f getMousePosition(GLFWWindow window) {
-        double xpos[] = new double[2];
-        double ypos[] = new double[2];
-        glfwGetCursorPos(window.getGlId(), xpos, ypos);
-        return new Vector2f((float)xpos[0], (float)ypos[0]);
-    }
 
     public void setMouseCursorVisible(boolean state){
         glfwSetInputMode(window.getGlId(), GLFW_CURSOR, state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
     }
 
-    public static void setMouseCursorVisible_(boolean state){
-        glfwSetInputMode(context.getGlId(), GLFW_CURSOR, state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
-    }
-
-    public static void setMouseCursorVisible(GLFWWindow window, boolean state){
-        glfwSetInputMode(window.getGlId(), GLFW_CURSOR, state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
-    }
-
     public void setMouseCursorDisabled(boolean state){
-        glfwSetInputMode(window.getGlId(), GLFW_CURSOR, !state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-    }
-
-    public static void setMouseCursorDisabled_(boolean state){
-        glfwSetInputMode(context.getGlId(), GLFW_CURSOR, !state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-    }
-
-    public static void setMouseCursorDisabled(GLFWWindow window, boolean state){
         glfwSetInputMode(window.getGlId(), GLFW_CURSOR, !state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
 

@@ -3,10 +3,10 @@ package Graphics;
 /**
  * Represents a 3D point/vector/dimension.
  */
-public class Vector3f implements Comparable<Vector3f> {
-    public float x;
+public class Vector3f extends org.lwjgl.util.vector.Vector3f implements Comparable<Vector3f> {
+    /*public float x;
     public float y;
-    public float z;
+    public float z;*/
 
     /**
      * Generates a vector placed at (x,y,z).
@@ -141,9 +141,9 @@ public class Vector3f implements Comparable<Vector3f> {
      * Computes the length of 'this'.
      * @return length of the vector
      */
-    public double length(){
+    /*public double length(){
         return Math.sqrt(x*x+y*y+z*z);
-    }
+    }*/
 
     /**
      * Computes the scalar of two vectors.

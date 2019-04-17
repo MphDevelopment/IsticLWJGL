@@ -4,9 +4,9 @@ package Graphics;
 /**
  * Represents a 2D point/vector/dimension.
  */
-public class Vector2f {
-    public float x;
-    public float y;
+public class Vector2f extends org.lwjgl.util.vector.Vector2f{
+    /*public float x;
+    public float y;*/
 
     public Vector2f(){
         this.x = this.y = 0;
@@ -78,9 +78,9 @@ public class Vector2f {
         return x*x+y*y;
     }
 
-    public double length(){
+    /*public double length(){
         return Math.sqrt(x*x+y*y);
-    }
+    }*/
 
     @Override
     public Vector2f clone() {

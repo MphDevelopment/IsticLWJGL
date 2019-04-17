@@ -26,8 +26,16 @@ public class Viewport {
      * @param target
      * @return the top-left corner of the viewport.
      */
-    public Vector2f getTopleftCorner(RenderTarget target){
+    /*public Vector2f getTopleftCorner(RenderTarget target){
         return new Vector2f((int)(rect.l), (int)(-rect.t + target.getDimension().y - rect.h));
+    }*/
+
+    /**
+     * Top-left corner of the viewport
+     * @return the top-left corner of the viewport.
+     */
+    public Vector2f getTopleftCorner() {
+        return new Vector2f(rect.l, rect.t);
     }
 
     /**
@@ -48,7 +56,12 @@ public class Viewport {
         rect.t = position.y;
     }
 
+    /**
+     * Apply a viewport linked to RenderTarget dimension
+     * @param target
+     */
     public void apply(RenderTarget target){
         glViewport((int)(rect.l), (int)(-rect.t + target.getDimension().y - rect.h), (int)(rect.w), (int)(rect.h));
     }
+
 }

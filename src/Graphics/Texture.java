@@ -54,7 +54,7 @@ import System.GlObject;
  */
 public class Texture extends GlObject {
     // Current bound texture
-    private static Texture currentTexture;
+    //private static Texture currentTexture;
 
     // Image dimension
     public final int width;
@@ -101,7 +101,7 @@ public class Texture extends GlObject {
      * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
      */
     public Texture(String file, int filter) throws IOException {
-        this(file, filter, GL_CLAMP_TO_EDGE);
+        this(file, filter, GL_CLAMP);
     }
 
     /**
@@ -157,7 +157,7 @@ public class Texture extends GlObject {
 
             Texture.unbind();
 
-            this.setWrapMode(CLAMP);
+            //this.setWrapMode(CLAMP);
         } finally {
             if (input != null) {
                 try { input.close(); } catch (IOException e) { }
@@ -257,20 +257,20 @@ public class Texture extends GlObject {
         Texture.unbind();
     }
 
-    public static void setCurrentTexture(Texture texture){
+    /*public static void setCurrentTexture(Texture texture){
         currentTexture = texture;
     }
 
     public static Texture CurrentTexture(){
         return currentTexture;
-    }
+    }*/
 
     /**
      * Frees the texture from GPU memory.
      */
     @Override
     public void free(){
-        glBindTexture((int)glId, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
         glDeleteTextures((int)glId);
         glId = 0;
     }
@@ -288,6 +288,41 @@ public class Texture extends GlObject {
         }
 
         return false;
+    }
+
+    public Image toImage() {
+        final int bpp = 4;
+
+        glBindTexture(GL_TEXTURE_2D, (int)glId);
+
+        byte[] array = new byte[width * height * 4];
+        ByteBuffer buffer = ByteBuffer.allocateDirect(array.length);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        buffer.get(array);
+
+        //invert y
+        for (int i=0;i < width ; ++i) {
+            for (int j=0; j < height/2 ; ++j) {
+                byte[] rgba = new byte[]{
+                        array[i * bpp + j * width * bpp    ],
+                        array[i * bpp + j * width * bpp + 1],
+                        array[i * bpp + j * width * bpp + 2],
+                        array[i * bpp + j * width * bpp + 3]
+                };
+
+                array[i * bpp + j * width * bpp    ] = array[i * bpp + (height - j - 1) * width * bpp    ];
+                array[i * bpp + j * width * bpp + 1] = array[i * bpp + (height - j - 1) * width * bpp + 1];
+                array[i * bpp + j * width * bpp + 2] = array[i * bpp + (height - j - 1) * width * bpp + 2];
+                array[i * bpp + j * width * bpp + 3] = array[i * bpp + (height - j - 1) * width * bpp + 3];
+
+                array[i * bpp + (height - j - 1) * width * bpp    ] = rgba[0];
+                array[i * bpp + (height - j - 1) * width * bpp + 1] = rgba[1];
+                array[i * bpp + (height - j - 1) * width * bpp + 2] = rgba[2];
+                array[i * bpp + (height - j - 1) * width * bpp + 3] = rgba[3];
+            }
+        }
+
+        return new Image(array, width, height);
     }
 
 }

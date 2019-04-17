@@ -4,9 +4,15 @@ package System;
  * Time interface with seconds, milliseconds, microseconds, nanoseconds accuracy
  */
 public final class Time implements Comparable<Time> {
-    public static final Time Zero = new Time(0);
-
     private long nanoseconds;
+
+    /**
+     * Create a time interface initialized with 0 elapsed nanoseconds
+     * @return time with 0 as initial value
+     */
+    public static Time zero() {
+        return new Time(0);
+    }
 
     /**
      * Create a time interface initialized with seconds

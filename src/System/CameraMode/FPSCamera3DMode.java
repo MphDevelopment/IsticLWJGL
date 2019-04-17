@@ -11,10 +11,14 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class FPSCamera3DMode implements Camera3DMode {
     private Vector3f _angles = new Vector3f(0,0,0);
+    private Keyboard keyboard;
 
-    public FPSCamera3DMode(){}
+    public FPSCamera3DMode(Keyboard keyboard){
+        this.keyboard = keyboard;
+    }
 
-    public FPSCamera3DMode(Vector3f angles) {
+    public FPSCamera3DMode(Keyboard keyboard, Vector3f angles) {
+        this.keyboard = keyboard;
         this._angles = new Vector3f(angles);
     }
 
@@ -28,22 +32,22 @@ public class FPSCamera3DMode implements Camera3DMode {
         // movement handling
         Vector3f pos = camera.getCenter();
         Vector3f motion = new Vector3f();
-        if (Keyboard.isKeyPressed_(GLFW_KEY_Z)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_Z)) {
             motion.add(camera.getOrientation().fact((float)( pxPerSeconds*seconds)));
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_S)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_S)) {
             motion.add(camera.getOrientation().fact((float)(-pxPerSeconds*seconds)));
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_Q)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_Q)) {
             motion.add(Vector3f.product(camera.getUpVector(), camera.getOrientation()).mul((float)(-pxPerSeconds*seconds)));
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_D)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_D)) {
             motion.add(Vector3f.product(camera.getUpVector(), camera.getOrientation()).mul((float)( pxPerSeconds*seconds)));
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_SPACE)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
             motion.add(camera.getUpVector().mul((float)(pxPerSeconds*seconds)));
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_LEFT_SHIFT)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
             motion.add(camera.getUpVector().neg().mul((float)(pxPerSeconds*seconds)));
         }
         if (motion.compareTo(new Vector3f(0,0,0)) != 0) {
@@ -53,16 +57,16 @@ public class FPSCamera3DMode implements Camera3DMode {
         }
 
         // angle handling
-        if (Keyboard.isKeyPressed_(GLFW_KEY_UP)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_UP)) {
             _angles.z += radPerSeconds*seconds;
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_DOWN)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_DOWN)) {
             _angles.z -= radPerSeconds*seconds;
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_LEFT)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_LEFT)) {
             _angles.y -= radPerSeconds*seconds;
         }
-        if (Keyboard.isKeyPressed_(GLFW_KEY_RIGHT)) {
+        if (keyboard.isKeyPressed(GLFW_KEY_RIGHT)) {
             _angles.y += radPerSeconds*seconds;
         }
         if (_angles.z < -3.14 / 2)
