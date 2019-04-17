@@ -11,6 +11,9 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * RenderTexture specifies a Texture which can be edited by the GPU by drawing stuffs on it.
+ */
 public class RenderTexture extends RenderTarget {
     private int fboId;
     private int depthId;
@@ -37,7 +40,6 @@ public class RenderTexture extends RenderTarget {
         //create texture to render to
         this.glId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, (int)this.glId);
-        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         // Poor filtering. Needed !
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -52,70 +54,92 @@ public class RenderTexture extends RenderTarget {
 
         texture = new Texture((int)this.glId, width, height);
 
+        this.initGl();
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     }
 
-    @Override
-    public void clear(Color color) {
-        //this.bind();
+    private void initGl(){
+        defaultCamera = new Camera2D(new Vector2f(texture.getWidth(), texture.getHeight()));
+        camera = defaultCamera;
+        defaultViewport = new Viewport(new FloatRect(0,0, texture.getWidth(), texture.getHeight()));
+        viewport = defaultViewport;
 
-        glClearColor(color.r, color.g, color.b, color.a);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        camera.apply();
+        viewport.apply(this);
 
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+        /// ELSE
 
-    @Override
-    public void clear() {
-        //this.bind();
-
-        glClearColor(0, 0,0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    }
-
-    @Override
-    public void draw(Drawable d) {
-        //this.bind();
-
-        d.draw();
-    }
-
-    public void display(){
-        //this.bind();
-
-        glFlush();
-
-        //this.unbind();
-    }
-
-    //TODO on doit faire en sorte que les matrices se mettent a jour entre chaque different bind de RenderTarget
-    public void bind(){
-        //render to fbo
-        //if (RenderTarget.getCurrentRenderer() != this) {
-            //super.setCurrent();
-        glBindFramebuffer(GL_FRAMEBUFFER, this.fboId);
-        glViewport(0, 0, texture.getWidth(), texture.getHeight());
-        //}
+        /*glViewport(0, 0, width, height);
 
         glMatrixMode(GL_PROJECTION);
-        Matrix4f ortho = GLM.ortho(0.f, texture.getWidth(), texture.getHeight(), 0.f, -1f, 1.f);
+        glLoadIdentity();
+        Matrix4f ortho = GLM.ortho(0.f, this.getDimension().x, this.getDimension().y, 0.f, -1f, 1.f);
         glLoadMatrixf(GLM.toFloatArray(ortho));
 
         glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glLoadIdentity();*/
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    public void unbind(){
+    @Override
+    public void clear(Color color) {
+        if (!this.isActive()) this.setActive();
+
+        glClearColor(color.r, color.g, color.b, color.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    @Override
+    public void clear() {
+        if (!this.isActive()) this.setActive();
+
+        glClearColor(0, 0,0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    @Override
+    public void draw(Drawable d) {
+        if (!this.isActive()) this.setActive();
+
+        d.draw();
+    }
+
+    public void display(){
+        if (!this.isActive()) this.setActive();
+
+        glFlush();
+    }
+
+    /**
+     * Select the frame buffer of the RenderTexture to allow draws on Texture.
+     * Make 'this' as the current RenderTarget.
+     */
+    //TODO on doit faire en sorte que les matrices se mettent a jour entre chaque different bind de RenderTarget
+    //TODO on doit faire en sorte que les matrices et le bind soit mis a jour pas en meme temps (nouvelle méthode updateDisplayMode)
+    protected void bind(){
+        //render to fbo
+        glBindFramebuffer(GL_FRAMEBUFFER, this.fboId);
+
+        camera.apply();
+        viewport.apply(this);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    /**
+     * Reset the frame buffer to default
+     */
+    /*public void unbind(){
         //if (RenderTarget.getCurrentRenderer() == this) {
             //glPopAttrib();
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            //glBindFramebuffer(GL_FRAMEBUFFER, 0);
        // }
-    }
+    }*/
 
     public Vector2i getDimension() {
         return new Vector2i(texture.getWidth(), texture.getHeight());
@@ -132,20 +156,51 @@ public class RenderTexture extends RenderTarget {
         texture = null;
     }
 
+    @Override
+    @Deprecated
     public Image capture() {
         final int bpp = 4;
 
-        this.bind();
+        if (!this.isActive()) this.setActive();
+
+        //return texture.getImage();
+        //this.bind();
+
+        /*int width = texture.getWidth();
+        int height = texture.getHeight();
+
 
         glReadBuffer(GL_FRONT);
-        ByteBuffer buffer = BufferUtils.createByteBuffer(texture.getWidth() * texture.getHeight() * bpp);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * bpp);
 
-        glReadPixels(0, 0, texture.getWidth(), texture.getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
-        Image i = new Image(buffer, texture.getWidth(), texture.getHeight());
+        byte[] array = new byte[width*height*bpp];
+        buffer.get(array);
 
-        this.unbind();
+        //invert y
+        for (int i=0;i < width ; ++i) {
+            for (int j=0; j < height/2 ; ++j) {
+                byte[] rgba = new byte[]{
+                        array[i * bpp + j * width * bpp + 0],
+                        array[i * bpp + j * width * bpp + 1],
+                        array[i * bpp + j * width * bpp + 2],
+                        array[i * bpp + j * width * bpp + 3]
+                };
 
-        return i;
+                array[i * bpp + j * width * bpp + 0] = array[i * bpp + (height - j - 1) * width * bpp + 0];
+                array[i * bpp + j * width * bpp + 1] = array[i * bpp + (height - j - 1) * width * bpp + 1];
+                array[i * bpp + j * width * bpp + 2] = array[i * bpp + (height - j - 1) * width * bpp + 2];
+                array[i * bpp + j * width * bpp + 3] = array[i * bpp + (height - j - 1) * width * bpp + 3];
+
+                array[i * bpp + (height - j - 1) * width * bpp + 0] = rgba[0];
+                array[i * bpp + (height - j - 1) * width * bpp + 1] = rgba[1];
+                array[i * bpp + (height - j - 1) * width * bpp + 2] = rgba[2];
+                array[i * bpp + (height - j - 1) * width * bpp + 3] = rgba[3];
+            }
+        }*/
+
+        //return new Image(array, width, height);
+        return null;
     }
 }

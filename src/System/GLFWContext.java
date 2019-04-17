@@ -10,7 +10,8 @@ public final class GLFWContext {
     private static int contextCount = 0;
 
     /**
-     * When first context is created we must initialize GLFW
+     * When first context is created we must initialize GLFW.
+     * Only one window is enable.
      */
     public static void createContext(){
         if (contextCount++ == 0) {
@@ -20,17 +21,20 @@ public final class GLFWContext {
 
             // Initialize GLFW. Most GLFW functions will not work before doing this.
             if (!glfwInit()) {
-                throw new IllegalStateException("Unable to initialize GLFW");
+                throw new IllegalStateException("Unable to initialize GLFW.");
             }
+        } else {
+            throw new RuntimeException("Current version of IsticLWJGL can't load multiple windows.");
         }
     }
 
     /**
-     * When first context is created we must terminate GLFW
+     * When last context is delete we must terminate GLFW
      */
     public static void deleteContext(){
         contextCount--;
         if (contextCount == 0) {
+            System.out.println("glfwTerminate() called");
             glfwTerminate();
         }
     }

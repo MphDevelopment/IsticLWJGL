@@ -1,12 +1,8 @@
 package System;
 
 import Graphics.*;
-import OpenGL.GLM;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.util.vector.Matrix4f;
 
 
 import java.io.IOException;
@@ -17,6 +13,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
 /**
@@ -65,6 +63,7 @@ public class GLFWWindow extends RenderTarget {
      * @param modes chosen modes
      */
     private void initCallbacks(CallbackMode modes) {
+        //Callbacks Inputs
         if (modes.enable(CallbackMode.KEY))
             glfwSetKeyCallback(this.glId, (window, key, scancode, action, mods) -> {
             switch (action) {
@@ -114,6 +113,13 @@ public class GLFWWindow extends RenderTarget {
             this.joystick = joystick;
             joystickTriggeredEvent = event;
         });
+        if (modes.enable(CallbackMode.FOCUS))
+            glfwSetWindowFocusCallback(this.glId, (window, focus)->{
+                focusEvent = true;
+                this.focus = focus;
+        });
+
+        // Callback window
         if (modes.enable(CallbackMode.RESIZE))
             glfwSetWindowSizeCallback(this.glId, (window, w, h) -> {
             resizeEvent = true;
@@ -122,9 +128,7 @@ public class GLFWWindow extends RenderTarget {
             this.width = resizex;
             this.height = resizey;
 
-            //glfwSetWindowSize(this.glId, this.width, this.height);
-            glViewport(0,0, this.width, this.height);
-            this.initGl();
+            this.updateDefaultView();
         });
         if (modes.enable(CallbackMode.MOVE))
             glfwSetWindowPosCallback(this.glId, (window, xpos, ypos) -> {
@@ -132,11 +136,8 @@ public class GLFWWindow extends RenderTarget {
             posx = xpos;
             posy = ypos;
         });
-        if (modes.enable(CallbackMode.FOCUS))
-            glfwSetWindowFocusCallback(this.glId, (window, focus)->{
-            focusEvent = true;
-            this.focus = focus;
-        });
+
+
     }
 
     /**
@@ -155,13 +156,23 @@ public class GLFWWindow extends RenderTarget {
     }
 
     /**
-     * Default initialization of window's MVP and Viewport and enabled gl states
+     * Default initialization of window's MVP and Viewport and enabled gl states.
+     * Init Camera (default Camera2D).
+     * Init Viewport (default Window dimension).
      */
-    //TODO on doit faire en sorte que les matrices se mettent a jour entre chaque different bind de RenderTarget
     protected void initGl() {
         //TODO RenderTargets must own their own view (Camera) and viewport (Viewport).
+        defaultCamera = new Camera2D(new Vector2f(width, height));
+        camera = defaultCamera;
+        defaultViewport = new Viewport(new FloatRect(0,0, width, height));
+        viewport = defaultViewport;
 
-        glViewport(0, 0, width, height);
+        camera.apply();
+        viewport.apply(this);
+
+        /// ELSE
+
+        /*glViewport(0, 0, width, height);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -169,14 +180,33 @@ public class GLFWWindow extends RenderTarget {
         glLoadMatrixf(GLM.toFloatArray(ortho));
 
         glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glLoadIdentity();*/
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    //TODO RenderTargets must own their own view enabled gl states called each time the RenderTarget is bound
-    private void initGlEnable() {
+    /**
+     * Updates current context Default Camera (default Camera2D) and Default Viewport.
+     * If defaultCamera is not camera, camera must be updated outside.
+     * If defaultViewport is not viewport, viewport must be updated outside.
+     */
+    protected void updateDefaultView(){
+        ((Camera2D)defaultCamera).setDimension(new Vector2f(width, height));
+        defaultViewport.setDimension(new Vector2f(width, height));
+    }
+
+    /**
+     * Make 'this' as the current RenderTarget.
+     */
+    @Override
+    protected final void bind(){
+        glfwMakeContextCurrent(glId);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        camera.apply();
+        viewport.apply(this);
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -188,7 +218,7 @@ public class GLFWWindow extends RenderTarget {
      * @param videoMode window's dimension
      * @param title  window's title
      */
-    protected GLFWWindow(VideoMode videoMode, String title) {
+    public GLFWWindow(VideoMode videoMode, String title) {
         this(videoMode, title, WindowStyle.DEFAULT);
     }
 
@@ -199,7 +229,7 @@ public class GLFWWindow extends RenderTarget {
      * @param title window's title
      * @param style window's style
      */
-    protected GLFWWindow(VideoMode videoMode, String title, WindowStyle style) {
+    public GLFWWindow(VideoMode videoMode, String title, WindowStyle style) {
         this(videoMode, title, style, CallbackMode.DEFAULT);
     }
 
@@ -210,7 +240,7 @@ public class GLFWWindow extends RenderTarget {
      * @param style window's style
      * @param modes window's callback modes
      */
-    protected GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
+    public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
         super();
 
         // initialized glfw if glfw is not initialized
@@ -260,8 +290,8 @@ public class GLFWWindow extends RenderTarget {
 
         this.initGl();
 
-        Keyboard.setContext(this);
-        Mouse.setContext(this);
+        //Keyboard.setContext(this);
+        //Mouse.setContext(this);
     }
 
 
@@ -269,7 +299,7 @@ public class GLFWWindow extends RenderTarget {
      * Close and destroy the window.
      * @see GLFWWindow#isOpen return now false
      */
-    public void close() {
+    public final void close() {
         if (!running) return;
 
         this.free();
@@ -278,11 +308,13 @@ public class GLFWWindow extends RenderTarget {
     /**
      * Checks if the window is running
      * @return true if the window is running
+     * @see GLFWWindow#close
      */
-    public boolean isOpen() {
+    public final boolean isOpen() {
         return running;
     }
 
+    ///EVENTS
     /**
      * Generates an event associated with its specific case values.
      * @return event caught by the window callbacks methods
@@ -352,8 +384,10 @@ public class GLFWWindow extends RenderTarget {
      * @see GLFWWindow#waitEvent()
      * @see GLFWWindow#waitEvent(Time)
      */
-    final public Event pollEvents() {
+    public final Event pollEvents() {
         if (!running) return null;
+
+        if (!this.isActive()) this.setActive();
 
         glfwPollEvents();
 
@@ -366,8 +400,10 @@ public class GLFWWindow extends RenderTarget {
      * @see GLFWWindow#waitEvent(Time)
      * @see GLFWWindow#pollEvents()
      */
-    final public Event waitEvent() {
+    public final Event waitEvent() {
         if (!running) return null;
+
+        if (!this.isActive()) this.setActive();
 
         glfwWaitEvents();
 
@@ -376,27 +412,32 @@ public class GLFWWindow extends RenderTarget {
 
     /**
      * Waits GLFW events until timeout then generate the event caught associated with its specific case values.
-     * @param timeout
+     * @param timeout time until the poll will stop
      * @return event caught by the window callbacks methods
      * @see GLFWWindow#waitEvent()
      * @see GLFWWindow#pollEvents()
      */
-    final public Event waitEvent(Time timeout) {
+    public final Event waitEvent(Time timeout) {
         if (!running) return null;
 
-        glfwWaitEventsTimeout(timeout.asMicroseconds());
+        if (!this.isActive()) this.setActive();
+
+        glfwWaitEventsTimeout(timeout.asSeconds());
 
         return pollEvents();
     }
 
+    ///DISPLAY
     /**
      * Clear all the window screen with black color.
      */
-    public void clear(){
+    public final void clear(){
         if (!this.isOpen()) return ;
 
+        if (!this.isActive()) this.setActive();
+
         glClearColor(0,0,0,1);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     /**
@@ -404,18 +445,22 @@ public class GLFWWindow extends RenderTarget {
      * @param color specified color
      */
     @Override
-    public void clear(Color color){
+    public final void clear(Color color){
         if (!this.isOpen()) return ;
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        if (!this.isActive()) this.setActive();
+
         glClearColor(color.r,color.g,color.b,color.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     /**
      * Render frame buffer to screen.
      */
-    public void display() {
+    public final void display() {
         if (!running) return ;
+
+        if (!this.isActive()) this.setActive();
 
         //glFlush();
         glfwSwapBuffers(this.glId);
@@ -423,24 +468,21 @@ public class GLFWWindow extends RenderTarget {
 
     /**
      * Draw the Drawable inside the frame buffer.
-     * @param drawable
+     * @param drawable something that can be drawn
      */
-    public void draw(Drawable drawable) {
+    public final void draw(Drawable drawable) {
         if (!running) return ;
+
+        if (!this.isActive()) this.setActive();
 
         drawable.draw();
     }
 
-    @Override
-    public void bind() {
-        this.initGl();
-
-        //glfwMakeContextCurrent(glId);
-        //glBindFrameBuffer(0);
-    }
 
     @Override
-    public void free() {
+    public final void free() {
+        if (!running) return;
+
         running = false;
 
         glfwFreeCallbacks(this.glId);
@@ -452,52 +494,100 @@ public class GLFWWindow extends RenderTarget {
         this.glId = 0;
     }
 
-    public void setPosition(Vector2i position){
+
+    /**
+     * Changes window's position into Desktop.
+     * @param position desktop topleft position
+     */
+    public final void setPosition(Vector2i position){
         glfwSetWindowPos(this.glId, position.x, position.y);
     }
 
-    public void setDimension(VideoMode dimension){
+    /**
+     * Changes window's dimension
+     * @param dimension specified dimension
+     */
+    public final void setDimension(VideoMode dimension){
         this.width = dimension.width;
         this.height = dimension.height;
         glfwSetWindowSize(this.glId, dimension.width, dimension.height);
+
+        this.updateDefaultView();
     }
 
-    public Vector2i getPosition() {
+    /**
+     * Position of the window into Desktop.
+     * @return window's position
+     */
+    public final Vector2i getPosition() {
         return new Vector2i(posx, posy);
     }
 
-    public Vector2i getDimension() {
+    /**
+     * Dimension of the window;
+     * @return window's dimension
+     */
+    public final Vector2i getDimension() {
         return new Vector2i(width, height);
     }
 
-    public void hide() {
+    public final void hide() {
         glfwHideWindow(this.getGlId());
     }
 
-    public void show() {
+    public final void show() {
         glfwShowWindow(this.getGlId());
     }
 
-    public Image capture() {
+    /**
+     * Screenshot the GLFWWindow and gives an image of it.
+     * @return screenshot image
+     */
+    @Override
+    public final Image capture() {
         final int bpp = 4;
 
-        this.bind();
+        if (!this.isActive()) this.setActive();
 
         glReadBuffer(GL_FRONT);
-        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * bpp);
 
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
-        return new Image(buffer, width, height);
+        byte[] array = new byte[width*height*bpp];
+        buffer.get(array);
+
+        //invert y
+        for (int i=0;i < width ; ++i) {
+            for (int j=0; j < height/2 ; ++j) {
+                byte[] rgba = new byte[]{
+                        array[i * bpp + j * width * bpp    ],
+                        array[i * bpp + j * width * bpp + 1],
+                        array[i * bpp + j * width * bpp + 2],
+                        array[i * bpp + j * width * bpp + 3]
+                };
+
+                array[i * bpp + j * width * bpp    ] = array[i * bpp + (height - j - 1) * width * bpp    ];
+                array[i * bpp + j * width * bpp + 1] = array[i * bpp + (height - j - 1) * width * bpp + 1];
+                array[i * bpp + j * width * bpp + 2] = array[i * bpp + (height - j - 1) * width * bpp + 2];
+                array[i * bpp + j * width * bpp + 3] = array[i * bpp + (height - j - 1) * width * bpp + 3];
+
+                array[i * bpp + (height - j - 1) * width * bpp    ] = rgba[0];
+                array[i * bpp + (height - j - 1) * width * bpp + 1] = rgba[1];
+                array[i * bpp + (height - j - 1) * width * bpp + 2] = rgba[2];
+                array[i * bpp + (height - j - 1) * width * bpp + 3] = rgba[3];
+            }
+        }
+
+        return new Image(array, width, height);
     }
 
-    public static void main(String[] args) {
-        GLFWWindow window = new GLFWWindow(VideoMode.getDesktopMode(), "OpenGL", WindowStyle.FULLSCREEN);
 
-        //RenderTexture renderTexture = null;
-        Texture texture = null;
+    public static void main(String[] args) {
+        GLFWWindow window = new GLFWWindow(/*VideoMode.getDesktopMode()*/new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT);
+
+        Texture texture;
         try {
-            //renderTexture = new RenderTexture(100,100);
             texture = new Texture("dalle.png");
         } catch (IOException e) {
             window.close();
@@ -517,37 +607,46 @@ public class GLFWWindow extends RenderTarget {
         sprite.setPosition(200,100);
 
 
-        Keyboard keyboard = new Keyboard(window);
+        Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
 
         while (window.isOpen()) {
-            if (Keyboard.isKeyPressed_(GLFW_KEY_LEFT)) {
+            if (keyboard.isKeyPressed(GLFW_KEY_LEFT)) {
                 sprite.move(-1f, 0);
             }
-            if (Keyboard.isKeyPressed_(GLFW_KEY_RIGHT)) {
+            if (keyboard.isKeyPressed(GLFW_KEY_RIGHT)) {
                 sprite.move(1f, 0);
             }
-            if (Keyboard.isKeyPressed_(GLFW_KEY_UP)) {
+            if (keyboard.isKeyPressed(GLFW_KEY_UP)) {
                 sprite.move(0, -1f);
             }
-            if (Keyboard.isKeyPressed_(GLFW_KEY_DOWN)) {
+            if (keyboard.isKeyPressed(GLFW_KEY_DOWN)) {
                 sprite.move(0, 1f);
             }
 
 
             window.clear(Color.Magenta);
-
-            //texture.bind();
             shape2.draw();
-
             sprite.draw();
             shape.draw();
             window.display();
+
+
+
+
 
             Event event;
             while ((event = window.pollEvents()) != null) {
                 if (event.type == Event.Type.CLOSE) {
                     window.close();
                     System.exit(0);
+                }
+                if (event.type == Event.Type.KEYRELEASED && event.keyReleased == GLFW_KEY_P) {
+                    System.out.println("Screenshot! 'capture.png'");
+                    try {
+                        window.capture().saveAs("capture");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

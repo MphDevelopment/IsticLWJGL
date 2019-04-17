@@ -5,7 +5,7 @@ import System.*;
 
 public final class Example2D {
    public static void main(String[] args) {
-      GLFWWindow window = new RenderWindow(new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT);
+      GLFWWindow window = new GLFWWindow(new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT);
       RectangleShape shape = new RectangleShape(10,10, 10,10);
       shape.setFillColor(Color.Red);
 

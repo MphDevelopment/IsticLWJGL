@@ -14,59 +14,56 @@ import System.Camera3D;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**http://schabby.de/opengl-shader-example/*/
 
-public class RenderWindow3D extends GLFWWindow {
+public final class RenderWindow3D extends GLFWWindow {
 
     public RenderWindow3D(){
         super(new VideoMode((int)(VideoMode.getDesktopMode().width/3.f), (int)(VideoMode.getDesktopMode().height/3.f)), "3D Example Test");
-        initGl();
     }
 
-    //@Override
+    /**
+     * Init Camera as Camera3D.
+     * Init Viewport using default Window Dimension.
+     */
+    @Override
     protected void initGl() {
-        glViewport(0, 0, super.getDimension().x, super.getDimension().y);
+        //TODO RenderTargets must own their own view (Camera) and viewport (Viewport).
+        defaultCamera = new Camera3D();
+        camera = defaultCamera;
+        defaultViewport = new Viewport(new FloatRect(0,0, super.getDimension().x, super.getDimension().y));
+        viewport = defaultViewport;
 
-        glClearDepth(1.f);
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(true);
-        glDepthRange(0.f, 1.f);
-
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        //Matrix4f perspect = GLM.perspective(70, this.getDimension().x / this.getDimension().y, 1, 3000);
-        //glLoadMatrixf(GLM.toFloatArray(perspect));
-
-        glMatrixMode( GL_MODELVIEW );
-        glLoadIdentity();
+        camera.apply();
+        viewport.apply(this);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    /**
+     * Update Default Camera (Camera3D) and Default Viewport.
+     */
     @Override
-    public void clear() {
-        if (!this.isOpen()) return ;
-        glClearColor(0,0,0,1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    protected final void updateDefaultView(){
+        ((Camera3D)defaultCamera).setAspectRatio(super.getDimension().x/super.getDimension().y);
+        defaultViewport.setDimension(new Vector2f(super.getDimension()));
     }
 
-    @Override
-    public void clear(Color color) {
-        if (!this.isOpen()) return ;
-        glClearColor(color.r, color.g, color.b, color.a);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+
+
+
+
+
 
     public static void main(String[] args) {
         RenderWindow3D window = new RenderWindow3D();
 
 
-        Mouse.setMouseCursorDisabled(window, false);
-        Keyboard.setContext(window);
 
 
         Shader shader = null;
@@ -117,20 +114,21 @@ public class RenderWindow3D extends GLFWWindow {
         Camera3D camera = new Camera3D(80.f, 1,1000, window);
         camera.setUpVector(new Vector3f(0,1,0));
 
-        camera.apply(window);
+        camera.apply();
         Clock clk = new Clock(Clock.Mode.NANOSECONDS_ACCURACY);
 
 
         //Camera3DMode mode2 = new SphereCamera3DMode(20.f);
-        Camera3DMode mode = new FPSCamera3DMode();
+        Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
+        Camera3DMode mode = new FPSCamera3DMode(keyboard);
 
         final int uniformMatrix = glGetUniformLocation((int)shader.getGlId(), "modelMatrix");
         final int uniformView = glGetUniformLocation((int)shader.getGlId(), "viewMatrix");
         final int uniformProjection = glGetUniformLocation((int)shader.getGlId(), "projectionMatrix");
 
-        Viewport viewport = new Viewport(new FloatRect(50,50, 400,400));
+        Viewport viewport = new Viewport(new FloatRect(50,50, 800,800));
 
-        Time elapsedSinceBeginning = Time.Zero;
+        Time elapsedSinceBeginning = Time.zero();
         while (window.isOpen()) {
             Time elapsed = clk.restart();
             elapsedSinceBeginning.add(elapsed);
@@ -144,46 +142,53 @@ public class RenderWindow3D extends GLFWWindow {
                     window.close();
                     System.exit(0);
                 } else if (event.type == Event.Type.RESIZE) {
-                    camera.setAspectRatio((float)event.resizex/(float)event.resizey);
+                    camera.setAspectRatio((float)event.resizeX /(float)event.resizeY);
+                } else if (event.type == Event.Type.KEYRELEASED && event.keyReleased == GLFW_KEY_P) {
+                    System.out.println("Screenshot! 'capture.png'");
+                    try {
+                        window.capture().saveAs("capture");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if (event.type == Event.Type.KEYPRESSED) {
+                    //System.out.println(event.keyPressed);
+                } else if (event.type == Event.Type.TEXTENTERED) {
+                    System.out.println((char)event.textEntered);
                 }
             }
 
             if (window.isOpen()) {
-                /*if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-                    window.close();
-                    break ;
+                /*for (int key=32; key <= GLFW_KEY_LAST ; ++key) {
+                    if (keyboard.isKeyPressed(key)) {
+                        System.out.println(glfwGetKeyName(key, 0));
+                        break;
+                    }
                 }*/
 
                 mode.apply(camera, elapsed);
 
-
                 //viewport update
                 //viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/100, (float)elapsedSinceBeginning.asMilliseconds()/100));
                 camera.setAspectRatio(viewport.getDimension().x/viewport.getDimension().y);
-                camera.apply(window);
+                camera.apply();
                 viewport.apply(window);
 
                 window.clear(new Color(0.1f,0.1f,0.1f));
 
                 sprite.draw();
-
                 glBegin(GL_TRIANGLES);
-
                 glColor3d(1, 0, 0);
                 glVertex3d(0+(float)elapsedSinceBeginning.asMilliseconds()/10, 0, 0);
                 glVertex3f(0+(float)elapsedSinceBeginning.asMilliseconds()/10, 50, 0);
                 glVertex3f(50+(float)elapsedSinceBeginning.asMilliseconds()/10, 50, 0);
-
                 glColor3d(0,1,0);
                 glVertex3d(50, 50, 50);
                 glVertex3f(0, -50, 50);
                 glVertex3f(50, 50, 0);
                 glEnd();
 
-
                 shader.bind();
                 camera.glUniformMVP(uniformMatrix, uniformView, uniformProjection);
-
                 cube.draw();
                 cube2.draw();
                 for (int i=0 ; i < cubes.size() ; ++i) {
@@ -195,17 +200,13 @@ public class RenderWindow3D extends GLFWWindow {
                 camera.glUniformMVP(uniformMatrix, uniformView, uniformProjection);
                 bump.draw();*/
 
-
-
                 tshader.bind();
                 camera.glUniformMVP(uniformMatrix, uniformView, uniformProjection);
-
                 cube3.draw();
                 cube4.draw();
                 cube5.draw();
                 cube6.draw();
                 vbot.draw();
-
                 Shader.unbind();
 
                 window.display();
