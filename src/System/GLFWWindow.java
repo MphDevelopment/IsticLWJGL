@@ -170,18 +170,6 @@ public class GLFWWindow extends RenderTarget {
         camera.apply();
         viewport.apply(this);
 
-        /// ELSE
-
-        /*glViewport(0, 0, width, height);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        Matrix4f ortho = GLM.ortho(0.f, this.getDimension().x, this.getDimension().y, 0.f, -1f, 1.f);
-        glLoadMatrixf(GLM.toFloatArray(ortho));
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();*/
-
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -287,11 +275,7 @@ public class GLFWWindow extends RenderTarget {
 
         this.running = true;
 
-
         this.initGl();
-
-        //Keyboard.setContext(this);
-        //Mouse.setContext(this);
     }
 
 
@@ -435,6 +419,7 @@ public class GLFWWindow extends RenderTarget {
         if (!this.isOpen()) return ;
 
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -449,6 +434,7 @@ public class GLFWWindow extends RenderTarget {
         if (!this.isOpen()) return ;
 
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         glClearColor(color.r,color.g,color.b,color.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -461,6 +447,7 @@ public class GLFWWindow extends RenderTarget {
         if (!running) return ;
 
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         //glFlush();
         glfwSwapBuffers(this.glId);
@@ -474,6 +461,7 @@ public class GLFWWindow extends RenderTarget {
         if (!running) return ;
 
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         drawable.draw();
     }
@@ -548,6 +536,7 @@ public class GLFWWindow extends RenderTarget {
         final int bpp = 4;
 
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         glReadBuffer(GL_FRONT);
         ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * bpp);
@@ -584,54 +573,40 @@ public class GLFWWindow extends RenderTarget {
 
 
     public static void main(String[] args) {
-        GLFWWindow window = new GLFWWindow(/*VideoMode.getDesktopMode()*/new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT);
-
-        Texture texture;
-        try {
-            texture = new Texture("dalle.png");
-        } catch (IOException e) {
-            window.close();
-            return ;
-        }
-
-        texture.setWrapMode(Texture.REPEAT);
+        GLFWWindow window = new GLFWWindow(/*VideoMode.getDesktopMode()*/new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT, CallbackMode.DEFAULT/*.remove(WindowStyle.RESIZABLE)*/);
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
         shape.setFillColor(Color.Red);
         RectangleShape shape2 = new RectangleShape(10,100, 50,50);
         shape2.setFillColor(Color.Yellow);
 
-        Sprite sprite = new Sprite();
-        sprite.setTexture(texture, true);
-        sprite.setTextureRect(0,0,window.getDimension().x,window.getDimension().y);
-        sprite.setPosition(200,100);
-
-
         Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
+
+        //Camera is not default window camera so it need to be updated when window is resized
+        Camera2D tracker = new Camera2D(window);
+        window.setCamera(tracker);
+
 
         while (window.isOpen()) {
             if (keyboard.isKeyPressed(GLFW_KEY_LEFT)) {
-                sprite.move(-1f, 0);
+                shape.move(-1f, 0);
             }
             if (keyboard.isKeyPressed(GLFW_KEY_RIGHT)) {
-                sprite.move(1f, 0);
+                shape.move(1f, 0);
             }
             if (keyboard.isKeyPressed(GLFW_KEY_UP)) {
-                sprite.move(0, -1f);
+                shape.move(0, -1f);
             }
             if (keyboard.isKeyPressed(GLFW_KEY_DOWN)) {
-                sprite.move(0, 1f);
+                shape.move(0, 1f);
             }
 
+            tracker.setCenter(shape.getPosition());
 
-            window.clear(Color.Magenta);
-            shape2.draw();
-            sprite.draw();
-            shape.draw();
+            window.clear();
+            window.draw(shape2);
+            window.draw(shape);
             window.display();
-
-
-
 
 
             Event event;
@@ -647,6 +622,10 @@ public class GLFWWindow extends RenderTarget {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }
+                //Camera is not default window camera so it needs to be updated when window is resized
+                if (event.type == Event.Type.RESIZE) {
+                    tracker.setDimension(new Vector2f(event.resizeX, event.resizeY));
                 }
             }
         }

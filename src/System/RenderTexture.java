@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL30.*;
 /**
  * RenderTexture specifies a Texture which can be edited by the GPU by drawing stuffs on it.
  */
-public class RenderTexture extends RenderTarget {
+public final class RenderTexture extends RenderTarget {
     private int fboId;
     private int depthId;
 
@@ -88,6 +88,7 @@ public class RenderTexture extends RenderTarget {
     @Override
     public void clear(Color color) {
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         glClearColor(color.r, color.g, color.b, color.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -96,6 +97,7 @@ public class RenderTexture extends RenderTarget {
     @Override
     public void clear() {
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         glClearColor(0, 0,0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -104,12 +106,14 @@ public class RenderTexture extends RenderTarget {
     @Override
     public void draw(Drawable d) {
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         d.draw();
     }
 
     public void display(){
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
         glFlush();
     }
@@ -162,8 +166,9 @@ public class RenderTexture extends RenderTarget {
         final int bpp = 4;
 
         if (!this.isActive()) this.setActive();
+        else if (this.needViewUpdate()) this.applyView();
 
-        //return texture.getImage();
+        return texture.toImage();
         //this.bind();
 
         /*int width = texture.getWidth();
@@ -201,6 +206,5 @@ public class RenderTexture extends RenderTarget {
         }*/
 
         //return new Image(array, width, height);
-        return null;
     }
 }

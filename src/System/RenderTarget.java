@@ -43,17 +43,21 @@ public abstract class RenderTarget extends GlObject {
     /**
      * Updates current RenderTarget View using Camera and Viewport
      */
-    private final void applyView() {
+    protected final void applyView() {
         camera.apply();
         viewport.apply(this);
     }
 
     /**
      * Checks if currentTarget is 'this'.
-     * @return true if currentTarget is 'this'
+     * @return true i
      */
     protected final boolean isActive(){
         return currentTarget == this;
+    }
+
+    protected final boolean needViewUpdate() {
+        return viewport.hasSinceBeenUpdated() || camera.hasSinceBeenUpdated();
     }
 
 
@@ -67,6 +71,11 @@ public abstract class RenderTarget extends GlObject {
     //TODO changer les paramètres de la camera utilisée pendant un affichage ne va pas remettre a jour la vue du RenderTarget
     public final void setCamera(@NotNull Camera cam){
         this.camera = cam;
+        if (isActive()) {
+            // changer de camera pendant un affichage ne va pas remettre a jour la vue du RenderTarget
+            // changer les paramètres de la camera utilisée pendant un affichage va remettre a jour la camera du RenderTarget
+            this.camera.apply();
+        }
     }
 
     /**
@@ -74,12 +83,22 @@ public abstract class RenderTarget extends GlObject {
      * Setting a viewport obliges the User to update viewport settings when the GLFWWindow is resizing.
      * @param viewport specified viewport
      */
-    //TODO changer de viewport pendant un affichage ne va pas remettre a jour la vue du RenderTarget
-    //TODO changer les paramètres du viewport utilisé pendant un affichage ne va pas remettre a jour la vue du RenderTarget
     public final void setViewport(@NotNull Viewport viewport){
         this.viewport = viewport;
+        if (isActive()) {
+            // changer de viewport pendant un affichage va remettre a jour la vue du RenderTarget
+            // changer les paramètres du viewport utilisée pendant un affichage va remettre a jour le viewport du RenderTarget
+            this.viewport.apply(this);
+        }
     }
 
+    public Viewport getViewport() {
+        return viewport;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
 
     /**
      * Clear the RenderTarget with a fill color.

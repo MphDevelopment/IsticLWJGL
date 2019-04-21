@@ -18,6 +18,8 @@ public class Camera2D extends Camera {
     private Vector2f center;
     private float zoom = 1;
     private float angle = 0;
+    private float znear = -1.f;
+    private float zfar = 1.f;
 
     public Camera2D(Vector2f dimension){
         screenDimension = dimension;
@@ -31,10 +33,15 @@ public class Camera2D extends Camera {
     public void setDimension(Vector2f dimension) {
         this.screenDimension.x = dimension.x;
         this.screenDimension.y = dimension.y;
+        updatable = true;
     }
 
     public Vector2f getDimension() {
         return new Vector2f(screenDimension.x, screenDimension.y);
+    }
+
+    public Vector2f getCenter() {
+        return center;
     }
 
     public float getAngle() {
@@ -43,6 +50,14 @@ public class Camera2D extends Camera {
 
     public float getZoom() {
         return zoom;
+    }
+
+    public float getZnear() {
+        return znear;
+    }
+
+    public float getZfar() {
+        return zfar;
     }
 
     @Override
@@ -61,24 +76,28 @@ public class Camera2D extends Camera {
     }
     @Override
     public Matrix4f getProjectionMatrix() {
-        return GLM.ortho(center.x - screenDimension.x/2, center.x + screenDimension.x/2, center.y + screenDimension.y/2, center.y - screenDimension.y/2, -1f, 1.f);
+        return GLM.ortho(center.x - screenDimension.x/2.f, center.x + screenDimension.x/2.f, center.y + screenDimension.y/2.f, center.y - screenDimension.y/2.f, znear, zfar);
     }
 
     public void move(Vector2f motion) {
         center.x += motion.x;
         center.y += motion.y;
+        updatable = true;
     }
 
     public void setCenter(Vector2f center) {
         this.center = center;
+        updatable = true;
     }
 
     public void zoom(float zoom) {
         this.zoom += zoom;
+        updatable = true;
     }
 
     public void setZoom(float zoom) {
         this.zoom = zoom;
+        updatable = true;
     }
 
     /**
@@ -87,6 +106,7 @@ public class Camera2D extends Camera {
      */
     public void setRotation(float angle) {
         this.angle = angle;
+        updatable = true;
     }
 
     /**
@@ -95,11 +115,23 @@ public class Camera2D extends Camera {
      */
     public void rotate(float angle) {
         this.angle += angle;
+        updatable = true;
+    }
+
+    public void setZnear(float znear) {
+        this.znear = znear;
+        updatable = true;
+    }
+
+    public void setZfar(float zfar) {
+        this.zfar = zfar;
+        updatable = true;
     }
 
 
     @Override
     public void apply() {
+        updatable = false;
         glDisable(GL_DEPTH_TEST);
 
         /// change fov

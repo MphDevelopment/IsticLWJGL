@@ -112,26 +112,32 @@ public class Camera3D extends Camera {
 
     public void setFOV(float fov) {
         this._fov = fov;
+        updatable = true;
     }
 
     public void setAspectRatio(float aspect) {
         this._aspectRatio = aspect;
+        updatable = true;
     }
 
     public void setZNear(float znear) {
         _znear = znear;
+        updatable = true;
     }
 
     public void setZFar(float zfar) {
         _zfar = zfar;
+        updatable = true;
     }
 
     public void move(Vector3f motion) {
         _center.add(motion);
+        updatable = true;
     }
 
     public void setPosition(Vector3f position) {
         _center = position;
+        updatable = true;
     }
 
     /**
@@ -141,6 +147,7 @@ public class Camera3D extends Camera {
      */
     public void look(Vector3f eye) {
         _eye = eye.unit();
+        updatable = true;
     }
 
     /**
@@ -150,7 +157,7 @@ public class Camera3D extends Camera {
      */
     public void lookAt(Vector3f target) {
         _eye = target.sum(_center.neg()).unit();
-        //System.out.println(_eye.x + ", " + _eye.y + ", " + _eye.z);
+        updatable = true;
     }
 
     /**
@@ -159,12 +166,12 @@ public class Camera3D extends Camera {
      */
     public void setUpVector(Vector3f up) {
         _up = up.unit();
+        updatable = true;
     }
 
     @Override
     public void apply() {
-        //target.bind();
-
+        updatable = false;
         glEnable(GL_DEPTH_TEST);
 
         /// change fov
