@@ -23,9 +23,9 @@ public final class GLFWContext {
             if (!glfwInit()) {
                 throw new IllegalStateException("Unable to initialize GLFW.");
             }
-        } else {
+        } /*else {
             throw new RuntimeException("Current version of IsticLWJGL can't load multiple windows.");
-        }
+        }*/
     }
 
     /**

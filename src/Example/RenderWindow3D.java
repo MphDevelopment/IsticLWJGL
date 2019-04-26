@@ -128,6 +128,9 @@ public final class RenderWindow3D extends GLFWWindow {
 
         Viewport viewport = new Viewport(new FloatRect(50,50, 800,800));
 
+        window.setCamera(camera);
+        window.setViewport(viewport);
+
         Time elapsedSinceBeginning = Time.zero();
         while (window.isOpen()) {
             Time elapsed = clk.restart();
@@ -166,15 +169,12 @@ public final class RenderWindow3D extends GLFWWindow {
                 }*/
 
                 mode.apply(camera, elapsed);
-
                 //viewport update
                 //viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/100, (float)elapsedSinceBeginning.asMilliseconds()/100));
                 camera.setAspectRatio(viewport.getDimension().x/viewport.getDimension().y);
-                camera.apply();
-                viewport.apply(window);
+
 
                 window.clear(new Color(0.1f,0.1f,0.1f));
-
                 sprite.draw();
                 glBegin(GL_TRIANGLES);
                 glColor3d(1, 0, 0);
@@ -188,7 +188,7 @@ public final class RenderWindow3D extends GLFWWindow {
                 glEnd();
 
                 shader.bind();
-                camera.glUniformMVP(uniformMatrix, uniformView, uniformProjection);
+                camera.setUniformMVP(uniformMatrix, uniformView, uniformProjection);
                 cube.draw();
                 cube2.draw();
                 for (int i=0 ; i < cubes.size() ; ++i) {
@@ -201,7 +201,7 @@ public final class RenderWindow3D extends GLFWWindow {
                 bump.draw();*/
 
                 tshader.bind();
-                camera.glUniformMVP(uniformMatrix, uniformView, uniformProjection);
+                camera.setUniformMVP(uniformMatrix, uniformView, uniformProjection);
                 cube3.draw();
                 cube4.draw();
                 cube5.draw();

@@ -24,6 +24,10 @@ public class GLFWWindow extends RenderTarget {
     // window settings
     private int width;
     private int height;
+    private String title;
+    private WindowStyle style;
+    private CallbackMode mode;
+    private GLFWWindow share;
     private boolean running = false;
 
     // window event values
@@ -229,7 +233,8 @@ public class GLFWWindow extends RenderTarget {
      * @param modes window's callback modes
      */
     public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
-        super();
+        this(videoMode, title, style, modes, null);
+        /*super();
 
         // initialized glfw if glfw is not initialized
         GLFWContext.createContext();
@@ -275,9 +280,70 @@ public class GLFWWindow extends RenderTarget {
 
         this.running = true;
 
-        this.initGl();
+        this.initGl();*/
     }
 
+
+    /**
+     * Create a window with a specific style and specific callback modes.
+     * @param videoMode window's dimension
+     * @param title window's title
+     * @param style window's style
+     * @param modes window's callback modes
+     * @param share
+     */
+    public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes, GLFWWindow share) {
+        super();
+
+        // initialized glfw if glfw is not initialized
+        GLFWContext.createContext();
+
+        this.width = videoMode.width;
+        this.height = videoMode.height;
+        this.title = title;
+        this.style = style.clone();
+        this.mode = modes.clone();
+
+        //////////////////////// Set up window //////////////////////////////
+        // Configure our window
+        this.initHints(style);
+
+        // Create the window
+        this.glId = glfwCreateWindow(this.width, this.height, title, ((WindowStyle.FULLSCREEN.bits & style.bits) == WindowStyle.FULLSCREEN.bits) ? glfwGetPrimaryMonitor() : 0, (share != null) ? share.getGlId() : 0);
+        if (this.glId == 0)
+            throw new RuntimeException("Failed to create the GLFW window");
+
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(this.glId);
+
+        // create a current thread context
+        GL.createCapabilities();
+
+
+        ////////////////////// Set up event handle //////////////////////////
+        // Setup a key callback.
+        this.initCallbacks(modes);
+
+        /////////////////////  Set up params ////////////////////
+        // Get the resolution of the primary monitor
+        VideoMode videomode = VideoMode.getDesktopMode();
+        // Center our window
+        posx = (videomode.width - this.width) / 2;
+        posy = (videomode.height - this.height) / 2;
+        glfwSetWindowPos(this.glId, posx, posy);
+
+
+        // Enable v-sync
+        glfwSwapInterval(((style.bits & WindowStyle.VSYNC.bits) == WindowStyle.VSYNC.bits) ? 1 : 0);
+        //glfwSwapInterval(1);
+
+        // Make the window visible
+        glfwShowWindow(this.glId);
+
+        this.running = true;
+
+        this.initGl();
+    }
 
     /**
      * Close and destroy the window.
@@ -573,12 +639,22 @@ public class GLFWWindow extends RenderTarget {
 
 
     public static void main(String[] args) {
-        GLFWWindow window = new GLFWWindow(/*VideoMode.getDesktopMode()*/new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT, CallbackMode.DEFAULT/*.remove(WindowStyle.RESIZABLE)*/);
+        GLFWWindow window = new GLFWWindow(/*VideoMode.getDesktopMode()*/new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT/*.remove(WindowStyle.VSYNC)*/, CallbackMode.DEFAULT);
+        GLFWWindow window2 = new GLFWWindow(/*VideoMode.getDesktopMode()*/new VideoMode(500,500), "Window 2", WindowStyle.DEFAULT, CallbackMode.DEFAULT, window);
+
+        Texture texture;
+        try {
+            texture = new Texture("dalle.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ;
+        }
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
         shape.setFillColor(Color.Red);
         RectangleShape shape2 = new RectangleShape(10,100, 50,50);
         shape2.setFillColor(Color.Yellow);
+        Sprite sprite = new Sprite(texture);
 
         Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
 
@@ -603,16 +679,33 @@ public class GLFWWindow extends RenderTarget {
 
             tracker.setCenter(shape.getPosition());
 
+            Event event;
+
+
+            window2.clear();
+            window2.draw(shape2);
+            window2.draw(sprite);
+            window2.display();
+
+            while ((event = window2.pollEvents()) != null) {
+                if (event.type == Event.Type.CLOSE) {
+                    window2.close();
+                }
+                if (event.type == Event.Type.MOUSEDROP) {
+                    System.out.println("Mouse drop! 'window two'");
+                }
+            }
+
             window.clear();
             window.draw(shape2);
             window.draw(shape);
+            window.draw(sprite);
             window.display();
 
-
-            Event event;
             while ((event = window.pollEvents()) != null) {
                 if (event.type == Event.Type.CLOSE) {
                     window.close();
+                    window2.close();
                     System.exit(0);
                 }
                 if (event.type == Event.Type.KEYRELEASED && event.keyReleased == GLFW_KEY_P) {
@@ -627,7 +720,12 @@ public class GLFWWindow extends RenderTarget {
                 if (event.type == Event.Type.RESIZE) {
                     tracker.setDimension(new Vector2f(event.resizeX, event.resizeY));
                 }
+                if (event.type == Event.Type.MOUSEDROP) {
+                    System.out.println("Mouse drop! 'window one'");
+                }
             }
+
+
         }
     }
 

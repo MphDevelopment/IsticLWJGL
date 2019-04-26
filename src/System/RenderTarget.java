@@ -13,7 +13,7 @@ import com.sun.istack.internal.NotNull;
 //TODO RenderTargets must own their own view (Camera) and viewport (Viewport).
 public abstract class RenderTarget extends GlObject {
     //Multiple RenderTargets
-    private static RenderTarget currentTarget = null;
+    private static ThreadLocal<RenderTarget> currentTarget = new ThreadLocal<RenderTarget>();
 
     //default view parameters
     protected Camera defaultCamera;
@@ -30,7 +30,8 @@ public abstract class RenderTarget extends GlObject {
      * Change current RenderTarget to 'this' and change view to 'this' view
      */
     protected final void setActive(){
-        currentTarget = this;
+        //currentTarget = this;
+        currentTarget.set(this);
         this.bind(); // on souhaite modifier ce RenderTarget seulement
         this.applyView(); // on applique sa vue et ses paramètres
     }
@@ -53,14 +54,12 @@ public abstract class RenderTarget extends GlObject {
      * @return true i
      */
     protected final boolean isActive(){
-        return currentTarget == this;
+        return currentTarget.get() == this;
     }
 
     protected final boolean needViewUpdate() {
         return viewport.hasSinceBeenUpdated() || camera.hasSinceBeenUpdated();
     }
-
-
 
     /**
      * Change last camera to camera.

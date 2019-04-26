@@ -86,7 +86,7 @@ public final class RenderTexture extends RenderTarget {
     }
 
     @Override
-    public void clear(Color color) {
+    public final void clear(Color color) {
         if (!this.isActive()) this.setActive();
         else if (this.needViewUpdate()) this.applyView();
 
@@ -95,7 +95,7 @@ public final class RenderTexture extends RenderTarget {
     }
 
     @Override
-    public void clear() {
+    public final void clear() {
         if (!this.isActive()) this.setActive();
         else if (this.needViewUpdate()) this.applyView();
 
@@ -104,14 +104,14 @@ public final class RenderTexture extends RenderTarget {
     }
 
     @Override
-    public void draw(Drawable d) {
+    public final void draw(Drawable d) {
         if (!this.isActive()) this.setActive();
         else if (this.needViewUpdate()) this.applyView();
 
         d.draw();
     }
 
-    public void display(){
+    public final void display(){
         if (!this.isActive()) this.setActive();
         else if (this.needViewUpdate()) this.applyView();
 
@@ -122,9 +122,7 @@ public final class RenderTexture extends RenderTarget {
      * Select the frame buffer of the RenderTexture to allow draws on Texture.
      * Make 'this' as the current RenderTarget.
      */
-    //TODO on doit faire en sorte que les matrices se mettent a jour entre chaque different bind de RenderTarget
-    //TODO on doit faire en sorte que les matrices et le bind soit mis a jour pas en meme temps (nouvelle méthode updateDisplayMode)
-    protected void bind(){
+    protected final void bind(){
         //render to fbo
         glBindFramebuffer(GL_FRAMEBUFFER, this.fboId);
 
@@ -135,26 +133,16 @@ public final class RenderTexture extends RenderTarget {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    /**
-     * Reset the frame buffer to default
-     */
-    /*public void unbind(){
-        //if (RenderTarget.getCurrentRenderer() == this) {
-            //glPopAttrib();
-            //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-       // }
-    }*/
-
-    public Vector2i getDimension() {
+    public final Vector2i getDimension() {
         return new Vector2i(texture.getWidth(), texture.getHeight());
     }
 
-    public Texture getTexture(){
+    public final Texture getTexture(){
         return texture;
     }
 
     @Override
-    public void free() {
+    public final void free() {
         if (texture != null)
             texture.free();
         texture = null;
@@ -162,7 +150,7 @@ public final class RenderTexture extends RenderTarget {
 
     @Override
     @Deprecated
-    public Image capture() {
+    public final Image capture() {
         final int bpp = 4;
 
         if (!this.isActive()) this.setActive();

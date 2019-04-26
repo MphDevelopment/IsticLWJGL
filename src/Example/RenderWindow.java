@@ -124,8 +124,10 @@ public class RenderWindow /*extends GLFWWindow*/ {
 
         Clock clk = new Clock();
 
-        Viewport viewport = new Viewport(new FloatRect(50,50, 400,400));
+        Viewport viewport = new Viewport(new FloatRect(50,50, 600,600));
         window.setViewport(viewport);
+
+        Viewport viewport2 = new Viewport(new FloatRect(400,50, 400,400));
 
 
         Time elapsedSinceBeginning = Time.seconds(0);
@@ -169,7 +171,7 @@ public class RenderWindow /*extends GLFWWindow*/ {
                 }
                 if (event.type == Event.Type.RESIZE) {
                     System.out.print("R");
-                    camera.setDimension(new Vector2f(window.getDimension()));
+                    //camera.setDimension(new Vector2f(window.getDimension()));
                 }
                 if (event.type == Event.Type.MOVE) {
                     System.out.print("m");
@@ -184,10 +186,10 @@ public class RenderWindow /*extends GLFWWindow*/ {
 
             //viewport update
             //viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/10, (float)elapsedSinceBeginning.asMilliseconds()/10));
-            viewport.setTopleftCorner(new Vector2f(15,15));
-            viewport.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
-            camera.setDimension(viewport.getDimension());
-            camera.setCenter(shape.getPosition());
+            //viewport.setTopleftCorner(new Vector2f(15,15));
+            //viewport.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
+            //viewport2.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
+
 
             shape.move(+1f,+1f);
             fullBackground.move(1,1);
@@ -195,20 +197,29 @@ public class RenderWindow /*extends GLFWWindow*/ {
             screen2.move(0.25f,0);
 
 
+            camera.setDimension(viewport.getDimension());
+            camera.setCenter(shape.getPosition());
+            if (keyboard.isKeyPressed(GLFW_KEY_P)) {
+                try {
+                    renderTexture.capture().saveAs("target");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             //Rendering
             renderTexture.clear(Color.Blue);
             renderTexture.draw(sprite);
             renderTexture.draw(shape);
-            //renderTexture.unbind();
 
-            screenCamera2.move(new Vector2f(0.1f, 0.1f));
+            //screenCamera2.move(new Vector2f(0.1f, 0.1f));
             renderTexture2.clear(Color.Yellow);
             renderTexture2.draw(background);
             renderTexture2.draw(sprite);
-            shape.draw();
-            //renderTexture2.unbind();
+            renderTexture2.draw(shape);
 
             //test viewport 1
+            window.setViewport(viewport);
             window.clear(Color.Green);
             fullBackground.draw();
             screen.draw();
@@ -226,10 +237,12 @@ public class RenderWindow /*extends GLFWWindow*/ {
             //test viewport 2
             /*camera.setCenter(shape.getPosition());
             viewport.setTopleftCorner(new Vector2f(30,30));
-            viewport.apply(window);
-            screen.draw();
-            screen2.draw();
-            shape.draw();*/
+            viewport.apply(window);*/
+            camera.setDimension(viewport2.getDimension());
+            window.setViewport(viewport2);
+            window.draw(screen);
+            window.draw(screen2);
+            window.draw(shape);
 
             window.display();
         }

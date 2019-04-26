@@ -17,14 +17,18 @@ public class WindowStyle {
     /** RESIZABLE : The displayed window will be resizable, if not the maximize button from title bar will be removed */
     public static final WindowStyle RESIZABLE = new WindowStyle(1 << 3);
     /** MAXIMIZED : The displayed window will be maximized when created */
+    @Deprecated
     public static final WindowStyle MAXIMIZED = new WindowStyle(1 << 4);
+    /** MAXIMIZED : The displayed window will enable vsync */
+    public static final WindowStyle VSYNC = new WindowStyle(1 << 6);
 
     /** DEFAULT : VISIBLE + RESIZABLE + TITLEBAR */
-    public static final WindowStyle DEFAULT = new WindowStyle(VISIBLE.bits | RESIZABLE.bits | TITLEBAR.bits);
+    public static final WindowStyle DEFAULT = new WindowStyle(VISIBLE.bits | RESIZABLE.bits | TITLEBAR.bits | VSYNC.bits);
     /** FULLSCREEN : the displayed window will be in fullscreen mode */
     public static final WindowStyle FULLSCREEN = new WindowStyle(1 << 5 | VISIBLE.bits);
     /** NONE : the displayed window will appear as pop-up window */
     public static final WindowStyle NONE = new WindowStyle(VISIBLE.bits);
+
 
     public final int bits;
 
@@ -53,5 +57,10 @@ public class WindowStyle {
      */
     public WindowStyle remove(WindowStyle styles) {
         return new WindowStyle(this.bits ^ (this.bits & styles.bits));
+    }
+
+    @Override
+    public WindowStyle clone(){
+        return new WindowStyle(this.bits);
     }
 }
