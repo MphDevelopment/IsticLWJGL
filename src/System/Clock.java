@@ -28,7 +28,7 @@ public class Clock {
         }
     }
 
-    private Mode mode = Mode.NANOSECONDS_ACCURACY;
+    private Mode mode = Mode.MILLISECONDS_ACCURACY;
     private long t1 = 0; // first timestamp
     private long t2 = 0; // second timestamp
 
@@ -40,6 +40,8 @@ public class Clock {
         this.mode = mode;
         t1 = t2 = ClockFunction(mode);
     }
+
+
 
     /**
      * Generates a clock that start to run with NANOSECONDS_ACCURACY.
