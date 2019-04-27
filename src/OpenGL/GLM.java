@@ -1,5 +1,6 @@
 package OpenGL;
 
+import Graphics.Vector2f;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -36,6 +37,7 @@ public class GLM {
         return buffer;
     }
 
+    ///Matrices Transformations
     /**
      * Converts a matrix to float[]
      * @param m converted matrix
@@ -177,5 +179,23 @@ public class GLM {
         m.translate(new Vector3f(-eye.x, -eye.y, -eye.z));
 
         return m;
+    }
+
+
+    //Vectors transformations
+    public static Vector2f rotate(Vector2f center, Vector2f point, float radian) {
+        return rotate(center, point, Math.cos(radian), Math.sin(radian));
+    }
+
+    public static Vector2f rotate(Vector2f origin, Vector2f point, double cos, double sin) {
+        //set origin to (0,0) and not (center.x, center.y)
+        Vector2f transformed = point.sum(origin.neg());
+
+        Vector2f result = new Vector2f((float)(cos * transformed.x + (sin) * transformed.y) + origin.x, (float)((-sin) * transformed.x + cos * transformed.y) + origin.y);
+        //transformed.x = (float)(cos * transformed.x + (sin) * transformed.y) + origin.x;
+        //transformed.y = (float)((-sin) * transformed.x + cos * transformed.y) + origin.y;
+
+        //return transformed;
+        return result;
     }
 }

@@ -174,6 +174,8 @@ public final class RenderWindow3D extends GLFWWindow {
                 camera.setAspectRatio(viewport.getDimension().x/viewport.getDimension().y);
 
 
+                sprite.rotate((float)(elapsed.asSeconds()/5));
+
                 window.clear(new Color(0.1f,0.1f,0.1f));
                 sprite.draw();
                 glBegin(GL_TRIANGLES);

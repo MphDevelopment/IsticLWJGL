@@ -1,8 +1,9 @@
 package Graphics;
 
 
+import OpenGL.GLM;
 import org.lwjgl.util.vector.*;
-import org.lwjgl.util.vector.Vector2f;
+//import org.lwjgl.util.vector.Vector2f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -53,23 +54,7 @@ public class Sprite extends Shape {
     }
 
     protected void update() {
-        /*float s = Math.sin(radian);
-        float c = Math.cos(radian);
 
-        // translate point back to origin:
-        p.x -= x + ox;
-        p.y -= y + oy;
-
-        new Vector3f().toLwjgl().x+=2;new Matrix4f().translate(new Vector2f(x + ox, y + oy)).rotate(radian, new Vector3f(0,0,1));
-
-        // rotate point
-        float xnew = p.x * c - p.y * s;
-        float ynew = p.x * s + p.y * c;
-
-        // translate point back:
-        p.x = xnew + cx;
-        p.y = ynew + cy;
-        return p;*/
     }
 
     public void draw() {
@@ -89,7 +74,32 @@ public class Sprite extends Shape {
             glTexCoord2d(tx, ty + th);
             glVertex2d(x - ox, y + height*sy - oy);*/
 
+
             glBegin(GL_QUADS);
+            glColor3d(color.r,color.g,color.b);
+
+            //those values must be saved as Sprite parameters (not calculated each time but at each updates)
+            double cos = Math.cos(radian);
+            double sin = Math.sin(radian);
+            Vector2f center = new Vector2f(x + ox, y + oy);
+            Vector2f tl = GLM.rotate(center, new Vector2f(x - ox, y - oy), cos, sin);
+            Vector2f tr = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy), cos, sin);
+            Vector2f bl = GLM.rotate(center, new Vector2f(x - ox, y - oy + sy * height), cos, sin);
+            Vector2f br = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy + sy * height), cos, sin);
+
+            glTexCoord2d(tx, ty);
+            glVertex2d(bl.x, bl.y);
+            glTexCoord2d(tx + tw, ty);
+            glVertex2d(br.x, br.y);
+            glTexCoord2d(tx + tw, ty + th);
+            glVertex2d(tr.x, tr.y);
+            glTexCoord2d(tx, ty + th);
+            glVertex2d(tl.x, tl.y);
+
+            glEnd();
+
+
+            /*glBegin(GL_QUADS);
             glColor3d(color.r,color.g,color.b);
 
             glTexCoord2d(tx, ty);
@@ -101,7 +111,7 @@ public class Sprite extends Shape {
             glTexCoord2d(tx, ty + th);
             glVertex2d(x - ox, y - oy);
 
-            glTexCoord2d(tx, ty);
+            /*glTexCoord2d(tx, ty);
             glVertex2d(x - ox, y + height*sy - oy);
             glTexCoord2d(tx + tw, ty);
             glVertex2d(x + width*sx - ox, y + height*sy - oy);
@@ -110,7 +120,7 @@ public class Sprite extends Shape {
             glTexCoord2d(tx, ty + th);
             glVertex2d(x - ox, y - oy);
 
-            glEnd();
+            glEnd();*/
 
             Texture.unbind();
         }

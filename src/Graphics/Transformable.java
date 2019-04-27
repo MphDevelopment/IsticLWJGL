@@ -8,7 +8,7 @@ public abstract class Transformable {
     protected float ox=0, oy=0; // origin coordinates
     protected float sx=1,sy=1; // scale factors
     private boolean needUpdate = false;
-    //protected float radian = 0; // rotation angle
+    protected float radian = 0; // rotation angle
 
     public void setPosition(float x, float y) {
         this.x = x;
@@ -31,14 +31,14 @@ public abstract class Transformable {
         this.sy = y;
         update();
     }
-    /*public void setRotation(float radian) {
+    public void setRotation(float radian) {
         this.radian = radian;
         update();
     }
     public void rotate(float radian) {
         this.radian += radian;
         update();
-    }*/
+    }
 
     public float getX() { return x;}
     public float getY() { return y;}
@@ -46,7 +46,7 @@ public abstract class Transformable {
     public float getOriginY() { return oy;}
     public float getScaleX() { return sx;}
     public float getScaleY() { return sy;}
-    //public float getRotation() { return radian;}
+    public float getRotation() { return radian;}
 
     protected abstract void update();
 
