@@ -60,4 +60,9 @@ public class CallbackMode {
     public boolean enable(CallbackMode modes) {
         return (this.modes | modes.modes) == this.modes;
     }
+
+    @Override
+    public CallbackMode clone(){
+        return new CallbackMode(this.modes);
+    }
 }

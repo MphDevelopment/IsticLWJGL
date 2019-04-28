@@ -12,12 +12,9 @@ import java.io.IOException;
 
 /**http://schabby.de/opengl-shader-example/*/
 public class Shader extends GlObject {
-    public static final int FRAGMENT = 1 << 0;
-    public static final int VERTEX = 1 << 1;
+    //private ThreadLocal<Shader> current = new ThreadLocal<Shader>();
 
     public Shader(String vert, String frag) throws IOException {
-        //this.type = FRAGMENT | VERTEX;
-
         // create the shader program. If OK, create vertex and fragment shaders
         glId = glCreateProgram();
 
@@ -82,11 +79,11 @@ public class Shader extends GlObject {
      */
     private String loadFile(String filename) {
         StringBuilder vertexCode = new StringBuilder();
-        String line = null ;
+        String line;
         try
         {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            while( (line = reader.readLine()) !=null )
+            while( (line = reader.readLine()) != null )
             {
                 vertexCode.append(line);
                 vertexCode.append('\n');
@@ -123,6 +120,10 @@ public class Shader extends GlObject {
         glDeleteShader((int)glId);
         glUseProgram(0);
         glId = 0;
+    }
+
+    public int getUniformLocation(String name) {
+        return glGetUniformLocation((int)this.getGlId(), name);
     }
 
 }

@@ -79,7 +79,7 @@ public final class RenderWindow3D extends GLFWWindow {
             tshader = new Shader("shaders/defaultMVP.vert", "shaders/defaultMVP.frag");
             bshader = new Shader("shaders/bumpMapping.vert", "shaders/bumpMapping.frag");
             texture = new Texture("dalle.png");
-            benjibob = new Texture("ben10.png");
+            benjibob = new Texture("Phases.bmp");
             bumpTexture = new Texture("bump.png");
             transparent = new Texture("transp.png");
         } catch (IOException e) {
@@ -93,6 +93,7 @@ public final class RenderWindow3D extends GLFWWindow {
         //sprite.setFillColor(Color.Blue);
         sprite.setTexture(texture, true);
         sprite.setTextureRect(0,0,window.getDimension().x,window.getDimension().y);
+        sprite.setOrigin(-window.getDimension().x/2.f,-window.getDimension().y/2.f);
         sprite.setScale(-1.f,- 1.f);
 
         TexturedVBO vbot = new TexturedVBO(tshader, BufferObject.BindMode.STATIC_DRAW, new Vector3f(0,0,100), 100, benjibob);
@@ -147,9 +148,9 @@ public final class RenderWindow3D extends GLFWWindow {
                 } else if (event.type == Event.Type.RESIZE) {
                     camera.setAspectRatio((float)event.resizeX /(float)event.resizeY);
                 } else if (event.type == Event.Type.KEYRELEASED && event.keyReleased == GLFW_KEY_P) {
-                    System.out.println("Screenshot! 'capture.png'");
+                    System.out.println("Screenshot! 'capture.*'");
                     try {
-                        window.capture().saveAs("capture");
+                        window.capture().saveAs("capture.jpeg");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

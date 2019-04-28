@@ -32,19 +32,10 @@ public final class Viewport {
     }
 
     /**
-     * Top-left corner depends on which RenderTarget we drawn.
-     * @param target
-     * @return the top-left corner of the viewport.
-     */
-    /*public Vector2f getTopleftCorner(RenderTarget target){
-        return new Vector2f((int)(rect.l), (int)(-rect.t + target.getDimension().y - rect.h));
-    }*/
-
-    /**
      * Top-left corner of the viewport
      * @return the top-left corner of the viewport.
      */
-    public final Vector2f getTopleftCorner() {
+    public final Vector2f getTopLeftCorner() {
         return new Vector2f(rect.l, rect.t);
     }
 
@@ -62,10 +53,9 @@ public final class Viewport {
         updatable = true;
     }
 
-    public final void setTopleftCorner(Vector2f position) {
+    public final void setTopLeftCorner(Vector2f position) {
         rect.l = position.x;
         rect.t = position.y;
-        updatable = true;
         updatable = true;
     }
 

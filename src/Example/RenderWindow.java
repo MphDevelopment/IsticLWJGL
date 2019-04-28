@@ -96,7 +96,6 @@ public class RenderWindow /*extends GLFWWindow*/ {
 
         Sprite sprite = new Sprite(texture);
         sprite.move(50, 50);
-        sprite.setOrigin(25,25);
 
         Sprite screen = new Sprite(renderTexture.getTexture());
         screen.setTextureRect(0,0,400,400);
@@ -135,7 +134,6 @@ public class RenderWindow /*extends GLFWWindow*/ {
         while (window.isOpen()) {
             Time elapsed = clk.restart();
             elapsedSinceBeginning.add(elapsed);
-            sprite.rotate((float)(elapsed.asSeconds() / 5));
             //out.println(1.0/elapsed.asSeconds());
             //out.println("abs:" + mouse.getAbsolutePosition().x + ":" + mouse.getAbsolutePosition().y);
             //out.println("rel:" + mouse.getRelativePosition().x + ":" + mouse.getRelativePosition().y);
@@ -196,14 +194,14 @@ public class RenderWindow /*extends GLFWWindow*/ {
             shape.move(+1f,+1f);
             fullBackground.move(1,1);
             screen.move(0.5f,0);
-            //screen2.move(0.25f,0);
+            screen2.move(0.25f,0);
 
 
             camera.setDimension(viewport.getDimension());
-            //camera.setCenter(shape.getPosition());
+            camera.setCenter(shape.getPosition());
             if (keyboard.isKeyPressed(GLFW_KEY_P)) {
                 try {
-                    renderTexture.capture().saveAs("target");
+                    renderTexture.capture().saveAs("target.jpg");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

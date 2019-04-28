@@ -216,8 +216,6 @@ public class Image {
             throw new IOException("Image format required.");
         }
 
-        System.out.println(format);
-
         ImageIO.write(bfImage, format, new File(filename));
     }
 

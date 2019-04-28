@@ -8,7 +8,7 @@ import System.Time;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-
+@Deprecated //because it's not portable
 public class FPSCamera3DMode implements Camera3DMode {
     private Vector3f _angles = new Vector3f(0,0,0);
     private Keyboard keyboard;

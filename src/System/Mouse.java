@@ -31,8 +31,8 @@ public class Mouse {
     private GLFWWindow window;
 
     /**
-     *
-     * @param window
+     * Generates a Mouse Controler for a specific GLFWWindow
+     * @param window mouse monitor
      */
     public Mouse(GLFWWindow window) {
         this.window = window;
@@ -68,7 +68,7 @@ public class Mouse {
     }
 
     public Vector2f getRelativePositionUsingViewport(Viewport viewport) {
-        return (this.getRelativePosition()).add(viewport.getTopleftCorner().neg());
+        return (this.getRelativePosition()).add(viewport.getTopLeftCorner().neg());
     }
 
     public Vector2f getRelativePositionUsingCamera2D(Viewport viewport, Camera2D camera) {
