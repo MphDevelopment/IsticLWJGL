@@ -1,7 +1,6 @@
 package Graphics;
 
 
-import de.matthiasmann.twl.utils.PNGDecoder;
 import org.lwjgl.BufferUtils;
 
 import javax.imageio.ImageIO;
@@ -105,19 +104,12 @@ public class Image {
             //get an InputStream from our URL
             input = new FileInputStream(file);
 
-            //initialize the decoder
-            PNGDecoder dec = new PNGDecoder(input);
+            BufferedImage i = ImageIO.read(input);
 
-            width = dec.getWidth();
-            height = dec.getHeight();
+            width = i.getWidth();
+            height = i.getHeight();
 
-            //create a new byte buffer which will hold our pixel data
-            ByteBuffer buf = ByteBuffer.allocate(bpp * width * height);
-
-            //decode the image into the byte buffer, in RGBA format
-            dec.decode(buf, width * bpp, PNGDecoder.Format.RGBA);
-
-            buf.flip();
+            ByteBuffer buf = convertImage(i);
 
             buffer = buf.array();
         } finally {
@@ -125,6 +117,31 @@ public class Image {
                 input.close();
             }
         }
+    }
+
+    public static ByteBuffer convertImage(BufferedImage image)
+    {
+        final int BYTES_PER_PIXEL = 4;
+        int[] pixels = new int[image.getWidth() * image.getHeight()];
+        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+
+        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * BYTES_PER_PIXEL);
+
+        for(int y = 0; y < image.getHeight(); y++)
+        {
+            for(int x = 0; x < image.getWidth(); x++)
+            {
+                int pixel = pixels[y * image.getWidth() + x];
+                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
+                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
+                buffer.put((byte) (pixel & 0xFF));               // Blue component
+                buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
+            }
+        }
+
+        buffer.flip();
+
+        return buffer;
     }
 
     public int getWidth(){
@@ -164,8 +181,8 @@ public class Image {
     }
 
     /**
-     * Creates a PNG file using a specific name.
-     * @param filename file name without extension.
+     * Creates an image file using a specific name and specific extension.
+     * @param filename file name with extension. (PNG, JPG, BMP, ...)
      * @throws IOException thrown when image save did not correctly end up
      */
     public void saveAs(String filename) throws IOException {
@@ -188,7 +205,20 @@ public class Image {
 
         BufferedImage bfImage = new BufferedImage(colorModel, raster, false, null);
 
-        ImageIO.write(bfImage, "png", new File(filename+".png"));
+        String format = null;
+        int index = filename.lastIndexOf('.');
+        try {
+            format = filename.substring(index+1, filename.length());
+            if (format == null || !format.equals("png")) {
+                throw new IOException("Image PNG format required.");
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new IOException("Image format required.");
+        }
+
+        System.out.println(format);
+
+        ImageIO.write(bfImage, format, new File(filename));
     }
 
     public static void main(String[] args) {
@@ -198,13 +228,12 @@ public class Image {
 
         for (int i=0 ; i < 50 ; ++i) {
             for (int j=0 ; j < 50 ; j++) {
-                image.setPixel(i,j, new Color(0.f, 1.f, 1.f, (i+j)/(100.f)));
+                image.setPixel(i,j, new Color(j, 1.f, 1.f, (i+j)/(100.f)));
             }
         }
 
         try {
-            //image.loadFromFile("perf.png");
-            image.saveAs("test");
+            image.saveAs("test.jpg");
         } catch (IOException e) {
             e.printStackTrace();
         }

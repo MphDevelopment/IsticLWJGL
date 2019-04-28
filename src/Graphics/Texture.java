@@ -1,51 +1,21 @@
 package Graphics;
-/**
- * Copyright (c) 2012, Matt DesLauriers All rights reserved.
- *
- *	Redistribution and use in source and binary forms, with or without
- *	modification, are permitted provided that the following conditions are met:
- *
- *	* Redistributions of source code must retain the above copyright notice, this
- *	  list of conditions and the following disclaimer.
- *
- *	* Redistributions in binary
- *	  form must reproduce the above copyright notice, this list of conditions and
- *	  the following disclaimer in the documentation and/or other materials provided
- *	  with the distribution.
- *
- *	* Neither the name of the Matt DesLauriers nor the names
- *	  of his contributors may be used to endorse or promote products derived from
- *	  this software without specific prior written permission.
- *
- *	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- *	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *	POSSIBILITY OF SUCH DAMAGE.
- */
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL14.GL_MIRRORED_REPEAT;
 
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Native;
 import java.nio.ByteBuffer;
 
-import com.sun.istack.internal.Interned;
 import org.lwjgl.BufferUtils;
 
-import de.matthiasmann.twl.utils.PNGDecoder;
 
 import System.GlObject;
+
+import javax.imageio.ImageIO;
 
 /**
  * Texture represents a 2D graphic RGBA image that can be displayed by GPU.
@@ -53,9 +23,6 @@ import System.GlObject;
  * @see Graphics.Image Image (RAM only)
  */
 public class Texture extends GlObject {
-    // Current bound texture
-    //private static Texture currentTexture;
-
     // Image dimension
     public final int width;
     public final int height;
@@ -76,6 +43,7 @@ public class Texture extends GlObject {
      * @param width pixel width
      * @param height pixel height
      */
+    //TODO must be protected and then used by RenderTexture (that will inherit from Texture) [can't inherit from 2 classes...]
     public Texture(int glId, int width, int height){
         this.glId = glId;
         this.width = width;
@@ -114,7 +82,7 @@ public class Texture extends GlObject {
     public Texture(String file, int filter, int wrap) throws IOException {
         InputStream input = null;
         try {
-            //get an InputStream from our URL
+            /*//get an InputStream from our URL
             input = new FileInputStream(file);
 
             //initialize the decoder
@@ -134,7 +102,16 @@ public class Texture extends GlObject {
             dec.decode(buf, width * bpp, PNGDecoder.Format.RGBA);
 
             //flip the buffer into "read mode" for OpenGL
-            buf.flip();
+            buf.flip();*/
+
+            input = new FileInputStream(file);
+
+            BufferedImage i = ImageIO.read(input);
+
+            width = i.getWidth();
+            height = i.getHeight();
+
+            ByteBuffer buf = Image.convertImage(i);
 
             //enable textures and generate an ID
             //glEnable(GL_TEXTURE_2D);
@@ -156,13 +133,36 @@ public class Texture extends GlObject {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 
             Texture.unbind();
-
-            //this.setWrapMode(CLAMP);
         } finally {
             if (input != null) {
                 try { input.close(); } catch (IOException e) { }
             }
         }
+    }
+
+    private static ByteBuffer convertImage(BufferedImage image)
+    {
+        final int BYTES_PER_PIXEL = 4;
+        int[] pixels = new int[image.getWidth() * image.getHeight()];
+        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+
+        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * BYTES_PER_PIXEL);
+
+        for(int y = 0; y < image.getHeight(); y++)
+        {
+            for(int x = 0; x < image.getWidth(); x++)
+            {
+                int pixel = pixels[y * image.getWidth() + x];
+                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
+                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
+                buffer.put((byte) (pixel & 0xFF));               // Blue component
+                buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
+            }
+        }
+
+        buffer.flip();
+
+        return buffer;
     }
 
     /**
@@ -257,14 +257,6 @@ public class Texture extends GlObject {
         Texture.unbind();
     }
 
-    /*public static void setCurrentTexture(Texture texture){
-        currentTexture = texture;
-    }
-
-    public static Texture CurrentTexture(){
-        return currentTexture;
-    }*/
-
     /**
      * Frees the texture from GPU memory.
      */
@@ -301,7 +293,7 @@ public class Texture extends GlObject {
         buffer.get(array);
 
         //invert y
-        for (int i=0;i < width ; ++i) {
+        /*for (int i=0;i < width ; ++i) {
             for (int j=0; j < height/2 ; ++j) {
                 byte[] rgba = new byte[]{
                         array[i * bpp + j * width * bpp    ],
@@ -320,7 +312,7 @@ public class Texture extends GlObject {
                 array[i * bpp + (height - j - 1) * width * bpp + 2] = rgba[2];
                 array[i * bpp + (height - j - 1) * width * bpp + 3] = rgba[3];
             }
-        }
+        }*/
 
         return new Image(array, width, height);
     }
