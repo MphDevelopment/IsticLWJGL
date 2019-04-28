@@ -2,8 +2,6 @@ package Graphics;
 
 
 import OpenGL.GLM;
-import org.lwjgl.util.vector.*;
-//import org.lwjgl.util.vector.Vector2f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -54,7 +52,7 @@ public class Sprite extends Shape {
     }
 
     protected void update() {
-
+        //TODO update each time rotation is made, moving, scaling, ...
     }
 
     public void draw() {
@@ -81,7 +79,7 @@ public class Sprite extends Shape {
             //those values must be saved as Sprite parameters (not calculated each time but at each updates)
             double cos = Math.cos(radian);
             double sin = Math.sin(radian);
-            Vector2f center = new Vector2f(x + ox, y + oy);
+            Vector2f center = new Vector2f(x, y);
             Vector2f tl = GLM.rotate(center, new Vector2f(x - ox, y - oy), cos, sin);
             Vector2f tr = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy), cos, sin);
             Vector2f bl = GLM.rotate(center, new Vector2f(x - ox, y - oy + sy * height), cos, sin);
