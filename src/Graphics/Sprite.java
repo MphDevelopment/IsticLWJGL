@@ -61,18 +61,6 @@ public class Sprite extends Shape {
 
             glEnable(GL_TEXTURE_2D);
 
-            /*glBegin(GL_QUADS);
-            glColor3d(color.r,color.g,color.b);
-            glTexCoord2d(tx, ty);
-            glVertex2d(x - ox, y - oy);
-            glTexCoord2d(tx + tw, ty);
-            glVertex2d(x + width*sx - ox, y - oy);
-            glTexCoord2d(tx + tw, ty + th);
-            glVertex2d(x + width*sx - ox, y + height*sy - oy);
-            glTexCoord2d(tx, ty + th);
-            glVertex2d(x - ox, y + height*sy - oy);*/
-
-
             glBegin(GL_QUADS);
             glColor3d(color.r,color.g,color.b);
 
@@ -85,13 +73,13 @@ public class Sprite extends Shape {
             Vector2f bl = GLM.rotate(center, new Vector2f(x - ox, y - oy + sy * height), cos, sin);
             Vector2f br = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy + sy * height), cos, sin);
 
-            glTexCoord2d(tx, ty);
-            glVertex2d(bl.x, bl.y);
-            glTexCoord2d(tx + tw, ty);
-            glVertex2d(br.x, br.y);
-            glTexCoord2d(tx + tw, ty + th);
-            glVertex2d(tr.x, tr.y);
             glTexCoord2d(tx, ty + th);
+            glVertex2d(bl.x, bl.y);
+            glTexCoord2d(tx + tw, ty + th);
+            glVertex2d(br.x, br.y);
+            glTexCoord2d(tx + tw, ty);
+            glVertex2d(tr.x, tr.y);
+            glTexCoord2d(tx, ty);
             glVertex2d(tl.x, tl.y);
 
             glEnd();
@@ -124,7 +112,7 @@ public class Sprite extends Shape {
         }
     }
 
-    public Texture getTexure(){
+    public Texture getTexture(){
         return texture;
     }
 
