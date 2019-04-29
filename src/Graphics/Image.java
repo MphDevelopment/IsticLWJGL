@@ -119,8 +119,7 @@ public class Image {
         }
     }
 
-    public static ByteBuffer convertImage(BufferedImage image)
-    {
+    public static ByteBuffer convertImage(BufferedImage image) {
         final int BYTES_PER_PIXEL = 4;
         int[] pixels = new int[image.getWidth() * image.getHeight()];
         image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
@@ -182,7 +181,7 @@ public class Image {
 
     /**
      * Creates an image file using a specific name and specific extension.
-     * @param filename file name with extension. (PNG, JPG, BMP, ...)
+     * @param filename file name with extension. (PNG)
      * @throws IOException thrown when image save did not correctly end up
      */
     public void saveAs(String filename) throws IOException {
@@ -208,7 +207,7 @@ public class Image {
         String format = null;
         int index = filename.lastIndexOf('.');
         try {
-            format = filename.substring(index+1, filename.length());
+            format = filename.substring(index+1, filename.length()).toLowerCase();
             if (format == null || !format.equals("png")) {
                 throw new IOException("Image PNG format required.");
             }
@@ -226,12 +225,12 @@ public class Image {
 
         for (int i=0 ; i < 50 ; ++i) {
             for (int j=0 ; j < 50 ; j++) {
-                image.setPixel(i,j, new Color(j, 1.f, 1.f, (i+j)/(100.f)));
+                image.setPixel(i,j, new Color(0.f, 1.f, 1.f, (i+j)/(100.f)));
             }
         }
 
         try {
-            image.saveAs("test.jpg");
+            image.saveAs("test.PnG");
         } catch (IOException e) {
             e.printStackTrace();
         }
