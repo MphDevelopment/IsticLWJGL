@@ -6,14 +6,14 @@
 
 
 layout (location = 0) in vec3 VertexPosition;
-layout (location = 1) in vec3 VertexColor;
+layout (location = 1) in vec4 VertexColor;
 layout (location = 2) in vec2 VertexTexCoord;
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
-out vec3 Color;
+out vec4 Color;
 out vec2 TexCoord;
 
 void main()

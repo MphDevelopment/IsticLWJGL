@@ -3,7 +3,7 @@
 #version 400
 
 // corresponds with output from vertex shader
-in vec3 Color;
+in vec4 Color;
 in vec2 TexCoord;
 
 uniform bool repeat = true;
@@ -33,5 +33,5 @@ void main()
 
     vec4 pixel = texture2D(texture, TexCoord);
 	// assign vertex color to pixel color
-    FragColor = pixel * vec4(Color, 1.0);
+    FragColor = pixel * Color;
 }

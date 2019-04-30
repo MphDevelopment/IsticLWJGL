@@ -4,7 +4,7 @@
 #version 400
 
 // corresponds with output from vertex shader
-in vec3 Color;
+in vec4 Color;
 in vec2 TexCoord;
 
 uniform sampler2D tex0;
@@ -15,5 +15,5 @@ void main()
 {
     vec4 pixel = texture(tex0, TexCoord);
     // assign vertex color to pixel color
-    FragColor = vec4(Color, 1.0) * pixel;
+    FragColor = Color * pixel;
 }
