@@ -11,12 +11,61 @@ public final class Example2D {
 
         Mouse mouse = new Mouse(window);
 
+        Joystick joystick = (Joystick.isPlugged(0) ? new Joystick(0) : null);
+
+
         while (window.isOpen()) {
             //display
             if (mouse.isButtonPressed(Mouse.Button.Left)) {
                 window.clear(Color.Black);
             }
 
+            if (joystick != null) {
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.A)) {
+                    window.clear(Color.Red);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.B)) {
+                    window.clear(Color.Yellow);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.Y)) {
+                    window.clear(Color.White);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.X)) {
+                    window.clear(Color.Black);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_DOWN)) {
+                    window.clear(Color.Blue);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_RIGHT)) {
+                    window.clear(Color.Magenta);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_LEFT)) {
+                    window.clear(Color.Green);
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_UP)) {
+                    window.clear(Color.Cyan);
+                }
+
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.START)) {
+                    window.clear(new Color(0.5f,1.f,0.5f));
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.BACK)) {
+                    window.clear(new Color(1.0f,0.5f,0.5f));
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.LEFT_THUMB)) {
+                    window.clear(new Color(0.5f,0.5f,1.f));
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.RIGHT_THUMB)) {
+                    window.clear(new Color(1.f,0.5f,1.f));
+                }
+
+                System.out.println("left:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.LEFT_AXIS_X, 0.4f)+
+                        ";"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.LEFT_AXIS_Y, 0.4f));
+                System.out.println("right:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.RIGHT_AXIS_X, 0.4f)+
+                        ";"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.RIGHT_AXIS_Y, 0.4f));
+                System.out.println("R2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.R2, 0.f));
+                System.out.println("L2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.L2, 0.f));
+            }
             shape.move(1.f, 1.f);
 
             shape.draw();
@@ -43,8 +92,13 @@ public final class Example2D {
                 if (event.type == Event.Type.MOUSEDROP) {
                     System.out.println("Mouse is dropping files");
                 }
-                if (event.type == Event.Type.JOYSTICK) {
-                    System.out.println("Joystick event");
+                if (event.type == Event.Type.JOYSTICK_CONNECTION) {
+                    joystick = new Joystick(event.joystick);
+                    System.out.println("Joystick "+event.joystick+" connection");
+                }
+                if (event.type == Event.Type.JOYSTICK_DISCONNECTION) {
+                    joystick = null;
+                    System.out.println("Joystick "+event.joystick+" disconnection");
                 }
                 if (event.type == Event.Type.BUTTONRELEASED) {
                     System.out.println("Button released detected");

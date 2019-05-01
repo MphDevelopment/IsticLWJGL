@@ -18,12 +18,10 @@ public final class Event {
     public int keyRepeated;
     public int buttonPressed;
     public int buttonReleased;
-    public boolean mouseCollision;
     public float scrollX;
     public float scrollY;
     public String drop[];
     public int joystick;
-    public int joystickEvent;
     public int resizeX;
     public int resizeY;
     public int posX;
@@ -37,8 +35,8 @@ public final class Event {
         this.type = type;
 
         switch (type) {
-            case MOUSEENTER: mouseCollision = true; break;
-            case MOUSELEAVE: mouseCollision = false; break;
+            case MOUSEENTER: break;
+            case MOUSELEAVE: break;
         }
     }
 
@@ -62,7 +60,8 @@ public final class Event {
             case RESIZE: resizeX = values[0]; resizeY = values[1]; break;
             case MOVE: posX = values[0]; posY = values[1]; break;
 
-            case JOYSTICK: joystick = values[0]; joystickEvent = values[1]; break;
+            case JOYSTICK_CONNECTION: joystick = values[0]; break;
+            case JOYSTICK_DISCONNECTION: joystick = values[0]; break;
         }
     }
 
@@ -104,6 +103,7 @@ public final class Event {
 
         MOUSEDROP,      // User dropped items into window deposit                       | drop
 
-        JOYSTICK        // Joystick event                                               | joystickEvent
+        JOYSTICK_CONNECTION,         // Joystick event                                               | joystickEvent
+        JOYSTICK_DISCONNECTION        // Joystick event                                               | joystickEvent
     }
 }

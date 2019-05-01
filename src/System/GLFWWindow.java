@@ -22,8 +22,8 @@ import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
  */
 public class GLFWWindow extends RenderTarget {
     // window settings
-    private int width;
-    private int height;
+    private int width = 1;
+    private int height = 1;
     private String title;
     private WindowStyle style;
     private CallbackMode mode;
@@ -52,7 +52,7 @@ public class GLFWWindow extends RenderTarget {
     private String drop[];
     private boolean joystickEvent = false;
     private int joystick;
-    private int joystickTriggeredEvent;
+    private boolean joystickConnection;
     private boolean resizeEvent = false;
     private int resizex;
     private int resizey;
@@ -115,7 +115,14 @@ public class GLFWWindow extends RenderTarget {
             glfwSetJoystickCallback((joystick, event) -> {
             joystickEvent = true;
             this.joystick = joystick;
-            joystickTriggeredEvent = event;
+
+            if (event == GLFW_CONNECTED) {
+                // The joystick was connected
+                joystickConnection = true;
+            } else if (event == GLFW_DISCONNECTED) {
+                // The joystick was disconnected
+                joystickConnection = false;
+            }
         });
         if (modes.enable(CallbackMode.FOCUS))
             glfwSetWindowFocusCallback(this.glId, (window, focus)->{
@@ -150,6 +157,7 @@ public class GLFWWindow extends RenderTarget {
      */
     private void initHints(WindowStyle styles) {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
+        glfwWindowHint( GLFW_DOUBLEBUFFER, GL_FALSE );
         glfwWindowHint(GLFW_VISIBLE, ((styles.bits & WindowStyle.VISIBLE.bits) == WindowStyle.VISIBLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, ((styles.bits & WindowStyle.RESIZABLE.bits) == WindowStyle.RESIZABLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will be resizable
         glfwWindowHint(GLFW_DECORATED, ((styles.bits & WindowStyle.TITLEBAR.bits) == WindowStyle.TITLEBAR.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will have title bar
@@ -411,7 +419,7 @@ public class GLFWWindow extends RenderTarget {
         }
         if (joystickEvent) {
             joystickEvent = false;
-            return new Event(Event.Type.JOYSTICK, new int[]{joystick, joystickTriggeredEvent});
+            return new Event((joystickConnection) ? Event.Type.JOYSTICK_CONNECTION : Event.Type.JOYSTICK_DISCONNECTION, new int[]{joystick});
         }
         if (resizeEvent) {
             resizeEvent = false;
