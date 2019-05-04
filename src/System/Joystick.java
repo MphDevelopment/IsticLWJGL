@@ -5,17 +5,12 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public final class Joystick {
+public class Joystick {
     public enum GamePadButton {
-        A(0),
-        B(1),
-        X(2),
-        Y(3),
-
-        CROSS(0),
-        CIRCLE(1),
-        SQUARE(2),
-        TRIANGLE(3),
+        A(0), CROSS(0),
+        B(1), CIRCLE(1),
+        X(2), SQUARE(2),
+        Y(3), TRIANGLE(3),
 
         LEFT_BUMPER(4),
         RIGHT_BUMPER(5),
@@ -23,12 +18,14 @@ public final class Joystick {
         START(7),
         LEFT_THUMB(8),
         RIGHT_THUMB(9),
-        DPAD_UP(10),
-        DPAD_RIGHT(11),
-        DPAD_DOWN(12),
-        DPAD_LEFT(13),
 
-        LAST(14);
+        UP(10),
+        RIGHT(11),
+        DOWN(12),
+        LEFT(13),
+
+        GUIDE(14),
+        LAST(15);
 
 
         private int id;
@@ -51,13 +48,18 @@ public final class Joystick {
         }
     }
 
-    private int id;
+    private final int id;
+    private final String name;
 
     public Joystick(int id) {
         this.id = id;
+        String joystickName = glfwGetJoystickName(this.id);
+        name = joystickName != null ? joystickName : "?";
     }
 
     public float[] getAllAxis() {
+        if (!isPlugged()) return null;
+
         FloatBuffer axis = glfwGetJoystickAxes(id);
 
         float[] array = new float[axis.capacity()];
@@ -67,6 +69,8 @@ public final class Joystick {
     }
 
     public byte[] getAllButtons(){
+        if (!isPlugged()) return null;
+
         ByteBuffer buttons = glfwGetJoystickButtons(id);
 
         byte[] array = new byte[buttons.capacity()];
@@ -93,6 +97,10 @@ public final class Joystick {
     public float getAxisValue(int axis, float threshold) {
         float[] b = getAllAxis();
         return !(b == null || axis >= b.length || axis < 0) ? (Math.abs(b[axis]) < threshold ? 0 : b[axis])  : 0;
+    }
+
+    public String getJoystickName(){
+        return name;
     }
 
     public boolean isPlugged() {
