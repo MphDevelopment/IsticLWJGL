@@ -29,6 +29,8 @@ public class GLFWWindow extends RenderTarget {
     private CallbackMode mode;
     private GLFWWindow share;
     private boolean running = false;
+    private Clock internalClk = new Clock();
+    private Time frameTimeLimit = Time.zero();
 
     // window event values
     private int textEntered;
@@ -157,7 +159,7 @@ public class GLFWWindow extends RenderTarget {
      */
     private void initHints(WindowStyle styles) {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
-        glfwWindowHint( GLFW_DOUBLEBUFFER, GL_FALSE );
+        glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
         glfwWindowHint(GLFW_VISIBLE, ((styles.bits & WindowStyle.VISIBLE.bits) == WindowStyle.VISIBLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, ((styles.bits & WindowStyle.RESIZABLE.bits) == WindowStyle.RESIZABLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will be resizable
         glfwWindowHint(GLFW_DECORATED, ((styles.bits & WindowStyle.TITLEBAR.bits) == WindowStyle.TITLEBAR.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will have title bar
@@ -242,53 +244,6 @@ public class GLFWWindow extends RenderTarget {
      */
     public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
         this(videoMode, title, style, modes, null);
-        /*super();
-
-        // initialized glfw if glfw is not initialized
-        GLFWContext.createContext();
-
-        this.width = videoMode.width;
-        this.height = videoMode.height;
-
-        //////////////////////// Set up window //////////////////////////////
-        // Configure our window
-        this.initHints(style);
-
-        // Create the window
-        this.glId = glfwCreateWindow(this.width, this.height, title, ((WindowStyle.FULLSCREEN.bits & style.bits) == WindowStyle.FULLSCREEN.bits) ? glfwGetPrimaryMonitor() : 0, 0);
-        if (this.glId == 0)
-            throw new RuntimeException("Failed to create the GLFW window");
-
-        // Make the OpenGL context current
-        glfwMakeContextCurrent(this.glId);
-
-        // create a current thread context
-        GL.createCapabilities();
-
-
-        ////////////////////// Set up event handle //////////////////////////
-        // Setup a key callback.
-        this.initCallbacks(modes);
-
-        /////////////////////  Set up params ////////////////////
-        // Get the resolution of the primary monitor
-        VideoMode videomode = VideoMode.getDesktopMode();
-        // Center our window
-        posx = (videomode.width - this.width) / 2;
-        posy = (videomode.height - this.height) / 2;
-        glfwSetWindowPos(this.glId, posx, posy);
-
-
-        // Enable v-sync
-        glfwSwapInterval(1);
-        //glfwSwapInterval(1);
-
-        // Make the window visible
-        glfwShowWindow(this.glId);
-
-        this.running = true;
-
-        this.initGl();*/
     }
 
 
@@ -298,7 +253,7 @@ public class GLFWWindow extends RenderTarget {
      * @param title window's title
      * @param style window's style
      * @param modes window's callback modes
-     * @param share
+     * @param share target where 'this' will share Texture, Shaders, ...
      */
     public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes, GLFWWindow share) {
         super();
@@ -525,6 +480,25 @@ public class GLFWWindow extends RenderTarget {
 
         //glFlush();
         glfwSwapBuffers(this.glId);
+
+        if (frameTimeLimit.asSeconds() != 0.f) {
+            Time fps = frameTimeLimit.clone();
+            fps.reduce(internalClk.getElapsed());
+            try {
+                Thread.sleep((long)fps.asMilliseconds());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            /*float theta = (float) (frameRate) * 2 - 1.f /(float) elapsed.asSeconds();
+            if (theta > 0) {
+                try {
+                    Thread.sleep((int)(1000.f / theta));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }*/
+            internalClk.restart();
+        }
     }
 
     /**
@@ -591,6 +565,15 @@ public class GLFWWindow extends RenderTarget {
      */
     public final Vector2i getDimension() {
         return new Vector2i(width, height);
+    }
+
+    /**
+     * Sets approximate FPS limit.
+     * Set limit to Zero removes frame rate limit effect.
+     * @param frameRate frame per seconds
+     */
+    public final void setFrameRateLimit(int frameRate) {
+        this.frameTimeLimit = Time.milliseconds((long)Math.max(0.f, 1000.f / frameRate));
     }
 
     public final void hide() {
