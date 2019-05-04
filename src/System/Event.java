@@ -103,7 +103,7 @@ public final class Event {
 
         MOUSEDROP,      // User dropped items into window deposit                       | drop
 
-        JOYSTICK_CONNECTION,         // Joystick event                                               | joystickEvent
-        JOYSTICK_DISCONNECTION        // Joystick event                                               | joystickEvent
+        JOYSTICK_CONNECTION,          // Joystick event                       | no attributes
+        JOYSTICK_DISCONNECTION        // Joystick event                       | no attributes
     }
 }
