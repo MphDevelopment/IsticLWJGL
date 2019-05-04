@@ -10,11 +10,17 @@ import static org.lwjgl.opengl.GL11.glVertex2d;
  * "Display list" rectangle shape
  */
 public class RectangleShape extends Shape {
-    public RectangleShape(){}
+    public RectangleShape(){
+        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        update();
+    }
 
     public RectangleShape(float w, float h){
         this.width = w;
         this.height = h;
+
+        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        update();
     }
 
     public RectangleShape(float x, float y, float w, float h){
@@ -22,16 +28,31 @@ public class RectangleShape extends Shape {
         this.y = y;
         this.width = w;
         this.height = h;
+
+        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        update();
     }
 
     public void setSize(float x, float y){
         this.width = x;
         this.height = y;
+        update();
     }
 
     @Override
     protected void update(){
+        if (buffer == null) return ;
+        //TODO update each time rotation is made, moving, scaling, ...
+        //those values must be saved as Sprite parameters (not calculated each time but at each updates)
+        //double cos = Math.cos(radian);
+        //double sin = Math.sin(radian);
+        Vector2f center = new Vector2f(x, y);
+        Vector2f tl = GLM.rotate(center, new Vector2f(x - ox, y - oy), cos, sin);
+        Vector2f tr = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy), cos, sin);
+        Vector2f bl = GLM.rotate(center, new Vector2f(x - ox, y - oy + sy * height), cos, sin);
+        Vector2f br = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy + sy * height), cos, sin);
 
+        buffer.update(0, new float[]{ bl.x, bl.y, 0, br.x, br.y, 0, tr.x, tr.y, 0, tl.x, tl.y, 0});
     }
 
     @Override
@@ -43,8 +64,13 @@ public class RectangleShape extends Shape {
         glVertex2d(x + width - ox, y + height - oy);
         glVertex2d(x + width - ox, y - oy);
         glEnd();*/
+        //glDisable(GL_TEXTURE_2D);
 
-        glBegin(GL_QUADS);
+        Texture.unbind();
+
+        buffer.draw();
+
+        /*glBegin(GL_QUADS);
         glColor3d(color.r,color.g,color.b);
 
         //those values must be saved as Sprite parameters (not calculated each time but at each updates)
@@ -61,7 +87,7 @@ public class RectangleShape extends Shape {
         glVertex2d(tr.x, tr.y);
         glVertex2d(tl.x, tl.y);
 
-        glEnd();
+        glEnd();*/
     }
 
     @Override

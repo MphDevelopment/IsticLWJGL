@@ -33,16 +33,16 @@ public final class Example2D {
                 if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.X)) {
                     window.clear(Color.Black);
                 }
-                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_DOWN)) {
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DOWN)) {
                     window.clear(Color.Blue);
                 }
-                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_RIGHT)) {
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.RIGHT)) {
                     window.clear(Color.Magenta);
                 }
-                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_LEFT)) {
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.LEFT)) {
                     window.clear(Color.Green);
                 }
-                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.DPAD_UP)) {
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.UP)) {
                     window.clear(Color.Cyan);
                 }
 
@@ -58,13 +58,22 @@ public final class Example2D {
                 if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.RIGHT_THUMB)) {
                     window.clear(new Color(1.f,0.5f,1.f));
                 }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.LEFT_BUMPER)) {
+                    window.clear(new Color(0.5f,0.75f,0.25f));
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.RIGHT_BUMPER)) {
+                    window.clear(new Color(0.7f,0.10f,0.50f));
+                }
+                if (joystick.isGamePadButtonPressed(Joystick.GamePadButton.GUIDE)) {
+                    window.clear(/*new Color(0.5f,0.5f,0.5f, 0.5f)*/Color.Red);
+                }
 
-                System.out.println("left:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.LEFT_AXIS_X, 0.4f)+
+                System.out.println(joystick.getJoystickName()+":"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.LEFT_AXIS_X, 0.4f)+
                         ";"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.LEFT_AXIS_Y, 0.4f));
-                System.out.println("right:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.RIGHT_AXIS_X, 0.4f)+
+                /*System.out.println("right:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.RIGHT_AXIS_X, 0.4f)+
                         ";"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.RIGHT_AXIS_Y, 0.4f));
                 System.out.println("R2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.R2, 0.f));
-                System.out.println("L2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.L2, 0.f));
+                System.out.println("L2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.L2, 0.f));*/
             }
             shape.move(1.f, 1.f);
 

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**http://schabby.de/opengl-shader-example/*/
 
@@ -64,8 +63,6 @@ public final class RenderWindow3D extends GLFWWindow {
         RenderWindow3D window = new RenderWindow3D();
 
 
-
-
         Shader shader = null;
         Shader tshader = null;
         Shader bshader = null;
@@ -75,7 +72,7 @@ public final class RenderWindow3D extends GLFWWindow {
         Texture transparent = null;
 
         try {
-            shader = new Shader("shaders/model.vert", "shaders/mvp.frag");
+            shader = new Shader("shaders/model.vert", "shaders/vao/textured/mvp.frag");
             tshader = new Shader("shaders/defaultMVP.vert", "shaders/defaultMVP.frag");
             bshader = new Shader("shaders/bumpMapping.vert", "shaders/bumpMapping.frag");
             texture = new Texture("dalle.png");
@@ -89,8 +86,11 @@ public final class RenderWindow3D extends GLFWWindow {
         texture.setWrapMode(Texture.REPEAT);
         benjibob.setWrapMode(Texture.MIRROR);
 
-        Sprite sprite = new Sprite();
-        //sprite.setFillColor(Color.Blue);
+        RectangleShape shape = new RectangleShape(-100, -100, 1000,1000);
+        shape.setFillColor(Color.Red);
+
+        Sprite sprite = new Sprite(/*texture*/);
+        sprite.setFillColor(Color.Blue);
         sprite.setTexture(texture, true);
         sprite.setTextureRect(0,0,window.getDimension().x,window.getDimension().y);
         sprite.setOrigin(-window.getDimension().x/2.f,-window.getDimension().y/2.f);
@@ -111,9 +111,91 @@ public final class RenderWindow3D extends GLFWWindow {
         }
         BufferObject bump = new BumpVBO(bshader, BufferObject.BindMode.STATIC_DRAW, new Vector3f(-5*length,length,length), length, transparent, bumpTexture);
 
+        VertexBuffer VERTEX = new VertexBuffer(6, 2, new int[]{3,4}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+        VERTEX.update(0, new float[]{
+                0, 0, 0,
+                1000, 0, 0,
+                1000,1000,0,
+
+                0,0,0,
+                1000,1000,0,
+                0,1000,0
+        });
+        VERTEX.update(1, new float[]{
+                1, 1, 0, 1,
+                1, 0, 0, 1,
+                1, 1, 0, 1,
+
+                1, 0, 1, 1,
+                0, 0, 0, 1,
+                1, 0, 1, 1
+        });
+
+        ArrayList<Drawable> vertices = new ArrayList<>();
+        for (int i = 0 ; i < 100 ; ++i) {
+            VertexBuffer tmp = new VertexBuffer(6, 3, new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+            tmp.update(0, new float[]{
+                    0, 0+ i%10 * 100, 0 + i/100 * 100.f,
+                    0, 0 + i%10 * 100, 100 + i/100 * 100.f,
+                    0,100+ i%10 * 100,100 + i/100 * 100.f,
+
+                    0,0+ i%10 * 100,0 + i/100 * 100.f ,
+                    0,100+ i%10 * 100,100 + i/100* 100.f ,
+                    0,100+ i%10 * 100,0 + i/100* 100.f
+            });
+            tmp.update(1, new float[]{
+                    0, 0, 0, 1,
+                    1, 1, 1, 1,
+                    1, 1, 1, 1,
+
+                    0, 0, 0, 1,
+                    1, 1, 1, 1,
+                    1, 1, 1, 1,
+            });
+            tmp.update(2, new float[]{
+                    1, 1,
+                    1, 0,
+                    0, 0,
+
+                    1, 1,
+                    0, 0,
+                    0, 1
+            });
+            vertices.add(tmp);
+        }
+        VertexBuffer VERTEX2 = new VertexBuffer(6, 3, new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+        VERTEX2.update(0, new float[]{
+                0, 0, 0,
+                0, 0, 1000,
+                0,1000,1000,
+
+                0,0,0,
+                0,1000,1000,
+                0,1000,0
+        });
+        VERTEX2.update(1, new float[]{
+                0, 0, 0, 1,
+                1, 1, 1, 1,
+                1, 1, 1, 1,
+
+                0, 0, 0, 1,
+                1, 1, 1, 1,
+                1, 1, 1, 1,
+        });
+        VERTEX2.update(2, new float[]{
+                1, 1,
+                1, 0,
+                0, 0,
+
+                1, 1,
+                0, 0,
+                0, 1
+        });
+
+
+
 
         Camera3D camera = new Camera3D(80.f, 1,1000, window);
-        camera.setUpVector(new Vector3f(0,1,0));
 
         camera.apply();
         Clock clk = new Clock(Clock.Mode.NANOSECONDS_ACCURACY);
@@ -123,9 +205,9 @@ public final class RenderWindow3D extends GLFWWindow {
         Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
         Camera3DMode mode = new FPSCamera3DMode(keyboard);
 
-        final int uniformMatrix = glGetUniformLocation((int)shader.getGlId(), "modelMatrix");
-        final int uniformView = glGetUniformLocation((int)shader.getGlId(), "viewMatrix");
-        final int uniformProjection = glGetUniformLocation((int)shader.getGlId(), "projectionMatrix");
+        final int uniformMatrix = shader.getUniformLocation("modelMatrix");
+        final int uniformView = shader.getUniformLocation("viewMatrix");
+        final int uniformProjection = shader.getUniformLocation("projectionMatrix");
 
         Viewport viewport = new Viewport(new FloatRect(50,50, 800,800));
 
@@ -136,6 +218,18 @@ public final class RenderWindow3D extends GLFWWindow {
         while (window.isOpen()) {
             Time elapsed = clk.restart();
             elapsedSinceBeginning.add(elapsed);
+
+
+            float sec = (float)elapsedSinceBeginning.asSeconds();
+            VERTEX2.update(0, new float[]{
+                    sec*100, 0, 0,
+                    sec*100, 0, 1000,
+                    sec*100,1000,1000,
+
+                    sec*100,0,0,
+                    sec*100,1000,1000,
+                    sec*100,1000,0
+            });
 
             //System.out.println("fps:"+1.0/elapsed.asSeconds());
             //System.out.println("seconds:"+elapsed.asSeconds());
@@ -150,11 +244,11 @@ public final class RenderWindow3D extends GLFWWindow {
                 } else if (event.type == Event.Type.KEYRELEASED && event.keyReleased == GLFW_KEY_P) {
                     System.out.println("Screenshot! 'capture.*'");
                     try {
-                        window.capture().saveAs("capture.jpeg");
+                        window.capture().saveAs("capture.PNG");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else if (event.type == Event.Type.KEYPRESSED) {
+                } else if (event.type == Event.Type.KEYRELEASED) {
                     //System.out.println(event.keyPressed);
                 } else if (event.type == Event.Type.TEXTENTERED) {
                     System.out.println((char)event.textEntered);
@@ -178,7 +272,8 @@ public final class RenderWindow3D extends GLFWWindow {
                 sprite.rotate((float)(elapsed.asSeconds()/5));
 
                 window.clear(new Color(0.1f,0.1f,0.1f));
-                sprite.draw();
+
+                Texture.unbind();
                 glBegin(GL_TRIANGLES);
                 glColor3d(1, 0, 0);
                 glVertex3d(0+(float)elapsedSinceBeginning.asMilliseconds()/10, 0, 0);
@@ -192,11 +287,14 @@ public final class RenderWindow3D extends GLFWWindow {
 
                 shader.bind();
                 camera.setUniformMVP(uniformMatrix, uniformView, uniformProjection);
+                shape.draw();
+                VERTEX.draw();
                 cube.draw();
                 cube2.draw();
                 for (int i=0 ; i < cubes.size() ; ++i) {
                     cubes.get(i).draw();
                 }
+
 
                 ///CAUSE COLOR ERROR FOR DL DRAW
                 /*bshader.bind();
@@ -205,6 +303,12 @@ public final class RenderWindow3D extends GLFWWindow {
 
                 tshader.bind();
                 camera.setUniformMVP(uniformMatrix, uniformView, uniformProjection);
+                sprite.draw();
+                texture.bind();
+                for (int i=0 ; i < vertices.size() ; ++i) {
+                    vertices.get(i).draw();
+                }
+                VERTEX2.draw();
                 cube3.draw();
                 cube4.draw();
                 cube5.draw();

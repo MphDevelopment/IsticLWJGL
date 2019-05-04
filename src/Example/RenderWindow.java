@@ -6,46 +6,13 @@ import Graphics.*;
 import Graphics.Color;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 import static org.lwjgl.opengl.GL11.*;
 
-
-public class RenderWindow /*extends GLFWWindow*/ {
-
-    /*public RenderWindow(VideoMode videoMode, String title) {
-        super(videoMode, title);
-    }
-
-    public RenderWindow(VideoMode videoMode, String title, WindowStyle style) {
-        super(videoMode, title, style);
-    }
-
-    public RenderWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
-        super(videoMode, title, style, modes);
-    }
-
-    @Override
-    public void clear(){
-        if (!this.isOpen()) return ;
-        glClearColor(0,0,0,1);
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
-
-    @Override
-    public void clear(Color color){
-        if (!this.isOpen()) return ;
-
-        glClearColor(color.r,color.g,color.b,color.a);
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
-
-    @Override
-    public void draw(Drawable d) {
-        if (!this.isOpen()) return ;
-
-        d.draw();
-    }*/
+//TODO trouver un moyen de ne transmettre la MVP qu'une seule fois (uniform blocks, uniform buffer object)
+public class RenderWindow {
 
     public static void main(String[] args) {
 
@@ -54,20 +21,27 @@ public class RenderWindow /*extends GLFWWindow*/ {
                 WindowStyle.DEFAULT.add(WindowStyle.TOPMOST),
                 CallbackMode.DEFAULT
         );
+        //window.setFrameRateLimit(120);
 
         RenderTexture renderTexture;
         RenderTexture renderTexture2;
 
         Texture texture;
         FontFamily font;
+
+        Shader texturedShader;
+        Shader untexturedShader;
         try {
+            texturedShader = new Shader("shaders/vao/textured/mvp.vert", "shaders/vao/textured/mvp.frag");
+            untexturedShader = new Shader("shaders/vao/untextured/mvp.vert", "shaders/vao/untextured/mvp.frag");
+
             renderTexture = new RenderTexture(200,200);
             renderTexture2 = new RenderTexture(200,200);
 
             texture = new Texture("dalle.png");
             texture.setWrapMode(Texture.REPEAT);
 
-            font = new FontFamily("default.ttf", 40);
+            font = new FontFamily("default.ttf", 30);
             //font = new FontFamily("asmelina.ttf", 24);
             //font = new FontFamily("arial.ttf", 24);
             //font = new FontFamily("mono.ttf", 24);
@@ -80,7 +54,8 @@ public class RenderWindow /*extends GLFWWindow*/ {
         Text text = new Text(font, "Phrase Italique!", Text.ITALIC);
         Text text2 = new Text(font, "Phrase Normale!", Text.REGULAR);
         Text text3 = new Text(font, "Phrase Grasse!", Text.BOLD);
-
+        Text fpsText = new Text(font, "0", Text.BOLD);
+        fpsText.setFillColor(Color.Red);
 
         text.setFillColor(Color.Black);
         text2.setFillColor(new Color(1, 0.59f, 0.2f));
@@ -88,6 +63,7 @@ public class RenderWindow /*extends GLFWWindow*/ {
         //text2.setScale(0.2f,0.5f);
         RectangleShape textShape = new RectangleShape(text2.getBounds().l, text2.getBounds().t, text2.getBounds().w, text2.getBounds().h);
         textShape.setFillColor(Color.Red);
+
 
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
@@ -122,19 +98,31 @@ public class RenderWindow /*extends GLFWWindow*/ {
         fullBackground.move(-300,-300);
         fullBackground.setFillColor(Color.Cyan);
 
-        Clock clk = new Clock();
 
-        Viewport viewport = new Viewport(new FloatRect(50,50, 600,600));
+        ArrayList<Shape> array = new ArrayList<>();
+        final int arraySize = 3000;
+        for (int i = 0; i < arraySize ; ++i) {
+            Sprite tmp = new Sprite(texture);
+            //RectangleShape tmp = new RectangleShape(1000,100);
+            tmp.move((i%(int)Math.sqrt(arraySize))*100.f,(i/(int)Math.sqrt(arraySize))*100.f);
+            tmp.setFillColor(new Color(i / (float)arraySize, i / (float)arraySize, i / (float)arraySize));
+            array.add(tmp);
+        }
+
+        Clock clk = new Clock(Clock.Mode.NANOSECONDS_ACCURACY);
+
+        Viewport viewport = new Viewport(new FloatRect(0,0, 2000,1024));
         window.setViewport(viewport);
 
-        Viewport viewport2 = new Viewport(new FloatRect(400,50, 400,400));
+        Viewport viewport2 = new Viewport(new FloatRect(400,50, 900,400));
 
 
         Time elapsedSinceBeginning = Time.seconds(0);
         while (window.isOpen()) {
             Time elapsed = clk.restart();
             elapsedSinceBeginning.add(elapsed);
-            //out.println(1.0/elapsed.asSeconds());
+            //System.out.println(1.0/elapsed.asSeconds());
+            fpsText.setString("fps:"+(int)(1.0/elapsed.asSeconds()));
             //out.println("abs:" + mouse.getAbsolutePosition().x + ":" + mouse.getAbsolutePosition().y);
             //out.println("rel:" + mouse.getRelativePosition().x + ":" + mouse.getRelativePosition().y);
 
@@ -143,43 +131,33 @@ public class RenderWindow /*extends GLFWWindow*/ {
                 if (event.type == Event.Type.CLOSE) {
                     window.close();
                     System.exit(0);
-                }
-                if (event.type == Event.Type.KEYREPEAT) {
+                } else if (event.type == Event.Type.KEYREPEAT) {
                     System.out.println(event.keyRepeated);
-                }
-                if (event.type == Event.Type.MOUSELEAVE) {
+                } else if (event.type == Event.Type.MOUSELEAVE) {
                     System.out.print("l");
-                }
-                if (event.type == Event.Type.MOUSESCROLL) {
+                } else if (event.type == Event.Type.MOUSESCROLL) {
                     System.out.print("s");
                     shape.move(0,event.scrollY);
-                }
-                if (event.type == Event.Type.MOUSEENTER) {
+                } else if (event.type == Event.Type.MOUSEENTER) {
                     System.out.print("e");
-                }
-                if (event.type == Event.Type.MOUSEDROP) {
+                } else if (event.type == Event.Type.MOUSEDROP) {
                     System.out.print("d");
-                }
-                if (event.type == Event.Type.JOYSTICK) {
-                    System.out.print("j");
-                }
-                if (event.type == Event.Type.BUTTONRELEASED) {
+                } else if (event.type == Event.Type.JOYSTICK_CONNECTION) {
+                    System.out.println("Joystick event");
+                } else if (event.type == Event.Type.JOYSTICK_DISCONNECTION) {
+                    System.out.println("Joystick event");
+                } else if (event.type == Event.Type.BUTTONRELEASED) {
                     System.out.print("r");
-                }
-                if (event.type == Event.Type.BUTTONPRESSED) {
+                } else if (event.type == Event.Type.BUTTONPRESSED) {
                     System.out.print("p");
-                }
-                if (event.type == Event.Type.RESIZE) {
+                } else if (event.type == Event.Type.RESIZE) {
                     System.out.print("R");
                     //camera.setDimension(new Vector2f(window.getDimension()));
-                }
-                if (event.type == Event.Type.MOVE) {
+                } else if (event.type == Event.Type.MOVE) {
                     System.out.print("m");
-                }
-                if (event.type == Event.Type.FOCUS) {
+                } else if (event.type == Event.Type.FOCUS) {
                     System.out.print("f+");
-                }
-                if (event.type == Event.Type.UNFOCUS) {
+                } else if (event.type == Event.Type.UNFOCUS) {
                     System.out.print("f-");
                 }
             }
@@ -191,7 +169,7 @@ public class RenderWindow /*extends GLFWWindow*/ {
             //viewport2.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
 
 
-            shape.move(+1f,+1f);
+            shape.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
             fullBackground.move(1,1);
             screen.move(0.5f,0);
             screen2.move(0.25f,0);
@@ -208,43 +186,71 @@ public class RenderWindow /*extends GLFWWindow*/ {
             }
 
             //Rendering
-            renderTexture.clear(Color.Blue);
+            /*renderTexture.clear(Color.Blue);
+            texturedShader.bind();
+            renderTexture.getCamera().setUniformMVP(0);
             renderTexture.draw(sprite);
+            untexturedShader.bind();
+            renderTexture.getCamera().setUniformMVP(0);
             renderTexture.draw(shape);
 
             //screenCamera2.move(new Vector2f(0.1f, 0.1f));
             renderTexture2.clear(Color.Yellow);
+            untexturedShader.bind();
+            renderTexture2.getCamera().setUniformMVP(0);
             renderTexture2.draw(background);
-            renderTexture2.draw(sprite);
             renderTexture2.draw(shape);
+            texturedShader.bind();
+            renderTexture2.getCamera().setUniformMVP(0);
+            renderTexture2.draw(sprite);*/
+
 
             //test viewport 1
             window.setViewport(viewport);
             window.clear(Color.Green);
-            fullBackground.draw();
-            screen.draw();
+            untexturedShader.bind();
+            window.getCamera().setUniformMVP(0);
+            window.draw(fullBackground);
+            window.draw(shape);
+            texturedShader.bind();
+            window.getCamera().setUniformMVP(0);
+            for (int i = 0; i < array.size() ; ++i) {
+                window.draw(array.get(i));
+            }
+            fpsText.setPosition(shape.getPosition().x-200, shape.getPosition().y - 50);
+            Shader.unbind();
+            window.draw(fpsText);
+
+            /*screen.draw();
             text.setPosition(shape.getPosition().x, shape.getPosition().y);
             text2.setPosition(shape.getPosition().x, shape.getPosition().y + 100);
             text3.setPosition(shape.getPosition().x, shape.getPosition().y + 200);
+
             textShape.setPosition(shape.getPosition().x, shape.getPosition().y + 100);
             textShape.draw();
             text.draw();
             text2.draw();
-            text3.draw();
-            screen2.draw();
-            shape.draw();
+            text3.draw();*/
+            //screen2.draw();
+
+            //fpsText.draw();
+
 
             //test viewport 2
             /*camera.setCenter(shape.getPosition());
             viewport.setTopleftCorner(new Vector2f(30,30));
             viewport.apply(window);*/
-            camera.setDimension(viewport2.getDimension());
+            /*camera.setDimension(viewport2.getDimension());
             window.setViewport(viewport2);
             window.draw(screen);
             window.draw(screen2);
-            window.draw(shape);
+            window.draw(shape);*/
 
             window.display();
+        }
+
+        for (int i = 0; i < array.size() ; ++i) {
+            //array.get(i).free();
         }
     }
 }
