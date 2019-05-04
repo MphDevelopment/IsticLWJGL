@@ -9,18 +9,61 @@ import static org.lwjgl.opengl.GL20.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**http://schabby.de/opengl-shader-example/*/
 public class Shader extends GlObject {
-    //private ThreadLocal<Shader> current = new ThreadLocal<Shader>();
+    //TODO plus optimisé de faire comme ça ? en gros on va conserver le dernier shader (ou null) activé pour ne pas l'activer a chaque fois qu'il va être utilisé a la suite
+    private static ThreadLocal<Shader> currentShader = new ThreadLocal<Shader>();
+    static {
+        currentShader.set(null);
+    }
+
+    private HashMap<String, Integer> uniforms = new HashMap<>();
+
+    public Shader(){}
 
     public Shader(String vert, String frag) throws IOException {
+        loadFromFile(vert, frag);
+    }
+
+    public void loadFromFile(String vert, String frag) throws IOException {
         // create the shader program. If OK, create vertex and fragment shaders
         glId = glCreateProgram();
 
         // load and compile the two shaders
         int vertShader = loadAndCompileShader(vert, GL_VERTEX_SHADER);
         int fragShader = loadAndCompileShader(frag, GL_FRAGMENT_SHADER);
+
+        // attach the compiled shaders to the program
+        glAttachShader((int)glId, vertShader);
+        glAttachShader((int)glId, fragShader);
+
+        // now link the program
+        glLinkProgram((int)glId);
+
+        // validate linking
+        if (glGetProgrami((int)glId, GL_LINK_STATUS) == GL11.GL_FALSE)
+        {
+            throw new RuntimeException("could not link shader. Reason: " + glGetProgramInfoLog((int)glId, 1000));
+        }
+
+        // perform general validation that the program is usable
+        glValidateProgram((int)glId);
+
+        if (glGetProgrami((int)glId, GL_VALIDATE_STATUS) == GL11.GL_FALSE)
+        {
+            throw new RuntimeException("could not validate shader. Reason: " + glGetProgramInfoLog((int)glId, 1000));
+        }
+    }
+
+    public void loadFromMemory(String vert, String frag) throws IOException {
+        // create the shader program. If OK, create vertex and fragment shaders
+        glId = glCreateProgram();
+
+        // load and compile the two shaders
+        int vertShader = loadAndCompileShaderFromMemory(vert, GL_VERTEX_SHADER);
+        int fragShader = loadAndCompileShaderFromMemory(frag, GL_FRAGMENT_SHADER);
 
         // attach the compiled shaders to the program
         glAttachShader((int)glId, vertShader);
@@ -74,6 +117,33 @@ public class Shader extends GlObject {
         return handle;
     }
 
+    private int loadAndCompileShaderFromMemory(String code, int shaderType) {
+        //vertShader will be non zero if succefully created
+        int handle = glCreateShader(shaderType);
+
+        if( handle == 0 )
+        {
+            throw new RuntimeException("could not created shader of type " + shaderType + " : " + glGetProgramInfoLog((int)glId, 1000));
+        }
+
+        // upload code to OpenGL and associate code with shader
+        glShaderSource(handle, code);
+
+        // compile source code into binary
+        glCompileShader(handle);
+
+        // acquire compilation status
+        int shaderStatus = glGetShaderi(handle, GL20.GL_COMPILE_STATUS);
+
+        // check whether compilation was successful
+        if( shaderStatus == GL11.GL_FALSE)
+        {
+            throw new IllegalStateException("compilation error for shader. Reason: " + glGetShaderInfoLog(handle, 1000));
+        }
+
+        return handle;
+    }
+
     /**
      * Loads a text file and return it as a String.
      */
@@ -101,14 +171,20 @@ public class Shader extends GlObject {
      * Sets 'this' as the current shader program
      */
     public void bind(){
-        GL20.glUseProgram((int)this.glId);
+        if (currentShader.get() != this) {
+            currentShader.set(this);
+            GL20.glUseProgram((int) this.glId);
+        }
     }
 
     /**
-     *
+     * Removes last bound shader as current shader.
      */
     public static void unbind(){
-        GL20.glUseProgram(0);
+        if (currentShader.get() != null) {
+            currentShader.set(null);
+            GL20.glUseProgram(0);
+        }
     }
 
     /**
@@ -122,8 +198,20 @@ public class Shader extends GlObject {
         glId = 0;
     }
 
+    /**
+     * Gets the uniform specified value location inside the shader program?
+     * @param name uniform value name.
+     * @return uniform specified value location inside the shader program?
+     */
     public int getUniformLocation(String name) {
-        return glGetUniformLocation((int)this.getGlId(), name);
+        Integer location = uniforms.get(name);
+        if (location != null) {
+            return location;
+        } else {
+            location = glGetUniformLocation((int)this.getGlId(), name);
+            uniforms.put(name, location);
+            return location;
+        }
     }
 
 }
