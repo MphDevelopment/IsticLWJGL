@@ -50,11 +50,22 @@ public class VertexBuffer extends GlObject implements Drawable {
     private int[] vboArrayId = null;
     private int[] vboArraySampleSize = null;
 
-
+    /**
+     * Creates a Vertex Buffer Object with a specific Usage.
+     * @param usage specified usage.
+     */
     public VertexBuffer(Usage usage) {
         this.usage = usage;
     }
 
+    /**
+     * Creates a Vertex Buffer Object with a specific Usage.
+     * @param verticesCount vertices count.
+     * @param vaoCount Number of VAO. (positions, colors, texture coords)
+     * @param vaoSampleSize For each VAO each vertices requires how many floats per sample. (0 < vaoSampleSize.length <= vaoCount)
+     * @param mode draw mode.
+     * @param usage usage specified usage.
+     */
     public VertexBuffer(int verticesCount, int vaoCount, int[] vaoSampleSize, Mode mode, Usage usage) {
         this.usage = usage;
         this.create(verticesCount, vaoCount, vaoSampleSize, mode);
@@ -98,13 +109,13 @@ public class VertexBuffer extends GlObject implements Drawable {
 
 
         // create vertex array object (VAO)
-        super.glId = GL30.glGenVertexArrays();
+        super.glId = GL30.glGenVertexArrays(); //TODO context can't share VAO
         glBindVertexArray((int)super.glId);
 
         for (int i=0 ; i < vaoCount ; ++i) {
             glEnableVertexAttribArray(i);
 
-            // assign vertex VBO to slot 0 of VAO
+            // assign vertex VBO to slot 'i' of VAO
             glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vboArrayId[i]);
             glVertexAttribPointer(i, vaoSampleSize[i], GL11.GL_FLOAT, false, 0, 0);
         }
@@ -113,6 +124,11 @@ public class VertexBuffer extends GlObject implements Drawable {
 
     }
 
+    /**
+     * Updates the GPU memory for a specific VAO.
+     * @param vao specified vao
+     * @param data New memory.
+     */
     public void update(int vao, float[] data) {
         if (super.getGlId() == 0) return;
 
@@ -125,6 +141,10 @@ public class VertexBuffer extends GlObject implements Drawable {
         glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
+    /**
+     * Frees the VertexBuffer from GPU memory.
+     */
+    @Override
     public void free() {
         if (super.getGlId() == 0) return;
 
@@ -138,6 +158,10 @@ public class VertexBuffer extends GlObject implements Drawable {
         super.glId = 0;
     }
 
+    /**
+     * Displays VBO.
+     */
+    @Override
     public void draw() {
         if (this.glId == 0) return ;
 
