@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL11.*;
  * https://www.oreilly.com/library/view/learning-java-4th/9781449372477/ch20s06.html
  * @author TheBoneJarmer
  */
+@Deprecated
 public class FontFamily {
 
     //Constants
@@ -57,10 +58,7 @@ public class FontFamily {
     //Constructors
     public FontFamily(String path, float size) throws IOException {
         try {
-            this.font = Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(size)
-            //        .deriveFont(Font.BOLD)
-            ;
-
+            this.font = Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(size);
         } catch (FontFormatException e) {
             throw new IOException("Font must be True Type Font (*.ttf).");
         }
