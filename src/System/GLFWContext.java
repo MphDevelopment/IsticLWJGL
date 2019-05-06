@@ -15,11 +15,12 @@ public final class GLFWContext {
      * Only one window is enable.
      */
     public synchronized static void createContext(){
+        // Checks if context is created within the Main thread
+        if (Thread.currentThread().getId() != mainThreadId) {
+            throw new RuntimeException("GLFW context is not initialized by the Main thread");
+        }
+
         if (contextCount++ == 0) {
-            // Checks if context is created within the Main thread
-            if (Thread.currentThread().getId() != mainThreadId) {
-                throw new RuntimeException("GLFW context is not initialized by the Main thread");
-            }
 
             // Setup an error callback. The default implementation
             // will print the error message in System.err.
@@ -38,12 +39,12 @@ public final class GLFWContext {
      * When last context is delete we must terminate GLFW
      */
     public synchronized static void deleteContext(){
+        if (Thread.currentThread().getId() != mainThreadId) {
+            throw new RuntimeException("GLFW context is not removed by the Main thread");
+        }
+
         contextCount--;
         if (contextCount == 0) {
-            if (Thread.currentThread().getId() != mainThreadId) {
-                throw new RuntimeException("GLFW context is not removed by the Main thread");
-            }
-
             System.out.println("glfwTerminate() called");
             glfwTerminate();
         }
