@@ -69,51 +69,53 @@ public final class RenderTexture extends RenderTarget {
         camera.apply();
         viewport.apply(this);
 
-        /// ELSE
-
-        /*glViewport(0, 0, width, height);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        Matrix4f ortho = GLM.ortho(0.f, this.getDimension().x, this.getDimension().y, 0.f, -1f, 1.f);
-        glLoadMatrixf(GLM.toFloatArray(ortho));
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();*/
-
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
-    public final void clear(Color color) {
+    public final void clear(ConstColor color) {
         if (!this.isActive()) this.setActive();
         else if (this.needViewUpdate()) this.applyView();
 
-        glClearColor(color.r, color.g, color.b, color.a);
+        glClearColor(color.getR(), color.getG(), color.getB(), color.getA());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     @Override
     public final void clear() {
-        if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
-
-        glClearColor(0, 0,0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        clear(Color.Black);
     }
 
     @Override
-    public final void draw(Drawable d) {
-        if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
+    public final void draw(Drawable drawable, Shader shader) {
+        if (!this.isActive()) {
+            this.setActive();
 
-        d.draw();
+            if (shader != null && shader.isBound())
+                Shader.rebind();
+        }
+
+        if (shader != null) {
+            if (!shader.isBound())
+                shader.bind();
+        } else Shader.unbind();
+
+        if (this.needViewUpdate()) this.applyView();
+
+        ///TODO avec ou ça
+        if (shader != null) {
+            shader.bind();
+            Shader.rebind();
+            camera.setUniformMVP(0);
+        }
+
+        drawable.draw();
     }
 
     public final void display(){
         if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
+        if (this.needViewUpdate()) this.applyView();
 
         glFlush();
     }

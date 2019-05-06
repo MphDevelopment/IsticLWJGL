@@ -1,11 +1,10 @@
 package System;
 
 
-import Graphics.Color;
-import Graphics.Drawable;
-import Graphics.Image;
-import Graphics.Vector2i;
+import Graphics.*;
 import com.sun.istack.internal.NotNull;
+
+import java.io.IOException;
 
 /**
  * RenderTarget is an abstract class specifying that it drawn OpenGL graphics.
@@ -14,6 +13,14 @@ import com.sun.istack.internal.NotNull;
 public abstract class RenderTarget extends GlObject {
     //Multiple RenderTargets
     private static ThreadLocal<RenderTarget> currentTarget = new ThreadLocal<RenderTarget>();
+
+    private static Shader defaultShader = null;
+    private static final String vertex = "";
+    private static final String fragment = "";
+
+
+    //load default shader only once
+    private static boolean first = true;
 
     //default view parameters
     protected Camera defaultCamera;
@@ -29,11 +36,11 @@ public abstract class RenderTarget extends GlObject {
     /**
      * Change current RenderTarget to 'this' and change view to 'this' view
      */
-    protected final void setActive(){
+    public final void setActive(){
         //currentTarget = this;
         currentTarget.set(this);
         this.bind(); // on souhaite modifier ce RenderTarget seulement
-        this.applyView(); // on applique sa vue et ses paramètres
+        //this.applyView(); // on applique sa vue et ses paramètres
     }
 
     /**
@@ -45,6 +52,7 @@ public abstract class RenderTarget extends GlObject {
      * Updates current RenderTarget View using Camera and Viewport
      */
     protected final void applyView() {
+        camera.setUniformMVP(0);
         camera.apply();
         viewport.apply(this);
     }
@@ -53,7 +61,7 @@ public abstract class RenderTarget extends GlObject {
      * Checks if currentTarget is 'this'.
      * @return true i
      */
-    protected final boolean isActive(){
+    public final boolean isActive(){
         return currentTarget.get() == this;
     }
 
@@ -104,7 +112,7 @@ public abstract class RenderTarget extends GlObject {
      * RenderTarget is activated before calling 'clear' method.
      * @param color clear color
      */
-    public abstract void clear(Color color);
+    public abstract void clear(ConstColor color);
 
     /**
      * Clear the RenderTarget with black color.
@@ -116,7 +124,11 @@ public abstract class RenderTarget extends GlObject {
      * RenderTarget is activated before calling 'draw' method of the drawable.
      * @param d drawable
      */
-    public abstract void draw(Drawable d);
+    public final void draw(Drawable d) {
+        draw(d, Shader.getDefaultShader());
+    }
+
+    public abstract void draw(Drawable d, Shader shader);
 
     /**
      * Gives the pixel dimension of the RenderTarget.

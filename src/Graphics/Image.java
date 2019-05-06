@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
  * Contrary to Texture, data are saved into the RAM.
  * @see Texture Texture (DRAM only)
  */
-public class Image {
+public class Image implements ConstImage {
     private static final int bpp = 4;
 
     private int width;
@@ -94,7 +94,7 @@ public class Image {
 
 
     /**
-     * Loads current image from a PNG file.
+     * Loads current image from a PNG/JPG/BMP file.
      * @param file specified file
      * @throws IOException thrown when image can't be load from file
      */
@@ -119,6 +119,11 @@ public class Image {
         }
     }
 
+    /**
+     * Converts BufferedImage to ByteBuffer
+     * @param image specified BufferedImage
+     * @return conversion to ByteBuffer
+     */
     public static ByteBuffer convertImage(BufferedImage image) {
         final int BYTES_PER_PIXEL = 4;
         int[] pixels = new int[image.getWidth() * image.getHeight()];
@@ -180,7 +185,7 @@ public class Image {
     }
 
     /**
-     * Creates an image file using a specific name and specific extension.
+     * Creates an PNG image file using a specific name and specific extension.
      * @param filename file name with extension. (PNG)
      * @throws IOException thrown when image save did not correctly end up
      */

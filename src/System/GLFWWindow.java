@@ -64,6 +64,9 @@ public class GLFWWindow extends RenderTarget {
     private boolean focusEvent = false;
     private boolean focus;
 
+    // auto share
+    private static GLFWWindow lastCreated = null;
+
     /**
      * Enable callbacks according to 'modes' parameter
      * @param modes chosen modes
@@ -195,6 +198,7 @@ public class GLFWWindow extends RenderTarget {
      */
     protected void updateDefaultView(){
         ((Camera2D)defaultCamera).setDimension(new Vector2f(width, height));
+        ((Camera2D)defaultCamera).setCenter(new Vector2f(width / 2.f,height / 2.f));
         defaultViewport.setDimension(new Vector2f(width, height));
     }
 
@@ -243,7 +247,7 @@ public class GLFWWindow extends RenderTarget {
      * @param modes window's callback modes
      */
     public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes) {
-        this(videoMode, title, style, modes, null);
+        this(videoMode, title, style, modes, lastCreated); // auto share
     }
 
 
@@ -253,9 +257,9 @@ public class GLFWWindow extends RenderTarget {
      * @param title window's title
      * @param style window's style
      * @param modes window's callback modes
-     * @param share target where 'this' will share Texture, Shaders, ...
+     * @param share target where 'this' will share Texture, Shaders, VBO ...
      */
-    public GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes, GLFWWindow share) {
+    protected GLFWWindow(VideoMode videoMode, String title, WindowStyle style, CallbackMode modes, GLFWWindow share) {
         super();
 
         // initialized glfw if glfw is not initialized
@@ -284,7 +288,7 @@ public class GLFWWindow extends RenderTarget {
 
 
         ////////////////////// Set up event handle //////////////////////////
-        // Setup a key callback.
+        // Setup a all callbacks.
         this.initCallbacks(modes);
 
         /////////////////////  Set up params ////////////////////
@@ -303,9 +307,21 @@ public class GLFWWindow extends RenderTarget {
         // Make the window visible
         glfwShowWindow(this.glId);
 
+        // Right now the window is opened
         this.running = true;
 
+        // Creates trivial texture (white 1*1 2D texture) for prime created window
+        // Creates default shader for prime created window
+        if (share == null) {
+            Texture.createTrivial();
+            Shader.createDefault();
+        }
+
+        // Creates default GL states and camera and viewport
         this.initGl();
+
+        // for auto sharing
+        lastCreated = this;
     }
 
     /**
@@ -445,13 +461,7 @@ public class GLFWWindow extends RenderTarget {
      * Clear all the window screen with black color.
      */
     public final void clear(){
-        if (!this.isOpen()) return ;
-
-        if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
-
-        glClearColor(0,0,0,1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        clear(Color.Black);
     }
 
     /**
@@ -459,13 +469,23 @@ public class GLFWWindow extends RenderTarget {
      * @param color specified color
      */
     @Override
-    public final void clear(Color color){
+    public final void clear(ConstColor color){
         if (!this.isOpen()) return ;
 
-        if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
+        /*if (!this.isActive()) this.setActive();
+        if (this.needViewUpdate()) this.applyView();*/
+        //TODO ça
+        if (!this.isActive()) {
+            this.setActive();
+            Shader.rebind();
+            this.applyView();
+        }
+        if (this.needViewUpdate()) {
+            //Shader.rebind();
+            this.applyView();
+        }
 
-        glClearColor(color.r,color.g,color.b,color.a);
+        glClearColor(color.getR(),color.getG(),color.getB(),color.getA());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -476,10 +496,11 @@ public class GLFWWindow extends RenderTarget {
         if (!running) return ;
 
         if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
+        if (this.needViewUpdate()) this.applyView();
 
         //glFlush();
         glfwSwapBuffers(this.glId);
+
 
         if (frameTimeLimit.asSeconds() != 0.f) {
             Time fps = frameTimeLimit.clone();
@@ -489,14 +510,6 @@ public class GLFWWindow extends RenderTarget {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            /*float theta = (float) (frameRate) * 2 - 1.f /(float) elapsed.asSeconds();
-            if (theta > 0) {
-                try {
-                    Thread.sleep((int)(1000.f / theta));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }*/
             internalClk.restart();
         }
     }
@@ -505,15 +518,33 @@ public class GLFWWindow extends RenderTarget {
      * Draw the Drawable inside the frame buffer.
      * @param drawable something that can be drawn
      */
-    public final void draw(Drawable drawable) {
+    public final void draw(Drawable drawable, Shader shader) {
         if (!running) return ;
 
-        if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
+
+        //TODO ça
+        if (!this.isActive()) {
+            this.setActive();
+            if (!shader.isBound())
+                shader.bind();
+            else Shader.rebind();
+            this.applyView();
+        }
+        if (!shader.isBound() || this.needViewUpdate()) {
+            if (!shader.isBound())
+                shader.bind();
+            this.applyView();
+        }
+
+        ///TODO avec ou ça
+        /*if (shader != null) {
+            shader.bind();
+            Shader.rebind();
+            camera.setUniformMVP(0);
+        }*/
 
         drawable.draw();
     }
-
 
     @Override
     public final void free() {

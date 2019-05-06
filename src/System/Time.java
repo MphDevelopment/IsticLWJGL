@@ -3,7 +3,7 @@ package System;
 /**
  * Time interface with seconds, milliseconds, microseconds, nanoseconds accuracy
  */
-public final class Time implements Comparable<Time> {
+public final class Time extends ConstTime {
     private long nanoseconds;
 
     /**
@@ -17,7 +17,7 @@ public final class Time implements Comparable<Time> {
     /**
      * Create a time interface initialized with seconds
      * @param seconds initial value
-     * @return
+     * @return time with default seconds
      */
     public static Time seconds(long seconds){
         return new Time(seconds * 1000000000);
@@ -26,7 +26,7 @@ public final class Time implements Comparable<Time> {
     /**
      * Create a time interface initialized with milliseconds
      * @param milliseconds initial value
-     * @return
+     * @return time with default milliseconds
      */
     public static Time milliseconds(long milliseconds){
         return new Time(milliseconds * 1000000);
@@ -35,7 +35,7 @@ public final class Time implements Comparable<Time> {
     /**
      * Create a time interface initialized with microseconds
      * @param microseconds initial value
-     * @return
+     * @return time with default microseconds
      */
     public static Time microseconds(long microseconds){
         return new Time(microseconds * 1000);
@@ -44,7 +44,7 @@ public final class Time implements Comparable<Time> {
     /**
      * Create a time interface initialized with nanoseconds
      * @param nanoseconds initial value
-     * @return
+     * @return time with dafault nanoseconds
      */
     @Deprecated
     public static Time nanoseconds(long nanoseconds){
@@ -53,13 +53,17 @@ public final class Time implements Comparable<Time> {
 
 
     /**
-     * Create timestamp with a default nanoseconds value
+     * Creates Time with a default nanoseconds value
      * @param value initial nanoseconds value
      */
     public Time(long value){
         this.nanoseconds = value;
     }
 
+    /**
+     * Creates Time using an other Time nanoseconds value
+     * @param t time reference
+     */
     public Time(Time t){
         this.nanoseconds = t.nanoseconds;
     }
@@ -167,18 +171,5 @@ public final class Time implements Comparable<Time> {
         return new Time(nanoseconds);
     }
 
-    /**
-     * Checks if 'this' is greater/lower than an other time or equal
-     * @param o compared to
-     * @return -1 if 'this' is lower, 1 if 'this' is greater, 0 else
-     */
-    @Override
-    public int compareTo(Time o) {
-        if (this.nanoseconds > o.nanoseconds)
-            return +1;
-        else if (this.nanoseconds < o.nanoseconds)
-            return -1;
-        else
-            return 0;
-    }
+
 }

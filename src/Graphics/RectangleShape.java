@@ -6,21 +6,25 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex2d;
 
-/**
- * "Display list" rectangle shape
- */
+
 public class RectangleShape extends Shape {
     public RectangleShape(){
-        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
-        update();
+        this(0,0);
     }
 
     public RectangleShape(float w, float h){
-        this.width = w;
+        /*this.width = w;
         this.height = h;
 
         buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
-        update();
+        buffer.update(2, new float[]{
+                0,0,
+                1,0,
+                1,1,
+                0,1
+         });
+        update();*/
+        this(0,0, w, h);
     }
 
     public RectangleShape(float x, float y, float w, float h){
@@ -29,7 +33,13 @@ public class RectangleShape extends Shape {
         this.width = w;
         this.height = h;
 
-        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        buffer = new VertexBuffer(4, /*3*/2, new int[]{3,4/*,2*/}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        /*buffer.update(2, new float[]{
+                0,0,
+                1,0,
+                1,1,
+                0,1
+        });*/
         update();
     }
 
@@ -66,7 +76,10 @@ public class RectangleShape extends Shape {
         glEnd();*/
         //glDisable(GL_TEXTURE_2D);
 
-        Texture.unbind();
+        //Texture.unbind();
+        Texture.DefaultTexture().bind();
+
+        glEnable(GL_TEXTURE_2D);
 
         buffer.draw();
 

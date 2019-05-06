@@ -22,7 +22,31 @@ import javax.imageio.ImageIO;
  * Contrary to Image, data are saved into the DRAM.
  * @see Graphics.Image Image (RAM only)
  */
-public class Texture extends GlObject {
+public class Texture extends GlObject implements ConstTexture {
+    //TODO plus optimisé de faire comme ça ? en gros on va conserver la dernier texture (ou null) activée pour ne pas l'activer a chaque fois qu'elle va être utilisée a la suite
+    private static ThreadLocal<Texture> currentTexture = new ThreadLocal<Texture>();
+    static {
+        currentTexture.set(null);
+    }
+
+    //
+    private static Texture trivial = null;
+    public static void createTrivial(){
+        if (trivial != null) return ;
+
+        BufferedImage image = new BufferedImage(1,1, BufferedImage.TYPE_INT_ARGB);
+        image.setRGB(0,0, ~0);
+        trivial = new Texture(image, GL_NEAREST, GL_REPEAT);
+        //throw new RuntimeException("Impossible to load trivial white texture");
+    }
+    public static ConstTexture DefaultTexture(){
+        return trivial;
+    }
+    //TODO delete texture when shutdown
+    public static void deleteTrivial(){
+        trivial.free();
+    }
+
     // Image dimension
     public final int width;
     public final int height;
@@ -52,7 +76,7 @@ public class Texture extends GlObject {
 
     /**
      * Loads a texture using a PNG file path
-     * @param file PNG file path
+     * @param file PNG/JPG/BMP file path
      *             filter mode is by default GL_NEAREST
      *             wrap mode is by default GL_CLAMP_TO_EDGE
      * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
@@ -63,7 +87,7 @@ public class Texture extends GlObject {
 
     /**
      * Loads a texture using a PNG file path with a specific Filter
-     * @param file PNG file path
+     * @param file PNG/JPG/BMP file path
      * @param filter OpenGL native filter mode
      *               wrap mode is by default GL_CLAMP_TO_EDGE.
      * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
@@ -74,7 +98,7 @@ public class Texture extends GlObject {
 
     /**
      * Loads a texture using a PNG file path with a specific Filter and a specific Wrap Mode
-     * @param file PNG file path
+     * @param file PNG/JPG/BMP file path
      * @param filter OpenGL native filter mode
      * @param wrap OpenGL native wrap mode
      * @throws IOException throws when texture is not correctly loaded because the file does not exist or because of internal OpenGL issues
@@ -82,28 +106,6 @@ public class Texture extends GlObject {
     public Texture(String file, int filter, int wrap) throws IOException {
         InputStream input = null;
         try {
-            /*//get an InputStream from our URL
-            input = new FileInputStream(file);
-
-            //initialize the decoder
-            PNGDecoder dec = new PNGDecoder(input);
-
-            //set up image dimensions
-            width = dec.getWidth();
-            height = dec.getHeight();
-
-            //we are using RGBA, i.e. 4 components or "bytes per pixel"
-            final int bpp = 4;
-
-            //create a new byte buffer which will hold our pixel data
-            ByteBuffer buf = BufferUtils.createByteBuffer(bpp * width * height);
-
-            //decode the image into the byte buffer, in RGBA format
-            dec.decode(buf, width * bpp, PNGDecoder.Format.RGBA);
-
-            //flip the buffer into "read mode" for OpenGL
-            buf.flip();*/
-
             input = new FileInputStream(file);
 
             BufferedImage i = ImageIO.read(input);
@@ -140,43 +142,53 @@ public class Texture extends GlObject {
         }
     }
 
-    private static ByteBuffer convertImage(BufferedImage image)
-    {
-        final int BYTES_PER_PIXEL = 4;
-        int[] pixels = new int[image.getWidth() * image.getHeight()];
-        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+    public Texture(BufferedImage buffer, int filter, int wrap) {
+        //buffer.setRGB(0,0, 255 << 16 + 255 << 8 + 255);
+        width = buffer.getWidth();
+        height = buffer.getHeight();
 
-        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * BYTES_PER_PIXEL);
+        ByteBuffer buf = Image.convertImage(buffer);
 
-        for(int y = 0; y < image.getHeight(); y++)
-        {
-            for(int x = 0; x < image.getWidth(); x++)
-            {
-                int pixel = pixels[y * image.getWidth() + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
-                buffer.put((byte) (pixel & 0xFF));               // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
-            }
-        }
+        //enable textures and generate an ID
+        //glEnable(GL_TEXTURE_2D);
+        glId = glGenTextures();
 
-        buffer.flip();
+        //bind texture
+        this.bind();
 
-        return buffer;
+        //setup unpack mode
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        //setup parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+
+        //pass RGBA data to OpenGL
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+        Texture.unbind();
     }
 
     /**
      * Sets this (glId) as the current Texture
      */
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D, (int)glId);
+        if (currentTexture.get() != this) {
+            currentTexture.set(this);
+            glBindTexture(GL_TEXTURE_2D, (int) glId);
+        }
     }
 
     /**
      * Removes last bound texture as current texture
      */
     public static void unbind() {
-        glBindTexture(GL_TEXTURE_2D, 0);
+        if (currentTexture.get() != null) {
+            currentTexture.set(null);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
     }
 
     /**

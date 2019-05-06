@@ -12,11 +12,57 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**http://schabby.de/opengl-shader-example/*/
-public class Shader extends GlObject {
+///TODO When user unbind it's own shader/ IsticLWJGL must bind the default one if there is no current shader (le faire pendant window.draw(drawable))
+public class Shader extends GlObject implements ConstShader {
     //TODO plus optimisé de faire comme ça ? en gros on va conserver le dernier shader (ou null) activé pour ne pas l'activer a chaque fois qu'il va être utilisé a la suite
     private static ThreadLocal<Shader> currentShader = new ThreadLocal<Shader>();
     static {
         currentShader.set(null);
+    }
+    public static void rebind() {
+        ///TODO IMPORTANT chaque fenetre doit binder le shader mais si le shader a été bindé précédement (ThreadLocal) il ne va plus se binder
+        GL20.glUseProgram(currentShader.get() != null ? (int) currentShader.get().glId : 0);
+    }
+
+    private static Shader defaultShader = null;
+    public static void createDefault() {
+        if (defaultShader != null) return ;
+
+        defaultShader = new Shader();
+        try {
+            defaultShader.loadFromMemory(
+                    "#version 400\n" +
+                    "layout (location = 0) in vec3 VertexPosition;\n" +
+                    "layout (location = 1) in vec4 VertexColor;\n" +
+                    "layout (location = 2) in vec2 VertexTexCoord;\n" +
+                    "uniform mat4 mvp;\n" +
+                    "out vec4 Color;\n" +
+                    "out vec2 TexCoord;\n" +
+                    "void main()\n" +
+                    "{\n" +
+                    "    Color  = VertexColor;\n" +
+                    "    TexCoord = VertexTexCoord;\n" +
+                    "    gl_Position = mvp * vec4(VertexPosition, 1.0);\n" +
+                    "}"
+                    ,
+
+
+                    "#version 400\n" +
+                    "in vec4 Color;\n" +
+                    "in vec2 TexCoord;\n" +
+                    "uniform sampler2D texture;\n" +
+                    "out vec4 FragColor;\n" +
+                    "void main()\n" +
+                    "{\n" +
+                    "    vec4 pixel = texture2D(texture, TexCoord);\n" +
+                    "    FragColor = pixel * Color;\n" +
+                    "}");
+        } catch (IOException e) {
+            throw new RuntimeException("Can't load default Shader");
+        }
+    }
+    public static Shader getDefaultShader() {
+        return defaultShader;
     }
 
     private HashMap<String, Integer> uniforms = new HashMap<>();
@@ -169,12 +215,21 @@ public class Shader extends GlObject {
 
     /**
      * Sets 'this' as the current shader program
+     * @see Shader#isBound now returns true
      */
     public void bind(){
         if (currentShader.get() != this) {
             currentShader.set(this);
             GL20.glUseProgram((int) this.glId);
         }
+    }
+
+    /**
+     * Checks if 'this' is current bound shader
+     * @return true if 'this' is current bound shader else false
+     */
+    public boolean isBound() {
+        return currentShader.get() == this;
     }
 
     /**

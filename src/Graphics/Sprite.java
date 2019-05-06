@@ -5,9 +5,7 @@ import OpenGL.GLM;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * "Display List" sprite
- */
+
 public class Sprite extends Shape {
     private Texture texture = null;
     private float tx=0,ty=0,tw=0,th=0;
