@@ -5,13 +5,14 @@ import java.io.IOException;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Keyboard {
+public final class Keyboard {
     public static final int AZERTY = 0;
     public static final int QWERTY = 1;
     public static final int QWERTZ = 2;
 
     /**Context values*/
     private GLFWWindow window;
+    @Deprecated
     private int layout = QWERTY;
 
     /**
@@ -53,6 +54,7 @@ public class Keyboard {
      * @param layout chosen keyboard layout
      * @throws IOException thrown when the keyboard layout is not well known
      */
+    @Deprecated
     public void setLayout(int layout) throws IOException {
         int[] layouts = getLocalLayouts();
         for (int i=0 ; i < layouts.length ; ++i) {
@@ -69,10 +71,12 @@ public class Keyboard {
      * List of layout containing some keyboard default layout as AZERTY or QWERTY
      * @return keyboard key layout depending on which country the user is
      */
+    @Deprecated
     private static int[] getLocalLayouts() {
         return new int[]{AZERTY, QWERTY, QWERTZ};
     }
 
+    @Deprecated
     private static int toLocalLayout(int layout, int key) {
         switch (layout) {
             case AZERTY: return AzertyToQwerty(key);
@@ -82,10 +86,12 @@ public class Keyboard {
         }
     }
 
+    @Deprecated
     private static int toQwertyLayout(int glfwKeyCode) {
         return glfwKeyCode;
     }
 
+    @Deprecated
     private static int QwertzToQwerty(int glfwKeyCode) {
         switch( glfwKeyCode ) {
             case GLFW_KEY_Z             : return GLFW_KEY_Y;
@@ -94,6 +100,7 @@ public class Keyboard {
         }
     }
 
+    @Deprecated
     private static int AzertyToQwerty(int qwertyGlfwKeyCode) {
         switch( qwertyGlfwKeyCode ) {
             //local                       qwerty

@@ -6,7 +6,7 @@ import Graphics.Vector2f;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPos;
 
-public class Mouse {
+public final class Mouse {
     /**
      * Enumeration of all Mouse possible Buttons.
      */
@@ -28,6 +28,8 @@ public class Mouse {
         }
     }
 
+    private boolean hidden = false;
+    private boolean grabbed = false;
     private GLFWWindow window;
 
     /**
@@ -80,11 +82,13 @@ public class Mouse {
     }
 
     public void setMouseCursorVisible(boolean state){
-        glfwSetInputMode(window.getGlId(), GLFW_CURSOR, state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+        hidden = state;
+        glfwSetInputMode(window.getGlId(), GLFW_CURSOR, state ? (grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL) : GLFW_CURSOR_HIDDEN);
     }
 
-    public void setMouseCursorDisabled(boolean state){
-        glfwSetInputMode(window.getGlId(), GLFW_CURSOR, !state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+    public void setMouseCursorGrabbed(boolean state){
+        grabbed = state;
+        glfwSetInputMode(window.getGlId(), GLFW_CURSOR, !state ? (hidden ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL) : GLFW_CURSOR_DISABLED);
     }
 
 }
