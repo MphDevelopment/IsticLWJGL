@@ -7,15 +7,17 @@ public abstract class Transformable {
     protected float x=0, y=0; // position coordinates
     protected float ox=0, oy=0; // origin coordinates
     protected float sx=1,sy=1; // scale factors
-    private boolean needUpdate = false;
     protected float radian = 0; // rotation angle
+    protected float cos = 1; // precomputed cosines
+    protected float sin = 0; // precomputed sinus
+    private boolean needUpdate = false;
+
 
     public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
         update();
     }
-
     public void move(float x, float y) {
         this.x += x;
         this.y += y;
@@ -33,10 +35,14 @@ public abstract class Transformable {
     }
     public void setRotation(float radian) {
         this.radian = radian;
+        cos = (float)Math.cos(this.radian);
+        sin = (float)Math.sin(this.radian);
         update();
     }
     public void rotate(float radian) {
         this.radian += radian;
+        cos = (float)Math.cos(this.radian);
+        sin = (float)Math.sin(this.radian);
         update();
     }
 
@@ -47,9 +53,6 @@ public abstract class Transformable {
     public float getScaleX() { return sx;}
     public float getScaleY() { return sy;}
     public float getRotation() { return radian;}
-
-    protected abstract void update();
-
     public Vector2f getPosition(){
         return new Vector2f(x, y);
     }
@@ -60,5 +63,8 @@ public abstract class Transformable {
         return new Vector2f(sx, sy);
     }
 
-
+    /**
+     * Updates VBO/VAO vertices using scale, origin, rotation and position.
+     */
+    protected abstract void update();
 }
