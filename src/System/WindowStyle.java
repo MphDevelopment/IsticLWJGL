@@ -23,7 +23,7 @@ public class WindowStyle {
     public static final WindowStyle VSYNC = new WindowStyle(1 << 6);
 
     /** DEFAULT : VISIBLE + RESIZABLE + TITLEBAR */
-    public static final WindowStyle DEFAULT = new WindowStyle(VISIBLE.bits | RESIZABLE.bits | TITLEBAR.bits | VSYNC.bits);
+    public static final WindowStyle DEFAULT = new WindowStyle(VISIBLE.bits | RESIZABLE.bits | TITLEBAR.bits);
     /** FULLSCREEN : the displayed window will be in fullscreen mode */
     public static final WindowStyle FULLSCREEN = new WindowStyle(1 << 5 | VISIBLE.bits);
     /** NONE : the displayed window will appear as pop-up window */

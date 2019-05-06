@@ -11,7 +11,7 @@ public class VideoMode {
     public final int height;
 
     //1280×800, 1440×900, 1680×1050, 1920×1200, 2560×1600, 1024×576, 1152×648, 1280×720, 1366×768, 1600×900, 1920×1080, 2560×1440, 3840×2160, 7680×4320
-    private static VideoMode[] defaultModes = new VideoMode[]{
+    private static final VideoMode[] defaultModes = new VideoMode[]{
             new VideoMode(1280, 800),
             new VideoMode(1440, 900),
             new VideoMode(1680, 1050),
@@ -59,6 +59,10 @@ public class VideoMode {
         return desktopMode;
     }
 
+    /**
+     * Returns list of default video modes among common display resolution
+     * @return list of default video modes among common display resolution
+     */
     public static VideoMode[] getDefaultModes() {
         return defaultModes;
     }
