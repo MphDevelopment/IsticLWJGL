@@ -1,18 +1,12 @@
 package System;
 
 
-import Graphics.FloatRect;
-import Graphics.Shader;
-import Graphics.Vector2f;
 import Graphics.Vector3f;
 import OpenGL.GLM;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**
  * Camera3D is an interface designed to control RenderTarget Views.
@@ -22,7 +16,7 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 public class Camera3D extends Camera {
 
     private Vector3f _center = new Vector3f(0,0,0);
-    private Vector3f _up = new Vector3f(0,1,0);
+    private Vector3f _up = new Vector3f(0,-1,0);
     private Vector3f _eye  = new Vector3f(0,0,1);
     private float _fov = 90.f;
     private float _znear = 1;
@@ -97,10 +91,6 @@ public class Camera3D extends Camera {
         return new Vector3f(_up);
     }
 
-    @Override
-    public Matrix4f getModelMatrix() {
-        return (Matrix4f) new Matrix4f().setIdentity();
-    }
     @Override
     public Matrix4f getViewMatrix() {
         return GLM.lookAt(_center/*.toLwjgl()*/, _eye.sum(_center)/*.toLwjgl()*/,  _up/*.toLwjgl()*/);

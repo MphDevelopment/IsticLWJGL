@@ -1,6 +1,5 @@
 package System;
 
-import Graphics.FloatRect;
 import Graphics.Vector2f;
 import OpenGL.GLM;
 import org.lwjgl.util.vector.Matrix4f;
@@ -23,7 +22,7 @@ public class Camera2D extends Camera {
 
     public Camera2D(Vector2f dimension){
         screenDimension = dimension;
-        center = new Vector2f(dimension.x / 2,dimension.y / 2);
+        center = new Vector2f(dimension.x / 2.f,dimension.y / 2.f);
     }
 
     public Camera2D(RenderTarget target){
@@ -44,10 +43,6 @@ public class Camera2D extends Camera {
         return center;
     }
 
-    public float getAngle() {
-        return angle;
-    }
-
     public float getZoom() {
         return zoom;
     }
@@ -60,11 +55,10 @@ public class Camera2D extends Camera {
         return zfar;
     }
 
-    @Override
-    public Matrix4f getModelMatrix() {
-        return (Matrix4f) new Matrix4f().setIdentity();
-        //return new Matrix4f().translate(new Vector3f(viewport.l,viewport.t,0));
+    public float getRotation() {
+        return angle;
     }
+
     @Override
     public Matrix4f getViewMatrix() {
         //return (Matrix4f) new Matrix4f().setIdentity();

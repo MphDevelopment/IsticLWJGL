@@ -15,11 +15,9 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
  */
 public abstract class Camera {
     ////EXPERIMENTAL (permet a un RenderTarget de savoir si sa camera a changé d'état)
-    protected boolean updatable = true; // updatable -> checked?
-    //TODO Renommer isUpdatable pour mieux convenir au sens particulier de : 'a été mis a jour par un RenderTarget par ce que Camera a changé'
-    //needChecked
-    //has been modified
-    //a changé entre-temps |  changed in the meantime
+    protected boolean updatable = true; // updatable -> checked? Display List
+    //protected boolean uniformBlockUpdatable = true; // updatable -> checked?
+
     public final boolean hasSinceBeenUpdated() {
         /*boolean tmp = updatable;
         updatable = false;
@@ -27,15 +25,11 @@ public abstract class Camera {
         return updatable;
     }
 
-    public abstract Matrix4f getModelMatrix() ;
+    //public abstract Matrix4f getModelMatrix() ;
 
     public abstract Matrix4f getViewMatrix() ;
 
     public abstract Matrix4f getProjectionMatrix() ;
-
-    public final float[] getModelBuffer() {
-        return GLM.toFloatArray(getModelMatrix());
-    }
 
     public final float[] getViewBuffer() {
         return GLM.toFloatArray(getViewMatrix());
@@ -51,23 +45,12 @@ public abstract class Camera {
     public abstract void apply() ;
 
     /**
-     * Applies M/V/P Matrices to shader using M/V/P matrices names
-     * @param shader target
-     * @param model model matrix
-     * @param view view matrix
-     * @param projection projection matrix
-     */
-    public final void apply(Shader shader, String model, String view, String projection) {
-        this.setUniformMVP(shader, model, view, projection);
-    }
-
-    /**
      * Sets up MVP matrix to shader using GLSL matrix name
      * @param shader target
      * @param mvp MVP matrix name
      */
     public final void apply(Shader shader, String mvp) {
-        final int MVP = glGetUniformLocation((int)shader.getGlId(), mvp);
+        final int MVP = shader.getUniformLocation(mvp);
         this.setUniformMVP(MVP);
     }
 
@@ -81,7 +64,20 @@ public abstract class Camera {
             return;
         }
 
-        GL20.glUniformMatrix4fv(mvpUniform, false, GLM.toFloatArray((Matrix4f.mul(getProjectionMatrix(), Matrix4f.mul(getViewMatrix(), getModelMatrix(), new Matrix4f()), new Matrix4f()))));
+        //GL20.glUniformMatrix4fv(mvpUniform, false, GLM.toFloatArray((Matrix4f.mul(getProjectionMatrix(), Matrix4f.mul(getViewMatrix(), getModelMatrix(), null), null))));
+        GL20.glUniformMatrix4fv(mvpUniform, false, GLM.toFloatArray((Matrix4f.mul(getProjectionMatrix(), getViewMatrix(), null))));
+    }
+
+    /**
+     * Applies M/V/P Matrices to shader using M/V/P matrices names
+     * @param shader target
+     * @param model model matrix
+     * @param view view matrix
+     * @param projection projection matrix
+     */
+    @Deprecated
+    public final void apply(Shader shader, String model, String view, String projection) {
+        this.setUniformMVP(shader, model, view, projection);
     }
 
     /**
@@ -91,10 +87,11 @@ public abstract class Camera {
      * @param view uniform View matrix name
      * @param projection uniform Projection matrix name
      */
+    @Deprecated
     public final void setUniformMVP(Shader shader, String model, String view, String projection) {
-        final int M = glGetUniformLocation((int)shader.getGlId(), model);
-        final int V = glGetUniformLocation((int)shader.getGlId(), view);
-        final int P = glGetUniformLocation((int)shader.getGlId(), projection);
+        final int M = shader.getUniformLocation(model);
+        final int V = shader.getUniformLocation(view);
+        final int P = shader.getUniformLocation(projection);
         this.setUniformMVP(M,V,P);
     }
 
@@ -104,6 +101,7 @@ public abstract class Camera {
      * @param viewUniform uniform View matrix location
      * @param projectionLayout uniform Projection matrix location
      */
+    @Deprecated
     public final void setUniformMVP(int modelUniform, int viewUniform, int projectionLayout){
         if (modelUniform < 0 || viewUniform < 0 || projectionLayout < 0) {
             System.out.println("MVP Uniform matrix do not exist in the shader.");
@@ -111,15 +109,13 @@ public abstract class Camera {
         }
 
         // send MVP Data
-        GL20.glUniformMatrix4fv(modelUniform, false, getModelBuffer());
+        //GL20.glUniformMatrix4fv(modelUniform, false, getModelBuffer());
+        GL20.glUniformMatrix4fv(modelUniform, false, GLM.toFloatArray(new Matrix4f()));
         GL20.glUniformMatrix4fv(viewUniform, false, getViewBuffer());
         GL20.glUniformMatrix4fv(projectionLayout, false, getProjectionBuffer());
     }
 
-    public static void setUniformMVP(int uniformModel, Matrix4f model, int uniformView, Matrix4f view, int uniformProjection, Matrix4f projection) {
-        setUniformMVP(uniformModel, GLM.toFloatArray(model), uniformView, GLM.toFloatArray(view), uniformProjection, GLM.toFloatArray(projection));
-    }
-
+    @Deprecated
     public static void setUniformMVP(int uniformModel, float[] model, int uniformView, float[] view, int uniformProjection, float[] projection) {
         if (uniformModel < 0 || uniformView < 0 || uniformProjection < 0) {
             System.out.println("MVP Uniform matrix do not exist in the shader.");
