@@ -4,6 +4,7 @@ import System.*;
 
 import Graphics.*;
 import Graphics.Color;
+import System.IO.AZERTYLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,14 +15,18 @@ import static org.lwjgl.opengl.GL11.*;
 //TODO trouver un moyen de ne transmettre la MVP qu'une seule fois (uniform blocks, uniform buffer object)
 public class RenderWindow {
 
+    //TODO trouver un moyen de n'utiliser qu'un seul shaders en mettant par défaut la couleur blanche si pas de texture pour laisser apparaitre la couleur (super efficace)
+    //TODO trouver un moyen de n'utiliser qu'un seul shaders en mettant par défaut une texture blanche 1*1 (assez efficace)
+    //TODO ou utiliser deux shaders (peu efficace)
+
     public static void main(String[] args) {
 
         GLFWWindow window = new GLFWWindow(
-                new VideoMode(500, 600), "OpenGL",
+                new VideoMode(900, 900), "OpenGL",
                 WindowStyle.DEFAULT.add(WindowStyle.TOPMOST),
                 CallbackMode.DEFAULT
         );
-        //window.setFrameRateLimit(120);
+        //window.setFrameRateLimit(60);
 
         RenderTexture renderTexture;
         RenderTexture renderTexture2;
@@ -76,7 +81,7 @@ public class RenderWindow {
         Sprite screen = new Sprite(renderTexture.getTexture());
         screen.setTextureRect(0,0,400,400);
         screen.move(50,50);
-        screen.setScale(0.5f,0.5f);
+        screen.setScale(0.5f,-0.5f);
 
         Sprite screen2 = new Sprite(renderTexture2.getTexture());
         screen2.setTextureRect(0,0,200,200);
@@ -106,6 +111,7 @@ public class RenderWindow {
             //RectangleShape tmp = new RectangleShape(1000,100);
             tmp.move((i%(int)Math.sqrt(arraySize))*100.f,(i/(int)Math.sqrt(arraySize))*100.f);
             tmp.setFillColor(new Color(i / (float)arraySize, i / (float)arraySize, i / (float)arraySize));
+            tmp.setScale(0.9f, 0.9f);
             array.add(tmp);
         }
 
@@ -183,10 +189,14 @@ public class RenderWindow {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else if (keyboard.isKeyPressed(AZERTYLayout.ESCAPE.getKeyID())) {
+                window.close();
+                return ;
             }
 
-            //Rendering
-            /*renderTexture.clear(Color.Blue);
+
+                //Rendering
+            renderTexture.clear(new Color(0,0,1, 0.5f));
             texturedShader.bind();
             renderTexture.getCamera().setUniformMVP(0);
             renderTexture.draw(sprite);
@@ -194,32 +204,33 @@ public class RenderWindow {
             renderTexture.getCamera().setUniformMVP(0);
             renderTexture.draw(shape);
 
-            //screenCamera2.move(new Vector2f(0.1f, 0.1f));
-            renderTexture2.clear(Color.Yellow);
+            screenCamera.move(new Vector2f(0.1f, 0.1f));
+            renderTexture2.clear(new Color(1,1,0, 0.5f));
             untexturedShader.bind();
             renderTexture2.getCamera().setUniformMVP(0);
             renderTexture2.draw(background);
             renderTexture2.draw(shape);
             texturedShader.bind();
             renderTexture2.getCamera().setUniformMVP(0);
-            renderTexture2.draw(sprite);*/
+            renderTexture2.draw(sprite);
 
 
             //test viewport 1
             window.setViewport(viewport);
             window.clear(Color.Green);
-            untexturedShader.bind();
-            window.getCamera().setUniformMVP(0);
             window.draw(fullBackground);
-            window.draw(shape);
-            texturedShader.bind();
-            window.getCamera().setUniformMVP(0);
+            window.draw(shape, texturedShader);
+
+            //texturedShader.bind();
+            //window.getCamera().setUniformMVP(0);
             for (int i = 0; i < array.size() ; ++i) {
-                window.draw(array.get(i));
+                window.draw(array.get(i), texturedShader);
             }
+            window.draw(screen);
+            window.draw(screen2);
             fpsText.setPosition(shape.getPosition().x-200, shape.getPosition().y - 50);
             Shader.unbind();
-            window.draw(fpsText);
+            fpsText.draw();
 
             /*screen.draw();
             text.setPosition(shape.getPosition().x, shape.getPosition().y);

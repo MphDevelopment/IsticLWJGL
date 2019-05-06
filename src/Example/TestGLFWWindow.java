@@ -10,43 +10,42 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 
 
 public class TestGLFWWindow {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         GLFWWindow window = new GLFWWindow(new VideoMode(500,500), "OpenGL", WindowStyle.DEFAULT/*.remove(WindowStyle.VSYNC)*/, CallbackMode.DEFAULT);
-        GLFWWindow window2 = new GLFWWindow(new VideoMode(500,500), "Window 2", WindowStyle.DEFAULT, CallbackMode.DEFAULT, window);
-        window2.setPosition(new Vector2i(10,30));
 
-
-        Shader texturedShader;
-        Shader untexturedShader;
         Texture texture;
         try {
-            texturedShader = new Shader("shaders/vao/textured/mvp.vert", "shaders/vao/textured/mvp.frag");
-            untexturedShader = new Shader("shaders/vao/untextured/mvp.vert", "shaders/vao/untextured/mvp.frag");
             texture = new Texture("Phases.bmp");
         } catch (IOException e) {
             e.printStackTrace();
             return ;
         }
 
-        RectangleShape shape = new RectangleShape(10,10, 10,10);
-        shape.setFillColor(Color.Red);
-        RectangleShape shape2 = new RectangleShape(10,100, 50,50);
-        shape2.setFillColor(Color.Yellow);
-        Sprite sprite = new Sprite(texture);
-        //sprite.setOrigin(sprite.getBounds().w/2.f, sprite.getBounds().h/2.f);
-        sprite.setRotation(10.f/180.f*(float)Math.PI);
+        GLFWWindow window2 = new GLFWWindow(new VideoMode(500,500), "Window 2", WindowStyle.DEFAULT, CallbackMode.DEFAULT);
+        window2.setPosition(new Vector2i(10,30));
 
 
         window.setActive();
 
-        RectangleShape shape3 = new RectangleShape(10,10, 10,10);
-        shape3.setFillColor(Color.Red);
-        RectangleShape shape4 = new RectangleShape(10,100, 50,50);
-        shape4.setFillColor(Color.Yellow);
-        Sprite sprite2 = new Sprite(texture);
+        RectangleShape shapeA1 = new RectangleShape(10,10, 10,10);
+        shapeA1.setFillColor(Color.Red);
+        RectangleShape shapeA2 = new RectangleShape(10,100, 50,50);
+        shapeA2.setFillColor(Color.Yellow);
+        Sprite spriteA1 = new Sprite(texture);
+        spriteA1.setRotation(90.f/180.f*(float)Math.PI);
+
+        window2.setActive();
+
+        RectangleShape shapeB1 = new RectangleShape(10,10, 10,10);
+        shapeB1.setFillColor(Color.Red);
+        RectangleShape shapeB2 = new RectangleShape(10,100, 50,50);
+        shapeB2.setFillColor(Color.Yellow);
+        Sprite spriteB1 = new Sprite(texture);
         //sprite.setOrigin(sprite.getBounds().w/2.f, sprite.getBounds().h/2.f);
-        sprite2.setRotation(90.f/180.f*(float)Math.PI);
+        spriteB1.setRotation(10.f/180.f*(float)Math.PI);
+
+
 
         Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
 
@@ -57,42 +56,59 @@ public class TestGLFWWindow {
 
         while (window.isOpen()) {
             if (keyboard.isKeyPressed(GLFW_KEY_LEFT)) {
-                shape3.move(-1f, 0);
+                shapeA1.move(-1f, 0);
             }
             if (keyboard.isKeyPressed(GLFW_KEY_RIGHT)) {
-                shape3.move(1f, 0);
+                shapeA1.move(1f, 0);
             }
             if (keyboard.isKeyPressed(GLFW_KEY_UP)) {
-                shape3.move(0, -1f);
+                shapeA1.move(0, -1f);
             }
             if (keyboard.isKeyPressed(GLFW_KEY_DOWN)) {
-                shape3.move(0, 1f);
+                shapeA1.move(0, 1f);
             }
 
-            tracker.setCenter(shape3.getPosition());
+            tracker.setCenter(shapeA1.getPosition());
 
             Event event;
 
 
+
+
+
+
+
+            //window2.clear(Color.Black);
+            window2.draw(shapeB1);
+            window2.draw(shapeB2);
+            window2.draw(spriteB1);
+            window2.display();
+
             window.clear(Color.Blue);
+            window.draw(shapeA1);
+            window.draw(shapeA2);
+            window.draw(spriteA1);
+            window.display();
+
+            /*window.clear(Color.Blue);
             untexturedShader.bind();
             window.getCamera().setUniformMVP(0);
-            window.draw(shape3);
-            window.draw(shape4);
+            window.draw(shapeA1);
+            window.draw(shapeA2);
             texturedShader.bind();
             window.getCamera().setUniformMVP(0);
-            window.draw(sprite2);
+            window.draw(spriteA1);
             window.display();
 
 
             window2.clear();
             untexturedShader.bind();
             window2.getCamera().setUniformMVP(0);
-            window2.draw(shape2);
+            window2.draw(shapeB2);
             texturedShader.bind();
             window2.getCamera().setUniformMVP(0);
-            window2.draw(sprite);
-            window2.display();
+            window2.draw(spriteB1);
+            window2.display();*/
 
             while ((event = window2.pollEvents()) != null) {
                 if (event.type == Event.Type.CLOSE) {

@@ -3,13 +3,16 @@ package Example;
 import Graphics.*;
 import System.*;
 
+import java.io.IOException;
+
 public final class Example2D {
-    public static void main(String[] args) {
-        GLFWWindow window = new GLFWWindow(new VideoMode(500, 500), "Use mouse left button to clear the screen!", WindowStyle.DEFAULT);
+    public static void main(String[] args) throws IOException {
+        GLFWWindow window = new GLFWWindow(new VideoMode(500, 500), "Use mouse left button to clear the screen!", WindowStyle.DEFAULT, CallbackMode.DEFAULT);
         RectangleShape shape = new RectangleShape(10, 10, 10, 10);
         shape.setFillColor(Color.Red);
 
         Mouse mouse = new Mouse(window);
+
 
         Joystick joystick = (Joystick.isPlugged(0) ? new Joystick(0) : null);
 
@@ -77,8 +80,7 @@ public final class Example2D {
             }
             shape.move(1.f, 1.f);
 
-            shape.draw();
-
+            window.draw(shape);
             window.display();
 
             //poll events
