@@ -45,16 +45,6 @@ public abstract class Camera {
     public abstract void apply() ;
 
     /**
-     * Sets up MVP matrix to shader using GLSL matrix name
-     * @param shader target
-     * @param mvp MVP matrix name
-     */
-    public final void apply(Shader shader, String mvp) {
-        final int MVP = shader.getUniformLocation(mvp);
-        this.setUniformMVP(MVP);
-    }
-
-    /**
      * Sets up MVP matrix using GLSL matrix uniform location
      * @param mvpUniform uniform MVP matrix location
      */
@@ -67,6 +57,18 @@ public abstract class Camera {
         //GL20.glUniformMatrix4fv(mvpUniform, false, GLM.toFloatArray((Matrix4f.mul(getProjectionMatrix(), Matrix4f.mul(getViewMatrix(), getModelMatrix(), null), null))));
         GL20.glUniformMatrix4fv(mvpUniform, false, GLM.toFloatArray((Matrix4f.mul(getProjectionMatrix(), getViewMatrix(), null))));
     }
+
+    /**
+     * Sets up MVP matrix to shader using GLSL matrix name
+     * @param shader target
+     * @param mvp MVP matrix name
+     */
+    @Deprecated
+    public final void apply(Shader shader, String mvp) {
+        final int MVP = shader.getUniformLocation(mvp);
+        this.setUniformMVP(MVP);
+    }
+
 
     /**
      * Applies M/V/P Matrices to shader using M/V/P matrices names

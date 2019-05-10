@@ -177,7 +177,6 @@ public class GLFWWindow extends RenderTarget {
      * Init Viewport (default Window dimension).
      */
     protected void initGl() {
-        //TODO RenderTargets must own their own view (Camera) and viewport (Viewport).
         defaultCamera = new Camera2D(new Vector2f(width, height));
         camera = defaultCamera;
         defaultViewport = new Viewport(new FloatRect(0,0, width, height));
@@ -273,12 +272,6 @@ public class GLFWWindow extends RenderTarget {
         //////////////////////// Set up window //////////////////////////////
         // Configure our window
         this.initHints(style);
-
-        // ContextAttribs
-        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
         // Create the window
         this.glId = glfwCreateWindow(this.width, this.height, title, ((WindowStyle.FULLSCREEN.bits & style.bits) == WindowStyle.FULLSCREEN.bits) ? glfwGetPrimaryMonitor() : 0, (share != null) ? share.getGlId() : 0);
@@ -482,9 +475,6 @@ public class GLFWWindow extends RenderTarget {
     public final void clear(ConstColor color){
         if (!this.isOpen()) return ;
 
-        /*if (!this.isActive()) this.setActive();
-        if (this.needViewUpdate()) this.applyView();*/
-        //TODO ça
         if (!this.isActive()) {
             this.setActive();
             Shader.rebind();
@@ -531,8 +521,6 @@ public class GLFWWindow extends RenderTarget {
     public final void draw(Drawable drawable, ConstShader shader) {
         if (!running) return ;
 
-
-        //TODO ça
         if (!this.isActive()) {
             this.setActive();
             if (!shader.isBound())
@@ -545,13 +533,6 @@ public class GLFWWindow extends RenderTarget {
                 shader.bind();
             this.applyView();
         }
-
-        ///TODO avec ou ça
-        /*if (shader != null) {
-            shader.bind();
-            Shader.rebind();
-            camera.setUniformMVP(0);
-        }*/
 
         drawable.draw();
     }

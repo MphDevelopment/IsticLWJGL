@@ -61,12 +61,11 @@ public class Camera2D extends Camera {
 
     @Override
     public Matrix4f getViewMatrix() {
-        //return (Matrix4f) new Matrix4f().setIdentity();
         return new Matrix4f()
-                //.translate(new org.lwjgl.util.vector.Vector2f(zoom*-viewport.l/(viewport.w*viewport.w),zoom*-viewport.t/(viewport.h*viewport.h)))
-                //.translate(new org.lwjgl.util.vector.Vector2f(-viewport.l,-viewport.t))
+                .translate(new org.lwjgl.util.vector.Vector2f(center.x, center.y))
                 .scale(new Vector3f(zoom,zoom,1))
-                .rotate(angle, new Vector3f(0,0,1));
+                .rotate(angle, new Vector3f(0,0,1))
+                .translate(new org.lwjgl.util.vector.Vector2f(-center.x, -center.y));
     }
     @Override
     public Matrix4f getProjectionMatrix() {
