@@ -1,9 +1,9 @@
 package Graphics;
 
 
+import OpenGL.GLM;
+
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * "Display list" Text
@@ -29,13 +29,30 @@ public class Text extends Shape {
         this.string = str;
         this.style = styles;
 
+        //buffer = new VertexBuffer(str.length() * 3 * 2, 3 , new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM );
+
         update();
     }
 
     public void setString(String content) {
         this.string = content;
 
+        //buffer.create(content.length() * 3 * 2, 3, new int[]{3, 4, 2}, VertexBuffer.Mode.TRIANGLES);
+
         update();
+    }
+
+    @Override
+    protected void updateColor(){
+        /*float[] c = new float[buffer.getVertices() * 3 * 2 * 4];
+        for (int i = 0 ; i < buffer.getVertices() * 3 * 2 ; ++i) {
+            c[i*4 + 0] = color.r;
+            c[i*4 + 1] = color.g;
+            c[i*4 + 2] = color.b;
+            c[i*4 + 3] = color.a;
+        }
+
+        buffer.update(1, c);*/
     }
 
     @Override
@@ -50,6 +67,7 @@ public class Text extends Shape {
         float italicOffset = ((style & ITALIC) == ITALIC) ? (this.px / 10.f) : 0.f;
         float boldOffsetX = ((style & BOLD) == BOLD) ? (charHeight / 3.f) : 0.f;
         float boldOffsetY = ((style & BOLD) == BOLD) ? (charHeight / 100.f) : 0.f;
+
 
 
         for (char c : string.toCharArray()) {
@@ -68,14 +86,18 @@ public class Text extends Shape {
 
     @Override
     public void draw() {
-        glBindTexture(GL_TEXTURE_2D, (int)font.getGlId());
+        Shader.unbind();
+
+        font.getTexture().bind();
+
         glBegin(GL_QUADS);
 
         float xTmp = x;
-        float height = font.getCharHeight();
-        float italicOffset = ((style & ITALIC) == ITALIC) ? (this.px / 10.f) : 0.f;
-        float boldOffsetX = ((style & BOLD) == BOLD) ? (height / 3.f) : 0.f;
-        float boldOffsetY = ((style & BOLD) == BOLD) ? (height / 100.f) : 0.f;
+        final float height = font.getCharHeight();
+
+        final float italicOffset = ((style & ITALIC) == ITALIC) ? (this.px / 10.f) : 0.f;
+        final float boldOffsetX = ((style & BOLD) == BOLD) ? (height / 3.f) : 0.f;
+        final float boldOffsetY = ((style & BOLD) == BOLD) ? (height / 100.f) : 0.f;
 
         for (char c : string.toCharArray()) {
             float width = font.getCharWidth(c);
@@ -91,19 +113,18 @@ public class Text extends Shape {
             glVertex3f(xTmp + ox + italicOffset, y + oy, 0);
 
             glTexCoord2f(cx + cw, cy);
-            glVertex3f(xTmp + width * super.sx + ox + italicOffset + boldOffsetX, y + oy, 0);
+            glVertex3f(xTmp + ox + width * super.sx  + italicOffset + boldOffsetX, y + oy, 0);
 
             glTexCoord2f(cx + cw, cy + ch);
-            glVertex3f(xTmp + width * super.sx + ox + boldOffsetX, y + height * super.sy + oy + boldOffsetY, 0);
+            glVertex3f(xTmp + ox + width * super.sx  + boldOffsetX, y + oy + height * super.sy + boldOffsetY, 0);
 
             glTexCoord2f(cx, cy + ch);
-            glVertex3f(xTmp + ox , y + height * super.sy + oy + boldOffsetY, 0);
+            glVertex3f(xTmp + ox , y + oy + height * super.sy  + boldOffsetY, 0);
 
             xTmp += width * super.sx + boldOffsetX;
         }
         glEnd();
 
-        glBindTexture(GL_TEXTURE_2D,0);
     }
 
     @Override

@@ -23,14 +23,14 @@ public class FontFamily {
         put(0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         put(1, "abcdefghijklmnopqrstuvwxyz");
         put(2, "0123456789");
-        put(3, "ÄÖÜäöüßéèçàù");
-        put(4, " $+-*/=%\"'#@&_(),.;:?!\\|<>[]§`^~µ%'{}¤£");
+        put(3, "ÄÖÜäöüßéèçàùËë");
+        put(4, " $+-*/=%\"€'@&_(),.;:?!\\|<>[]§`^~µ%'{}¤£");
     }};
 
     //Variables
     private java.awt.Font font;
     private FontMetrics fontMetrics;
-    //private BufferedImage bufferedImage;
+    private Texture texture = null;
     private int fontTextureId;
 
     //Getters
@@ -48,7 +48,7 @@ public class FontFamily {
         float lineId = (float) CHARS.keySet().stream().filter(i -> CHARS.get(i).contains("" + c)).findFirst().orElse(0);
         return this.getCharHeight() * lineId;
     }
-    public float getCharWidth(char c) {
+    public float getCharWidth(int c) {
         return fontMetrics.charWidth(c);
     }
     public float getCharHeight() {
@@ -82,6 +82,8 @@ public class FontFamily {
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        texture = new Texture(fontTextureId, (int) getFontImageWidth(),(int) getFontImageHeight());
     }
 
     public boolean isUnicodeEnable(int unicode){
@@ -122,8 +124,8 @@ public class FontFamily {
         return byteBuffer;
     }
 
-    public long getGlId() {
-        return this.fontTextureId;
+    public ConstTexture getTexture() {
+        return texture;
     }
 
 }
