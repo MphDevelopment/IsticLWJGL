@@ -118,10 +118,10 @@ public class GLM {
 
     /**
      * Sets up a perspective projection matrix
-     * @param fovy
-     * @param aspect
-     * @param zNear
-     * @param zFar
+     * @param fovy field of view
+     * @param aspect view aspect
+     * @param zNear near depth
+     * @param zFar far depth
      * @return
      */
     public static Matrix4f perspective(float fovy, float aspect, float zNear, float zFar) {
@@ -145,9 +145,9 @@ public class GLM {
 
     /**
      * Sets up a view matrix
-     * @param eye
-     * @param center
-     * @param up
+     * @param eye point where eye look
+     * @param center position of camera
+     * @param up up vector of camera
      * @return
      */
     public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up) {
@@ -181,12 +181,14 @@ public class GLM {
         return m;
     }
 
-
-    //Vectors transformations
-    public static Vector2f rotate(Vector2f center, Vector2f point, float radian) {
-        return rotate(center, point, Math.cos(radian), Math.sin(radian));
-    }
-
+    /**
+     *
+     * @param origin center of rotation
+     * @param point rotated point
+     * @param cos cosines of angle
+     * @param sin sinus of angle
+     * @return
+     */
     public static Vector2f rotate(Vector2f origin, Vector2f point, double cos, double sin) {
         //set origin to (0,0) and not (center.x, center.y)
         Vector2f transformed = point.sum(origin.neg());
