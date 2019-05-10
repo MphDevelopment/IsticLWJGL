@@ -13,17 +13,6 @@ public class RectangleShape extends Shape {
     }
 
     public RectangleShape(float w, float h){
-        /*this.width = w;
-        this.height = h;
-
-        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
-        buffer.update(2, new float[]{
-                0,0,
-                1,0,
-                1,1,
-                0,1
-         });
-        update();*/
         this(0,0, w, h);
     }
 
@@ -33,8 +22,27 @@ public class RectangleShape extends Shape {
         this.width = w;
         this.height = h;
 
-        buffer = new VertexBuffer(4, /*3*/2, new int[]{3,4/*,2*/}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
-        /*buffer.update(2, new float[]{
+        /*buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        buffer.update(2, new float[]{
+                0,0,
+                1,0,
+                1,1,
+                0,1
+        });*/
+
+        buffer = new VertexBuffer(6, 3, new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+        buffer.update(2, new float[]{
+                0,0,
+                0,1,
+                1,1,
+
+                1,1,
+                0,0,
+                1,0
+        });
+
+        /*buffer = new VertexBuffer(4, 2, new int[]{3,4}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        buffer.update(2, new float[]{
                 0,0,
                 1,0,
                 1,1,
@@ -50,6 +58,17 @@ public class RectangleShape extends Shape {
     }
 
     @Override
+    protected void updateColor(){
+        if (buffer != null) buffer.update(1, new float[]{
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a});
+    }
+
+    @Override
     protected void update(){
         if (buffer == null) return ;
         //TODO update each time rotation is made, moving, scaling, ...
@@ -62,7 +81,16 @@ public class RectangleShape extends Shape {
         Vector2f bl = GLM.rotate(center, new Vector2f(x - ox, y - oy + sy * height), cos, sin);
         Vector2f br = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy + sy * height), cos, sin);
 
-        buffer.update(0, new float[]{ bl.x, bl.y, 0, br.x, br.y, 0, tr.x, tr.y, 0, tl.x, tl.y, 0});
+        //buffer.update(0, new float[]{ bl.x, bl.y, 0, br.x, br.y, 0, tr.x, tr.y, 0, tl.x, tl.y, 0});
+        buffer.update(0, new float[]{
+                bl.x, bl.y, 0,
+                br.x, br.y, 0,
+                tr.x, tr.y, 0,
+
+                tl.x, tl.y, 0,
+                tr.x, tr.y, 0,
+                bl.x, bl.y, 0
+        });
     }
 
     @Override
@@ -79,7 +107,7 @@ public class RectangleShape extends Shape {
         //Texture.unbind();
         Texture.DefaultTexture().bind();
 
-        glEnable(GL_TEXTURE_2D);
+        //glEnable(GL_TEXTURE_2D);
 
         buffer.draw();
 

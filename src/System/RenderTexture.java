@@ -75,8 +75,15 @@ public final class RenderTexture extends RenderTarget {
 
     @Override
     public final void clear(ConstColor color) {
-        if (!this.isActive()) this.setActive();
-        else if (this.needViewUpdate()) this.applyView();
+        if (!this.isActive()) {
+            this.setActive();
+            Shader.rebind();
+            this.applyView();
+        }
+        if (this.needViewUpdate()) {
+            //Shader.rebind();
+            this.applyView();
+        }
 
         glClearColor(color.getR(), color.getG(), color.getB(), color.getA());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -88,26 +95,18 @@ public final class RenderTexture extends RenderTarget {
     }
 
     @Override
-    public final void draw(Drawable drawable, Shader shader) {
+    public final void draw(Drawable drawable, ConstShader shader) {
         if (!this.isActive()) {
             this.setActive();
-
-            if (shader != null && shader.isBound())
-                Shader.rebind();
-        }
-
-        if (shader != null) {
             if (!shader.isBound())
                 shader.bind();
-        } else Shader.unbind();
-
-        if (this.needViewUpdate()) this.applyView();
-
-        ///TODO avec ou ça
-        if (shader != null) {
-            shader.bind();
-            Shader.rebind();
-            camera.setUniformMVP(0);
+            else Shader.rebind();
+            this.applyView();
+        }
+        if (!shader.isBound() || this.needViewUpdate()) {
+            if (!shader.isBound())
+                shader.bind();
+            this.applyView();
         }
 
         drawable.draw();
@@ -118,6 +117,7 @@ public final class RenderTexture extends RenderTarget {
         if (this.needViewUpdate()) this.applyView();
 
         glFlush();
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     /**

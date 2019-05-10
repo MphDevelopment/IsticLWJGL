@@ -7,23 +7,24 @@ import static org.lwjgl.opengl.GL11.*;
 
 
 public class Sprite extends Shape {
-    private Texture texture = null;
+    private ConstTexture texture = null;
     private float tx=0,ty=0,tw=0,th=0;
 
     public Sprite(){
-        buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        //buffer = new VertexBuffer(4, 3, new int[]{3,4,2}, VertexBuffer.Mode.QUADS, VertexBuffer.Usage.STREAM);
+        buffer = new VertexBuffer(6, 3, new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
         update();
         updateColor();
         updateCoords();
     }
 
-    public Sprite(Texture texture){
+    public Sprite(ConstTexture texture){
         this();
         this.setTexture(texture, true);
         updateColor();
     }
 
-    public void setTexture(Texture texture, boolean resize){
+    public void setTexture(ConstTexture texture, boolean resize){
         this.texture = texture;
         if (texture != null && resize) {
             width = texture.getWidth();
@@ -75,17 +76,59 @@ public class Sprite extends Shape {
         Vector2f br = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy + sy * height), cos, sin);
 
 
-        buffer.update(0, new float[]{ bl.x, bl.y, 0, br.x, br.y, 0, tr.x, tr.y, 0, tl.x, tl.y, 0});
+        //buffer.update(0, new float[]{ bl.x, bl.y, 0, br.x, br.y, 0, tr.x, tr.y, 0, tl.x, tl.y, 0});
+        buffer.update(0, new float[]{
+                bl.x, bl.y, 0,
+                br.x, br.y, 0,
+                tr.x, tr.y, 0,
+
+                tl.x, tl.y, 0,
+                tr.x, tr.y, 0,
+                bl.x, bl.y, 0
+        });
     }
+
+    @Override
+    protected void updateColor(){
+        if (buffer != null) buffer.update(1, new float[]{
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a});
+    }
+
+
+    /*@Override
+    protected void updateColor(){
+        if (buffer != null) buffer.update(1, new float[]{
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a,
+                color.r,color.g,color.b,color.a
+        });
+    }*/
 
     private void updateCoords(){
         if (buffer == null) return ;
+
+        /*buffer.update(2, new float[]{
+                tx,ty+th,
+                tx+tw,ty+th,
+                tx+tw,ty,
+                tx,ty});*/
 
         buffer.update(2, new float[]{
                 tx,ty+th,
                 tx+tw,ty+th,
                 tx+tw,ty,
-                tx,ty});
+
+                tx,ty,
+                tx+tw,ty,
+                tx,ty+th,
+
+        });
     }
 
     public void draw() {
@@ -94,7 +137,7 @@ public class Sprite extends Shape {
         if (texture != null) {
             texture.bind();
 
-            glEnable(GL_TEXTURE_2D);
+            //glEnable(GL_TEXTURE_2D);
 
             buffer.draw();
 
@@ -126,7 +169,7 @@ public class Sprite extends Shape {
         }
     }
 
-    public Texture getTexture(){
+    public ConstTexture getTexture(){
         return texture;
     }
 

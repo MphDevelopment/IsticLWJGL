@@ -21,9 +21,7 @@ public abstract class Shape extends Transformable implements Drawable {
     }
 
 
-    protected void updateColor(){
-        if (buffer != null) buffer.update(1, new float[]{color.r,color.g,color.b,color.a, color.r,color.g,color.b,color.a, color.r,color.g,color.b,color.a, color.r,color.g,color.b,color.a});
-    }
+    protected abstract void updateColor();
 
 
     /**

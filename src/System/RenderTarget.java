@@ -128,7 +128,12 @@ public abstract class RenderTarget extends GlObject {
         draw(d, Shader.getDefaultShader());
     }
 
-    public abstract void draw(Drawable d, Shader shader);
+    /**
+     * RenderTarget is activated before calling 'draw' method of the drawable and use shader program (with IsticLWJGL specificity).
+     * @param d drawable
+     * @param shader shader program
+     */
+    public abstract void draw(Drawable d, ConstShader shader);
 
     /**
      * Gives the pixel dimension of the RenderTarget.

@@ -21,7 +21,6 @@ public final class GLFWContext {
         }
 
         if (contextCount++ == 0) {
-
             // Setup an error callback. The default implementation
             // will print the error message in System.err.
             GLFWErrorCallback.createPrint(System.err).set();

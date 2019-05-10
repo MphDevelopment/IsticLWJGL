@@ -31,30 +31,30 @@ public class Shader extends GlObject implements ConstShader {
         defaultShader = new Shader();
         try {
             defaultShader.loadFromMemory(
-                    "#version 400\n" +
-                    "layout (location = 0) in vec3 VertexPosition;\n" +
-                    "layout (location = 1) in vec4 VertexColor;\n" +
-                    "layout (location = 2) in vec2 VertexTexCoord;\n" +
+                    "#version 130\n" +
+                    "/*layout (location = 0)*/ in vec3 VertexPosition;\n" +
+                    "/*layout (location = 1)*/ in vec4 VertexColor;\n" +
+                    "/*layout (location = 2)*/ in vec2 VertexTexCoordinates;\n" +
                     "uniform mat4 mvp;\n" +
                     "out vec4 Color;\n" +
-                    "out vec2 TexCoord;\n" +
+                    "out vec2 TexCoordinates;\n" +
                     "void main()\n" +
                     "{\n" +
                     "    Color  = VertexColor;\n" +
-                    "    TexCoord = VertexTexCoord;\n" +
+                    "    TexCoordinates = VertexTexCoordinates;\n" +
                     "    gl_Position = mvp * vec4(VertexPosition, 1.0);\n" +
                     "}"
                     ,
 
 
-                    "#version 400\n" +
+                    "#version 130\n" +
                     "in vec4 Color;\n" +
-                    "in vec2 TexCoord;\n" +
+                    "in vec2 TexCoordinates;\n" +
                     "uniform sampler2D texture;\n" +
                     "out vec4 FragColor;\n" +
                     "void main()\n" +
                     "{\n" +
-                    "    vec4 pixel = texture2D(texture, TexCoord);\n" +
+                    "    vec4 pixel = texture2D(texture, TexCoordinates);\n" +
                     "    FragColor = pixel * Color;\n" +
                     "}");
         } catch (IOException e) {
@@ -80,6 +80,10 @@ public class Shader extends GlObject implements ConstShader {
         // load and compile the two shaders
         int vertShader = loadAndCompileShader(vert, GL_VERTEX_SHADER);
         int fragShader = loadAndCompileShader(frag, GL_FRAGMENT_SHADER);
+
+        glBindAttribLocation((int)glId, 0, "VertexPosition");
+        glBindAttribLocation((int)glId, 1, "VertexColor");
+        glBindAttribLocation((int)glId, 2, "VertexTexCoordinates");
 
         // attach the compiled shaders to the program
         glAttachShader((int)glId, vertShader);
@@ -110,6 +114,10 @@ public class Shader extends GlObject implements ConstShader {
         // load and compile the two shaders
         int vertShader = loadAndCompileShaderFromMemory(vert, GL_VERTEX_SHADER);
         int fragShader = loadAndCompileShaderFromMemory(frag, GL_FRAGMENT_SHADER);
+
+        glBindAttribLocation((int)glId, 0, "VertexPosition");
+        glBindAttribLocation((int)glId, 1, "VertexColor");
+        glBindAttribLocation((int)glId, 2, "VertexTexCoordinates");
 
         // attach the compiled shaders to the program
         glAttachShader((int)glId, vertShader);

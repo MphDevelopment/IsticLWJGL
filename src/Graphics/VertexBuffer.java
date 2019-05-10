@@ -72,10 +72,15 @@ public class VertexBuffer extends GlObject implements Drawable {
     }
 
 
+    public int getVertices() {
+        return count;
+    }
+
     /**
-     *
+     * Creates a VBO.
+     * If was already created it frees it before creating it a new time.
      * @param verticesCount number of vertices
-     * @param vaoCount number of vao. Par exemple: [count=2](positions = 3, colors = 4) ou [count=3](positions = 3, colors = 4, texCoords = 2)
+     * @param vaoCount number of vao.For example: [count=2](positions = 3, colors = 4) ou [count=3](positions = 3, colors = 4, texCoords = 2)
      * @param vaoSampleSize each vao has it's own number of float values per sample
      * @param mode primitive type
      */
@@ -132,7 +137,7 @@ public class VertexBuffer extends GlObject implements Drawable {
     public void update(int vao, float[] data) {
         if (super.getGlId() == 0) return;
 
-        if (vao < 0 || vao >= vboArrayId.length || data.length % vboArraySampleSize[vao] != 0) throw new RuntimeException("");
+        if (vao < 0 || vao >= vboArrayId.length || data.length % vboArraySampleSize[vao] != 0) throw new RuntimeException("Out of bounds VAO.");
 
         glBindVertexArray((int)super.glId);
         // assign vertex VBO to slot 0 of VAO

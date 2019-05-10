@@ -162,14 +162,13 @@ public class GLFWWindow extends RenderTarget {
      */
     private void initHints(WindowStyle styles) {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
-        glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+        //glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+
         glfwWindowHint(GLFW_VISIBLE, ((styles.bits & WindowStyle.VISIBLE.bits) == WindowStyle.VISIBLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, ((styles.bits & WindowStyle.RESIZABLE.bits) == WindowStyle.RESIZABLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will be resizable
         glfwWindowHint(GLFW_DECORATED, ((styles.bits & WindowStyle.TITLEBAR.bits) == WindowStyle.TITLEBAR.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will have title bar
         glfwWindowHint(GLFW_FLOATING, ((styles.bits & WindowStyle.TOPMOST.bits) == WindowStyle.TOPMOST.bits) ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_MAXIMIZED, ((styles.bits & WindowStyle.MAXIMIZED.bits) == WindowStyle.MAXIMIZED.bits) ? GLFW_TRUE : GLFW_FALSE);
-
-        //glfwWindowHint(GLFW_STEREO, GLFW_TRUE);
     }
 
     /**
@@ -275,6 +274,12 @@ public class GLFWWindow extends RenderTarget {
         // Configure our window
         this.initHints(style);
 
+        // ContextAttribs
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+
         // Create the window
         this.glId = glfwCreateWindow(this.width, this.height, title, ((WindowStyle.FULLSCREEN.bits & style.bits) == WindowStyle.FULLSCREEN.bits) ? glfwGetPrimaryMonitor() : 0, (share != null) ? share.getGlId() : 0);
         if (this.glId == 0)
@@ -284,7 +289,9 @@ public class GLFWWindow extends RenderTarget {
         glfwMakeContextCurrent(this.glId);
 
         // create a current thread context
-        GL.createCapabilities();
+        if (lastCreated == null) {
+            GL.createCapabilities();
+        }
 
 
         ////////////////////// Set up event handle //////////////////////////
@@ -322,6 +329,9 @@ public class GLFWWindow extends RenderTarget {
 
         // for auto sharing
         lastCreated = this;
+
+        //first clear
+        clear();
     }
 
     /**
@@ -518,7 +528,7 @@ public class GLFWWindow extends RenderTarget {
      * Draw the Drawable inside the frame buffer.
      * @param drawable something that can be drawn
      */
-    public final void draw(Drawable drawable, Shader shader) {
+    public final void draw(Drawable drawable, ConstShader shader) {
         if (!running) return ;
 
 
