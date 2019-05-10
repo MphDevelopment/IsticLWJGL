@@ -16,8 +16,11 @@ public final class Example2D {
 
         Joystick joystick = (Joystick.isPlugged(0) ? new Joystick(0) : null);
 
+        Clock clk = new Clock();
 
         while (window.isOpen()) {
+            Time elapsed = clk.restart();
+
             //display
             if (mouse.isButtonPressed(Mouse.Button.Left)) {
                 window.clear(Color.Black);
@@ -78,8 +81,9 @@ public final class Example2D {
                 System.out.println("R2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.R2, 0.f));
                 System.out.println("L2:"+joystick.getGamePadAxisValue(Joystick.GamePadAxis.L2, 0.f));*/
             }
-            shape.move(1.f, 1.f);
+            shape.move((float)elapsed.asSeconds()*50, (float)elapsed.asSeconds()*50);
 
+            window.clear();
             window.draw(shape);
             window.display();
 
@@ -90,44 +94,44 @@ public final class Example2D {
                     window.close();
                     System.exit(0);
                 }
-                if (event.type == Event.Type.MOUSELEAVE) {
+                else if (event.type == Event.Type.MOUSELEAVE) {
                     System.out.println("Mouse leave the window");
                 }
-                if (event.type == Event.Type.MOUSESCROLL) {
+                else if (event.type == Event.Type.MOUSESCROLL) {
                     System.out.println("Mouse is scrolling");
                     shape.move(0, event.scrollY);
                 }
-                if (event.type == Event.Type.MOUSEENTER) {
+                else if (event.type == Event.Type.MOUSEENTER) {
                     System.out.println("Mouse enter inside the window");
                 }
-                if (event.type == Event.Type.MOUSEDROP) {
+                else if (event.type == Event.Type.MOUSEDROP) {
                     System.out.println("Mouse is dropping files");
                 }
-                if (event.type == Event.Type.JOYSTICK_CONNECTION) {
+                else if (event.type == Event.Type.JOYSTICK_CONNECTION) {
                     joystick = new Joystick(event.joystick);
                     System.out.println("Joystick "+event.joystick+" connection");
                 }
-                if (event.type == Event.Type.JOYSTICK_DISCONNECTION) {
+                else if (event.type == Event.Type.JOYSTICK_DISCONNECTION) {
                     joystick = null;
                     System.out.println("Joystick "+event.joystick+" disconnection");
                 }
-                if (event.type == Event.Type.BUTTONRELEASED) {
+                else if (event.type == Event.Type.BUTTONRELEASED) {
                     System.out.println("Button released detected");
                 }
-                if (event.type == Event.Type.BUTTONPRESSED) {
+                else if (event.type == Event.Type.BUTTONPRESSED) {
                     System.out.println("Button pressed detected");
                 }
-                if (event.type == Event.Type.RESIZE) {
+                else if (event.type == Event.Type.RESIZE) {
                     System.out.println("Window resized");
                     //
                 }
-                if (event.type == Event.Type.MOVE) {
+                else if (event.type == Event.Type.MOVE) {
                     System.out.println("Window moved");
                 }
-                if (event.type == Event.Type.FOCUS) {
+                else if (event.type == Event.Type.FOCUS) {
                     System.out.println("Window gained focus");
                 }
-                if (event.type == Event.Type.UNFOCUS) {
+                else if (event.type == Event.Type.UNFOCUS) {
                     System.out.println("Window lost focus");
                 }
             }

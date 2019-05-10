@@ -33,7 +33,7 @@ public class TestGLFWWindow {
         RectangleShape shapeA2 = new RectangleShape(10,100, 50,50);
         shapeA2.setFillColor(Color.Yellow);
         Sprite spriteA1 = new Sprite(texture);
-        spriteA1.setRotation(90.f/180.f*(float)Math.PI);
+        //spriteA1.setRotation(90.f/180.f*(float)Math.PI);
 
         window2.setActive();
 
