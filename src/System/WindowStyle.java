@@ -60,6 +60,17 @@ public class WindowStyle {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof WindowStyle) {
+            WindowStyle style = (WindowStyle)o;
+            return style.bits == bits;
+        }
+
+        return false;
+    }
+
+    @Override
     public WindowStyle clone(){
         return new WindowStyle(this.bits);
     }
