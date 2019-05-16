@@ -5,7 +5,6 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL;
 
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -31,6 +30,8 @@ public class GLFWWindow extends RenderTarget {
     private boolean running = false;
     private Clock internalClk = new Clock();
     private Time frameTimeLimit = Time.zero();
+
+    private static final int titlebarOfsset = 30;
 
     // window event values
     private int textEntered;
@@ -185,6 +186,7 @@ public class GLFWWindow extends RenderTarget {
         camera.apply();
         viewport.apply(this);
 
+        glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -297,7 +299,7 @@ public class GLFWWindow extends RenderTarget {
         // Center our window
         posx = (videomode.width - this.width) / 2;
         posy = (videomode.height - this.height) / 2;
-        glfwSetWindowPos(this.glId, posx, posy);
+        glfwSetWindowPos(this.glId, posx, posy + titlebarOfsset);
 
 
         // Enable v-sync

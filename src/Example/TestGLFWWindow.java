@@ -29,6 +29,7 @@ public class TestGLFWWindow {
         window.setActive();
 
         RectangleShape shapeA1 = new RectangleShape(10,10, 10,10);
+        shapeA1.setOrigin(5.f, 5.f);
         shapeA1.setFillColor(Color.Red);
         RectangleShape shapeA2 = new RectangleShape(10,100, 50,50);
         shapeA2.setFillColor(Color.Yellow);
@@ -70,6 +71,8 @@ public class TestGLFWWindow {
 
             tracker.setCenter(shapeA1.getPosition());
 
+            shapeA1.rotate(0.01f);
+
             Event event;
 
 
@@ -79,8 +82,8 @@ public class TestGLFWWindow {
 
 
             //window2.clear(Color.Black);
-            window2.draw(shapeB1);
-            window2.draw(shapeB2);
+            //window2.draw(shapeB1);
+            //window2.draw(shapeB2);
             window2.draw(spriteB1);
             window2.display();
 
@@ -90,18 +93,7 @@ public class TestGLFWWindow {
             window.draw(spriteA1);
             window.display();
 
-            /*window.clear(Color.Blue);
-            untexturedShader.bind();
-            window.getCamera().setUniformMVP(0);
-            window.draw(shapeA1);
-            window.draw(shapeA2);
-            texturedShader.bind();
-            window.getCamera().setUniformMVP(0);
-            window.draw(spriteA1);
-            window.display();
-
-
-            window2.clear();
+            /*window2.clear();
             untexturedShader.bind();
             window2.getCamera().setUniformMVP(0);
             window2.draw(shapeB2);

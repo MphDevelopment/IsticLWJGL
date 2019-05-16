@@ -19,6 +19,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**http://schabby.de/opengl-shader-example/*/
 
+@Deprecated
 public final class RenderWindow3D extends GLFWWindow {
 
     public RenderWindow3D(){
@@ -111,7 +112,7 @@ public final class RenderWindow3D extends GLFWWindow {
         }
         BufferObject bump = new BumpVBO(bshader, BufferObject.BindMode.STATIC_DRAW, new Vector3f(-5*length,length,length), length, transparent, bumpTexture);
 
-        VertexBuffer VERTEX = new VertexBuffer(6, 2, new int[]{3,4}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+        VertexArrayObject VERTEX = new VertexArrayObject(6, 2, new int[]{3,4}, VertexArrayObject.Mode.TRIANGLES, VertexArrayObject.Usage.STREAM);
         VERTEX.update(0, new float[]{
                 0, 0, 0,
                 1000, 0, 0,
@@ -133,7 +134,7 @@ public final class RenderWindow3D extends GLFWWindow {
 
         ArrayList<Drawable> vertices = new ArrayList<>();
         for (int i = 0 ; i < 100 ; ++i) {
-            VertexBuffer tmp = new VertexBuffer(6, 3, new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+            VertexArrayObject tmp = new VertexArrayObject(6, 3, new int[]{3,4,2}, VertexArrayObject.Mode.TRIANGLES, VertexArrayObject.Usage.STREAM);
             tmp.update(0, new float[]{
                     0, 0+ i%10 * 100, 0 + i/100 * 100.f,
                     0, 0 + i%10 * 100, 100 + i/100 * 100.f,
@@ -163,7 +164,7 @@ public final class RenderWindow3D extends GLFWWindow {
             });
             vertices.add(tmp);
         }
-        VertexBuffer VERTEX2 = new VertexBuffer(6, 3, new int[]{3,4,2}, VertexBuffer.Mode.TRIANGLES, VertexBuffer.Usage.STREAM);
+        VertexArrayObject VERTEX2 = new VertexArrayObject(6, 3, new int[]{3,4,2}, VertexArrayObject.Mode.TRIANGLES, VertexArrayObject.Usage.STREAM);
         VERTEX2.update(0, new float[]{
                 0, 0, 0,
                 0, 0, 1000,

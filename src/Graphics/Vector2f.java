@@ -4,7 +4,7 @@ package Graphics;
 /**
  * Represents a 2D point/vector/dimension.
  */
-public class Vector2f extends org.lwjgl.util.vector.Vector2f{
+public class Vector2f extends org.lwjgl.util.vector.Vector2f implements Comparable<Vector2f> {
     /*public float x;
     public float y;*/
 
@@ -78,22 +78,31 @@ public class Vector2f extends org.lwjgl.util.vector.Vector2f{
         return x*x+y*y;
     }
 
-    /*public double length(){
-        return Math.sqrt(x*x+y*y);
-    }*/
-
     @Override
     public Vector2f clone() {
         return new Vector2f(x,y);
     }
-    /*public static float scalar(Vector2f v1, Vector2f v2){
-        return v1.x*v2.x+v1.y*v2.y;
+
+    @Override
+    public boolean equals(Object v) {
+        if (v == this) return true;
+        if (v instanceof Vector2f) {
+            Vector2f v2 = (Vector2f)v;
+            return v2.x == x && v2.y == y;
+        } else return false;
     }
 
-    public static Vector3f product(Vector2f v1, Vector2f v2) {
-        Vector3f vt = new Vector3f((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y * v2.x));
-        vt.negate();
-        return vt;
-    }*/
+    @Override
+    public int compareTo(Vector2f o) {
+        if (o.x < this.x) return 1;
+        else if (o.x > this.x) return -1;
+        else {
+            if (o.y < this.y) return 1;
+            else if (o.y > this.y) return -1;
+            else {
+                return 0;
+            }
+        }
+    }
 
 }

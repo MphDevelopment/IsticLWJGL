@@ -9,7 +9,8 @@ public abstract class Shape extends Transformable implements Drawable {
     protected Color color = new Color(1,1,1,1);
     protected float width = 0, height = 0;
 
-    protected VertexBuffer buffer;
+    //protected VertexArrayObject buffer;
+    protected VertexDisplayList displayList = null;
 
     /**
      * Applies new color to the graphic component
@@ -23,16 +24,6 @@ public abstract class Shape extends Transformable implements Drawable {
 
     protected abstract void updateColor();
 
-
-    /**
-     * Release shape GPU resources
-     */
-    public final void delete(){
-        if (buffer == null) return ;
-
-        buffer.free();
-        buffer = null;
-    }
 
     /**
      * Global bounds of the shape

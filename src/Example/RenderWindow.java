@@ -29,18 +29,17 @@ public class RenderWindow {
 
         Texture texture;
         Texture texture2;
+        Texture texture3;
         FontFamily font;
 
-        Shader texturedShader;
         try {
-            texturedShader = new Shader("shaders/vao/textured/mvp.vert", "shaders/vao/textured/mvp.frag");
-
             //renderTexture = new RenderTexture(200,200);
             //renderTexture2 = new RenderTexture(200,200);
 
             texture = new Texture("dalle.png");
             texture.setWrapMode(Texture.REPEAT);
             texture2 = new Texture("Phases.bmp");
+            texture3 = new Texture("ben10.png");
 
             font = new FontFamily("default.ttf", 30);
             //font = new FontFamily("asmelina.ttf", 24);
@@ -96,7 +95,6 @@ public class RenderWindow {
         //Camera2D screenCamera = new Camera2D(renderTexture);
         //Camera2D screenCamera2 = new Camera2D(renderTexture2);
         window.setCamera(camera);
-        camera.setZoom(4.f);
 
         //renderTexture.setCamera(screenCamera);
         //renderTexture2.setCamera(screenCamera2);
@@ -105,12 +103,14 @@ public class RenderWindow {
 
 
         ArrayList<Shape> array = new ArrayList<>();
-        final int arraySize = 3000;
+        final int arraySize = 200;
         for (int i = 0; i < arraySize ; ++i) {
             Sprite tmp;
-            //if (i%2 == 0)
+            if (i%3 == 0)
                 tmp = new Sprite(texture);
-            //else tmp = new Sprite(texture2);
+            else if (i%3 == 1)
+                tmp = new Sprite(texture2);
+            else tmp = new Sprite(texture3);
             //RectangleShape tmp = new RectangleShape(1000,100);
             tmp.move((i%(int)Math.sqrt(arraySize))*50.f,(i/(int)Math.sqrt(arraySize))*50.f);
             tmp.setFillColor(new Color(1.f - i / (float)arraySize, i / (float)arraySize, i / (float)arraySize));
@@ -138,55 +138,15 @@ public class RenderWindow {
             Event event;
             while ((event = window.pollEvents()) != null) {
                 if (event.type == Event.Type.CLOSE) {
-                    for (int i = 0; i < arraySize ; ++i) {
-                        array.get(i).delete();
-                    }
+
                     window.close();
                     System.exit(0);
-                } /*else if (event.type == Event.Type.KEYREPEAT) {
-                    System.out.println(event.keyRepeated);
-                } else if (event.type == Event.Type.MOUSELEAVE) {
-                    System.out.print("l");
-                } else if (event.type == Event.Type.MOUSESCROLL) {
-                    System.out.print("s");
-                    shape.move(0,event.scrollY);
-                } else if (event.type == Event.Type.MOUSEENTER) {
-                    System.out.print("e");
-                } else if (event.type == Event.Type.MOUSEDROP) {
-                    System.out.print("d");
-                } else if (event.type == Event.Type.JOYSTICK_CONNECTION) {
-                    System.out.println("Joystick event");
-                } else if (event.type == Event.Type.JOYSTICK_DISCONNECTION) {
-                    System.out.println("Joystick event");
-                } else if (event.type == Event.Type.BUTTONRELEASED) {
-                    System.out.print("r");
-                } else if (event.type == Event.Type.BUTTONPRESSED) {
-                    System.out.print("p");
-                } else if (event.type == Event.Type.RESIZE) {
-                    System.out.print("R");
-                    //camera.setDimension(new Vector2f(window.getDimension()));
-                } else if (event.type == Event.Type.MOVE) {
-                    System.out.print("m");
-                } else if (event.type == Event.Type.FOCUS) {
-                    System.out.print("f+");
-                } else if (event.type == Event.Type.UNFOCUS) {
-                    System.out.print("f-");
-                }*/
+                }
             }
-
-            //viewport update
-            //viewport.setTopleftCorner(new Vector2f((float)elapsedSinceBeginning.asMilliseconds()/10, (float)elapsedSinceBeginning.asMilliseconds()/10));
-            //viewport.setTopleftCorner(new Vector2f(15,15));
-            //viewport.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
-            //viewport2.setDimension(new Vector2f(window.getDimension()).add(new Vector2f(-30, -30)));
-            camera.rotate(-0.01f);
 
 
             shape.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
             fullBackground.move(1,1);
-            //screen.move(0.5f,0);
-            //screen2.move(0.25f,0);
-
 
             camera.setDimension(window.getViewport().getDimension());
             camera.setCenter(shape.getPosition());
@@ -197,43 +157,25 @@ public class RenderWindow {
                     e.printStackTrace();
                 }*/
             } else if (keyboard.isKeyPressed(AZERTYLayout.ESCAPE.getKeyID())) {
-                for (int i = 0; i < arraySize ; ++i) {
-                    array.get(i).delete();
-                }
                 window.close();
                 return ;
             }
-
-
-                //Rendering
-            /*renderTexture.clear(new Color(0,0,1, 0.5f));
-            renderTexture.draw(sprite);
-            renderTexture.draw(shape, texturedShader);
-            renderTexture.display();
-
-            //screenCamera.move(new Vector2f(0.1f, 0.1f));
-            renderTexture2.clear(new Color(1,1,0, 0.5f));
-            //renderTexture2.draw(background);
-            renderTexture2.draw(shape);
-            renderTexture2.draw(sprite, texturedShader);
-            renderTexture2.display();*/
-
 
             //test viewport 1
             //window.setViewport(viewport);
             window.clear(Color.Green);
             window.draw(fullBackground);
-            window.draw(shape, texturedShader);
+            window.draw(shape);
 
             //texturedShader.bind();
             //window.getCamera().setUniformMVP(0);
             for (int i = 0; i < array.size() ; ++i) {
-                window.draw(array.get(i), texturedShader);
+                window.draw(array.get(i));
             }
             /*window.draw(screen);
             window.draw(screen2);*/
             fpsText.setPosition(shape.getPosition().x-200, shape.getPosition().y - 50);
-            Shader.unbind();
+
             fpsText.draw();
 
             /*screen.draw();

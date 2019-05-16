@@ -31,32 +31,21 @@ public class Shader extends GlObject implements ConstShader {
         defaultShader = new Shader();
         try {
             defaultShader.loadFromMemory(
-                    "#version 130\n" +
-                    "/*layout (location = 0)*/ in vec3 VertexPosition;\n" +
-                    "/*layout (location = 1)*/ in vec4 VertexColor;\n" +
-                    "/*layout (location = 2)*/ in vec2 VertexTexCoordinates;\n" +
-                    "uniform mat4 mvp;\n" +
-                    "out vec4 Color;\n" +
-                    "out vec2 TexCoordinates;\n" +
-                    "void main()\n" +
-                    "{\n" +
-                    "    Color  = VertexColor;\n" +
-                    "    TexCoordinates = VertexTexCoordinates;\n" +
-                    "    gl_Position = mvp * vec4(VertexPosition, 1.0);\n" +
-                    "}"
-                    ,
-
-
-                    "#version 130\n" +
-                    "in vec4 Color;\n" +
-                    "in vec2 TexCoordinates;\n" +
+                    "void main(void)\n" +
+                            "{" +
+                            "  gl_FrontColor = gl_Color;\n" +
+                            "  gl_Position = ftransform();\n" +
+                            "  gl_TexCoord [0] = gl_MultiTexCoord0;\n" +
+                            "}",
                     "uniform sampler2D texture;\n" +
-                    "out vec4 FragColor;\n" +
-                    "void main()\n" +
-                    "{\n" +
-                    "    vec4 pixel = texture2D(texture, TexCoordinates);\n" +
-                    "    FragColor = pixel * Color;\n" +
-                    "}");
+                            "void main(void)\n" +
+                            "{" +
+                            "  gl_FragColor = gl_Color * texture2D(texture, gl_TexCoord[0].st);\n" +
+                            /*"  gl_FragColor.r = 1.0 - gl_FragColor.r;\n" +
+                            "  gl_FragColor.g = 1.0 - gl_FragColor.g;\n" +
+                            "  gl_FragColor.b = 1.0 - gl_FragColor.b;\n" +*/
+                            "}"
+                    );
         } catch (IOException e) {
             throw new RuntimeException("Can't load default Shader");
         }
@@ -80,10 +69,6 @@ public class Shader extends GlObject implements ConstShader {
         // load and compile the two shaders
         int vertShader = loadAndCompileShader(vert, GL_VERTEX_SHADER);
         int fragShader = loadAndCompileShader(frag, GL_FRAGMENT_SHADER);
-
-        glBindAttribLocation((int)glId, 0, "VertexPosition");
-        glBindAttribLocation((int)glId, 1, "VertexColor");
-        glBindAttribLocation((int)glId, 2, "VertexTexCoordinates");
 
         // attach the compiled shaders to the program
         glAttachShader((int)glId, vertShader);
@@ -114,10 +99,6 @@ public class Shader extends GlObject implements ConstShader {
         // load and compile the two shaders
         int vertShader = loadAndCompileShaderFromMemory(vert, GL_VERTEX_SHADER);
         int fragShader = loadAndCompileShaderFromMemory(frag, GL_FRAGMENT_SHADER);
-
-        glBindAttribLocation((int)glId, 0, "VertexPosition");
-        glBindAttribLocation((int)glId, 1, "VertexColor");
-        glBindAttribLocation((int)glId, 2, "VertexTexCoordinates");
 
         // attach the compiled shaders to the program
         glAttachShader((int)glId, vertShader);

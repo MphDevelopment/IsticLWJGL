@@ -86,10 +86,10 @@ public class Text extends Shape {
 
     @Override
     public void draw() {
-        Shader.unbind();
+        //Shader.unbind();
 
         font.getTexture().bind();
-
+        glEnable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
 
         float xTmp = x;
@@ -99,6 +99,8 @@ public class Text extends Shape {
         final float boldOffsetX = ((style & BOLD) == BOLD) ? (height / 3.f) : 0.f;
         final float boldOffsetY = ((style & BOLD) == BOLD) ? (height / 100.f) : 0.f;
 
+        glColor4f(color.r, color.g, color.b, color.a);
+
         for (char c : string.toCharArray()) {
             float width = font.getCharWidth(c);
 
@@ -107,7 +109,6 @@ public class Text extends Shape {
             float cx = 1f / font.getFontImageWidth() * font.getCharX(c);
             float cy = 1f / font.getFontImageHeight() * font.getCharY(c);
 
-            glColor3f(color.r, color.g, color.b);
 
             glTexCoord2f(cx, cy);
             glVertex3f(xTmp + ox + italicOffset, y + oy, 0);
