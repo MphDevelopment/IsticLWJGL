@@ -96,7 +96,7 @@ public enum AZERTYLayout implements KeyboardLayout {
 
     //sometimes change
     A(GLFW_KEY_Q),
-    Z(GLFW_KEY_B),
+    Z(GLFW_KEY_W),
     E(GLFW_KEY_E),
     R(GLFW_KEY_R),
     T(GLFW_KEY_T),
