@@ -31,6 +31,8 @@ public final class Keyboard {
      * @return true if the keyboard key is pressed else false
      */
     public boolean isKeyPressed(int key) {
+        if (window.getGlId() == 0) return false;
+
         int state = glfwGetKey(window.getGlId(), key);
         return (state == GLFW_PRESS);
     }

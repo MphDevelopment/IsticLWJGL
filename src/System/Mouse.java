@@ -46,6 +46,8 @@ public final class Mouse {
      * @return true if mouse is currently pressed on the GLFWWindow
      */
     public boolean isButtonPressed(Button button) {
+        if (!isAvailable()) return false;
+
         int state = glfwGetMouseButton(window.getGlId(), button.id);
         return (state == GLFW_PRESS);
     }
@@ -55,6 +57,8 @@ public final class Mouse {
      * @return local mouse position into the GLFWWindow
      */
     public Vector2f getRelativePosition() {
+        if (!isAvailable()) return new Vector2f();
+
         double xpos[] = new double[1];
         double ypos[] = new double[1];
         glfwGetCursorPos(window.getGlId(), xpos, ypos);
@@ -78,17 +82,24 @@ public final class Mouse {
     }
 
     public void setPosition(Vector2f position){
+        if (!isAvailable()) return ;
         glfwSetCursorPos(window.getGlId(), position.x, position.y);
     }
 
     public void setMouseCursorVisible(boolean state){
+        if (!isAvailable()) return ;
         hidden = state;
         glfwSetInputMode(window.getGlId(), GLFW_CURSOR, state ? (grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL) : GLFW_CURSOR_HIDDEN);
     }
 
     public void setMouseCursorGrabbed(boolean state){
+        if (!isAvailable()) return ;
         grabbed = state;
         glfwSetInputMode(window.getGlId(), GLFW_CURSOR, !state ? (hidden ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL) : GLFW_CURSOR_DISABLED);
+    }
+
+    private boolean isAvailable() {
+        return window.getGlId() != 0;
     }
 
 }
