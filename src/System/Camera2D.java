@@ -36,11 +36,11 @@ public class Camera2D extends Camera {
     }
 
     public Vector2f getDimension() {
-        return new Vector2f(screenDimension.x, screenDimension.y);
+        return screenDimension.clone();
     }
 
     public Vector2f getCenter() {
-        return center;
+        return center.clone();
     }
 
     public float getZoom() {
