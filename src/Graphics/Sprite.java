@@ -91,7 +91,6 @@ public class Sprite extends Shape {
         if (displayList == null) return ;
 
         if (texture != null) {
-            //Shader.unbind();
             texture.bind();
             displayList.draw();
         }

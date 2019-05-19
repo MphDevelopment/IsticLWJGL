@@ -5,6 +5,7 @@ import System.*;
 import Graphics.*;
 import Graphics.Color;
 import System.IO.AZERTYLayout;
+import System.IO.AutoKeyboardLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class RenderWindow {
         GLFWWindow window = new GLFWWindow(
                 VideoMode.getDesktopMode(),
                 "OpenGL",
-                WindowStyle.DEFAULT.add(WindowStyle.TOPMOST)
+                WindowStyle.NONE
                 //WindowStyle.FULLSCREEN
         );
         //window.setFrameRateLimit(120);
@@ -73,7 +74,7 @@ public class RenderWindow {
         RectangleShape background = new RectangleShape(200,200);
         background.setFillColor(Color.Blue);
 
-        RectangleShape fullBackground = new RectangleShape(900,900);
+        RectangleShape fullBackground = new RectangleShape(500,500);
         fullBackground.move(-300,-300);
         fullBackground.setFillColor(Color.Cyan);
 
@@ -100,10 +101,10 @@ public class RenderWindow {
         //renderTexture2.setCamera(screenCamera2);
 
 
-
+        Mouse mouse = new Mouse(window);
 
         ArrayList<Shape> array = new ArrayList<>();
-        final int arraySize = 200;
+        final int arraySize = 1000;
         for (int i = 0; i < arraySize ; ++i) {
             Sprite tmp;
             if (i%3 == 0)
@@ -112,7 +113,7 @@ public class RenderWindow {
                 tmp = new Sprite(texture2);
             else tmp = new Sprite(texture3);
             //RectangleShape tmp = new RectangleShape(1000,100);
-            tmp.move((i%(int)Math.sqrt(arraySize))*50.f,(i/(int)Math.sqrt(arraySize))*50.f);
+            tmp.move((i%(int)Math.sqrt(arraySize))*200.f,(i/(int)Math.sqrt(arraySize))*200.f);
             tmp.setFillColor(new Color(1.f - i / (float)arraySize, i / (float)arraySize, i / (float)arraySize));
             tmp.setScale(0.5f, 0.5f);
             array.add(tmp);
@@ -145,8 +146,18 @@ public class RenderWindow {
             }
 
 
+            Vector2f mousePos = mouse.getRelativePositionUsingCamera2D(window.getViewport(), camera);
+            if (shape.getBounds().contains(mousePos.x, mousePos.y)) {
+                shape.setFillColor(Color.Yellow);
+            } else {
+                shape.setFillColor(Color.White);
+            }
+
             shape.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
-            fullBackground.move(1,1);
+            fullBackground.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
+
+
+
 
             camera.setDimension(window.getViewport().getDimension());
             camera.setCenter(shape.getPosition());
@@ -156,7 +167,7 @@ public class RenderWindow {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }*/
-            } else if (keyboard.isKeyPressed(AZERTYLayout.ESCAPE.getKeyID())) {
+            } else if (keyboard.isKeyPressed(AutoKeyboardLayout.Q.getKeyID())) {
                 window.close();
                 return ;
             }
@@ -164,14 +175,16 @@ public class RenderWindow {
             //test viewport 1
             //window.setViewport(viewport);
             window.clear(Color.Green);
-            window.draw(fullBackground);
-            window.draw(shape);
-
             //texturedShader.bind();
             //window.getCamera().setUniformMVP(0);
             for (int i = 0; i < array.size() ; ++i) {
                 window.draw(array.get(i));
             }
+            window.draw(fullBackground);
+
+            window.draw(shape);
+
+
             /*window.draw(screen);
             window.draw(screen2);*/
             fpsText.setPosition(shape.getPosition().x-200, shape.getPosition().y - 50);

@@ -48,7 +48,7 @@ public class TestGLFWWindow {
 
 
 
-        Keyboard keyboard = new Keyboard(window, Keyboard.AZERTY);
+        Keyboard keyboard = new Keyboard(window);
 
         //Camera is not default window camera so it need to be updated when window is resized
         Camera2D tracker = new Camera2D(window);
