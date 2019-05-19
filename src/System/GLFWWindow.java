@@ -138,7 +138,7 @@ public class GLFWWindow extends RenderTarget {
 
         // Callback window
         if (modes.enable(CallbackMode.RESIZE))
-            glfwSetWindowSizeCallback(this.glId, (window, w, h) -> {
+            glfwSetFramebufferSizeCallback(this.glId, (window, w, h) -> {
             resizeEvent = true;
             resizex = w;
             resizey = h;
