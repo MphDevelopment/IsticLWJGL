@@ -91,8 +91,6 @@ public enum AZERTYLayout implements KeyboardLayout {
     NUM_8(GLFW_KEY_8),
     NUM_9(GLFW_KEY_9),
     NUM_0(GLFW_KEY_0),
-    LEFT_PARENTHESIS(GLFW_KEY_MINUS),
-    EQUAL(GLFW_KEY_EQUAL),
 
     //sometimes change
     A(GLFW_KEY_Q),
@@ -121,17 +119,6 @@ public enum AZERTYLayout implements KeyboardLayout {
     V(GLFW_KEY_V),
     B(GLFW_KEY_B),
     N(GLFW_KEY_N)
-
-    /*COMMA(GLFW_KEY_M),
-    SEMICOLON(),
-    COLON(GLFW_KEY_PERIOD),
-    EXCLAMATION_MARK(GLFW_KEY_SLASH),
-    DOLLARS(GLFW_KEY_LEFT_BRACKET),
-    CIRCUMFLEX(GLFW_KEY_RIGHT_BRACKET),
-    ASTERISK(GLFW_KEY_BACKSLASH),
-    PERCENT(GLFW_KEY_APOSTROPHE),
-    CHEVRON(),
-    SQUARE(GLFW_KEY_APOSTROPHE),*/
 
     ;
 
