@@ -49,4 +49,9 @@ public class Vector2i implements Comparable<Vector2i> {
             }
         }
     }
+
+    @Override
+    public String toString(){
+        return "(" + x + " ," + y + ")";
+    }
 }

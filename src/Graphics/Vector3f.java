@@ -213,4 +213,9 @@ public class Vector3f extends org.lwjgl.util.vector.Vector3f implements Comparab
             }
         }
     }
+
+    @Override
+    public String toString(){
+        return "(" + x + ", " + y + ", " + z + ")";
+    }
 }

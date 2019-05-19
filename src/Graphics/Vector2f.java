@@ -105,4 +105,8 @@ public class Vector2f extends org.lwjgl.util.vector.Vector2f implements Comparab
         }
     }
 
+    @Override
+    public String toString(){
+        return "(" + x + " ," + y + ")";
+    }
 }
