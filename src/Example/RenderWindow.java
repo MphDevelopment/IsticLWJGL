@@ -20,7 +20,7 @@ public class RenderWindow {
         GLFWWindow window = new GLFWWindow(
                 VideoMode.getDesktopMode(),
                 "OpenGL",
-                WindowStyle.NONE
+                WindowStyle.DEFAULT
                 //WindowStyle.FULLSCREEN
         );
         //window.setFrameRateLimit(120);
@@ -31,6 +31,7 @@ public class RenderWindow {
         Texture texture;
         Texture texture2;
         Texture texture3;
+        Texture transp;
         FontFamily font;
 
         try {
@@ -41,6 +42,7 @@ public class RenderWindow {
             texture.setWrapMode(Texture.REPEAT);
             texture2 = new Texture("Phases.bmp");
             texture3 = new Texture("ben10.png");
+            transp = new Texture("character.png");
 
             font = new FontFamily("default.ttf", 30);
             //font = new FontFamily("asmelina.ttf", 24);
@@ -65,7 +67,8 @@ public class RenderWindow {
         RectangleShape textShape = new RectangleShape(text2.getBounds().l, text2.getBounds().t, text2.getBounds().w, text2.getBounds().h);
         textShape.setFillColor(Color.Red);
 
-
+        Sprite transptransp = new Sprite(transp);
+        transptransp.moveZLayer(9.99f);
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
         shape.setOrigin(5,5);
@@ -76,7 +79,8 @@ public class RenderWindow {
 
         RectangleShape fullBackground = new RectangleShape(500,500);
         fullBackground.move(-300,-300);
-        fullBackground.setFillColor(Color.Cyan);
+        fullBackground.moveZLayer(0.f);
+        fullBackground.setFillColor(Color.Red);
 
         Sprite sprite = new Sprite(texture);
         sprite.move(50, 50);
@@ -93,8 +97,8 @@ public class RenderWindow {
         Keyboard keyboard = new Keyboard(window);
 
         Camera2D camera = new Camera2D(window);
-        //Camera2D screenCamera = new Camera2D(renderTexture);
-        //Camera2D screenCamera2 = new Camera2D(renderTexture2);
+        camera.setZfar(10.f);
+        camera.setZnear(-10.f);
         window.setCamera(camera);
 
         //renderTexture.setCamera(screenCamera);
@@ -155,6 +159,7 @@ public class RenderWindow {
 
             shape.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
             fullBackground.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
+            transptransp.move((float)elapsed.asSeconds()*100, (float)elapsed.asSeconds()*100);
 
 
 
@@ -214,6 +219,7 @@ public class RenderWindow {
             window.draw(screen);
             window.draw(screen2);
             window.draw(shape);*/
+            window.draw(transptransp);
 
             window.display();
         }
