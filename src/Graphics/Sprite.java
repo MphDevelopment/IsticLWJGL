@@ -65,10 +65,10 @@ public class Sprite extends Shape {
         Vector2f bl = GLM.rotate(center, new Vector2f(x - ox, y - oy + sy * height), cos, sin);
         Vector2f br = GLM.rotate(center, new Vector2f(x - ox + sx * width, y - oy + sy * height), cos, sin);
 
-        displayList.setVertexPosition(0, new Vector3f(tl.x, tl.y, z));
-        displayList.setVertexPosition(1, new Vector3f(tr.x, tr.y, z));
-        displayList.setVertexPosition(2, new Vector3f(br.x, br.y, z));
-        displayList.setVertexPosition(3, new Vector3f(bl.x, bl.y, z));
+        displayList.setVertexPosition(0, tl);
+        displayList.setVertexPosition(1, tr);
+        displayList.setVertexPosition(2, br);
+        displayList.setVertexPosition(3, bl);
     }
 
     @Override

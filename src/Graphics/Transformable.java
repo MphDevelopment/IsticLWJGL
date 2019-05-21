@@ -5,7 +5,6 @@ package Graphics;
  */
 public abstract class Transformable {
     protected float x=0, y=0; // position coordinates
-    protected float z = 0; // layer
     protected float ox=0, oy=0; // origin coordinates
     protected float sx=1,sy=1; // scale factors
     protected float radian = 0; // rotation angle
@@ -46,14 +45,6 @@ public abstract class Transformable {
         sin = (float)Math.sin(this.radian);
         update();
     }
-    public void setZLayer(float z) {
-        this.z = z;
-        update();
-    }
-    public void moveZLayer(float z) {
-        this.z += z;
-        update();
-    }
 
     public float getX() { return x;}
     public float getY() { return y;}
@@ -71,7 +62,6 @@ public abstract class Transformable {
     public Vector2f getScale(){
         return new Vector2f(sx, sy);
     }
-    public float getZLayer() { return z;}
 
     /**
      * Updates VBO/VAO vertices using scale, origin, rotation and position.
