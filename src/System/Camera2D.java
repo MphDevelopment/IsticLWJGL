@@ -125,7 +125,7 @@ public class Camera2D extends Camera {
     @Override
     public void apply() {
         updatable = false;
-        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
 
         /// change fov
         glMatrixMode(GL_PROJECTION);
