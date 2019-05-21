@@ -58,7 +58,7 @@ public class RenderWindow {
         Text text2 = new Text(font, "Phrase Normale!", Text.REGULAR);
         Text text3 = new Text(font, "Phrase Grasse!", Text.BOLD);
         Text fpsText = new Text(font, "0", Text.BOLD);
-        fpsText.setFillColor(Color.Red);
+        fpsText.setFillColor(Color.Blue);
 
         text.setFillColor(Color.Black);
         text2.setFillColor(new Color(1, 0.59f, 0.2f));
@@ -68,7 +68,7 @@ public class RenderWindow {
         textShape.setFillColor(Color.Red);
 
         Sprite transptransp = new Sprite(transp);
-        transptransp.moveZLayer(9.99f);
+        transptransp.setFillColor(new Color(1,1,1,0.5f));
 
         RectangleShape shape = new RectangleShape(10,10, 10,10);
         shape.setOrigin(5,5);
@@ -79,7 +79,6 @@ public class RenderWindow {
 
         RectangleShape fullBackground = new RectangleShape(500,500);
         fullBackground.move(-300,-300);
-        fullBackground.moveZLayer(0.f);
         fullBackground.setFillColor(Color.Red);
 
         Sprite sprite = new Sprite(texture);
