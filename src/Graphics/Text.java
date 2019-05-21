@@ -111,16 +111,16 @@ public class Text extends Shape {
 
 
             glTexCoord2f(cx, cy);
-            glVertex3f(xTmp + ox + italicOffset, y + oy, 0);
+            glVertex3f(xTmp + ox + italicOffset, y + oy, z);
 
             glTexCoord2f(cx + cw, cy);
-            glVertex3f(xTmp + ox + width * super.sx  + italicOffset + boldOffsetX, y + oy, 0);
+            glVertex3f(xTmp + ox + width * super.sx  + italicOffset + boldOffsetX, y + oy, z);
 
             glTexCoord2f(cx + cw, cy + ch);
-            glVertex3f(xTmp + ox + width * super.sx  + boldOffsetX, y + oy + height * super.sy + boldOffsetY, 0);
+            glVertex3f(xTmp + ox + width * super.sx  + boldOffsetX, y + oy + height * super.sy + boldOffsetY, z);
 
             glTexCoord2f(cx, cy + ch);
-            glVertex3f(xTmp + ox , y + oy + height * super.sy  + boldOffsetY, 0);
+            glVertex3f(xTmp + ox , y + oy + height * super.sy  + boldOffsetY, z);
 
             xTmp += width * super.sx + boldOffsetX;
         }
