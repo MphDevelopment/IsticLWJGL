@@ -31,8 +31,6 @@ public class GLFWWindow extends RenderTarget {
     private Clock internalClk = new Clock();
     private Time frameTimeLimit = Time.zero();
 
-    private static final int titlebarOfsset = 30;
-
     // window event values
     private int textEntered;
     private boolean textEvent = false;
@@ -299,12 +297,17 @@ public class GLFWWindow extends RenderTarget {
         // Center our window
         posx = (videomode.width - this.width) / 2;
         posy = (videomode.height - this.height) / 2;
-        glfwSetWindowPos(this.glId, posx, posy + titlebarOfsset);
+        // Get the window border sizes
+        int[] pLeft = new int[1];
+        int[] pTop = new int[1]; // titlebar
+        int[] pRight = new int[1];
+        int[] pBottom = new int[1];
+        glfwGetWindowFrameSize(this.getGlId(), pLeft, pTop, pRight, pBottom);
+        glfwSetWindowPos(this.glId, posx, posy + pTop[0]);
 
 
         // Enable v-sync
         glfwSwapInterval(((style.bits & WindowStyle.VSYNC.bits) == WindowStyle.VSYNC.bits) ? 1 : 0);
-        //glfwSwapInterval(1);
 
         // Make the window visible
         glfwShowWindow(this.glId);
