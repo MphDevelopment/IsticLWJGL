@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import System.GlObject;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -16,7 +17,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author TheBoneJarmer
  */
 @Deprecated
-public class FontFamily {
+public class FontFamily extends GlObject {
 
     //Constants
     private final Map<Integer,String> CHARS = new HashMap<Integer,String>() {{
@@ -84,6 +85,8 @@ public class FontFamily {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         texture = new Texture(fontTextureId, (int) getFontImageWidth(),(int) getFontImageHeight());
+
+        this.glId = fontTextureId;
     }
 
     public boolean isUnicodeEnable(int unicode){
@@ -128,4 +131,8 @@ public class FontFamily {
         return texture;
     }
 
+    @Override
+    public void free() {
+        texture.free();
+    }
 }
