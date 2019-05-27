@@ -26,6 +26,10 @@ public final class Mouse {
         Button(int buttonId) {
             this.id = buttonId;
         }
+
+        public int getButtonID() {
+            return id;
+        }
     }
 
     private boolean hidden = false;
