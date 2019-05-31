@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**http://schabby.de/opengl-shader-example/*/
-///TODO When user unbind it's own shader/ IsticLWJGL must bind the default one if there is no current shader (le faire pendant window.draw(drawable))
 public class Shader extends GlObject implements ConstShader {
     //TODO plus optimisé de faire comme ça ? en gros on va conserver le dernier shader (ou null) activé pour ne pas l'activer a chaque fois qu'il va être utilisé a la suite
     private static ThreadLocal<Shader> currentShader = new ThreadLocal<Shader>();
@@ -41,16 +40,13 @@ public class Shader extends GlObject implements ConstShader {
                             "void main(void)\n" +
                             "{" +
                             "  gl_FragColor = gl_Color * texture2D(texture, gl_TexCoord[0].st);\n" +
-                            /*"  gl_FragColor.r = 1.0 - gl_FragColor.r;\n" +
-                            "  gl_FragColor.g = 1.0 - gl_FragColor.g;\n" +
-                            "  gl_FragColor.b = 1.0 - gl_FragColor.b;\n" +*/
                             "}"
                     );
         } catch (IOException e) {
             throw new RuntimeException("Can't load default Shader");
         }
     }
-    public static Shader getDefaultShader() {
+    public static ConstShader getDefaultShader() {
         return defaultShader;
     }
 
