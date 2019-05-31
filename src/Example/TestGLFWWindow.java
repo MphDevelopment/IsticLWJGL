@@ -31,9 +31,13 @@ public class TestGLFWWindow {
         RectangleShape shapeA1 = new RectangleShape(10,10, 10,10);
         shapeA1.setOrigin(5.f, 5.f);
         shapeA1.setFillColor(Color.Red);
+
         RectangleShape shapeA2 = new RectangleShape(10,100, 50,50);
         shapeA2.setFillColor(Color.Yellow);
         Sprite spriteA1 = new Sprite(texture);
+        spriteA1.setScale(-1.f, -1.f);
+        spriteA1.setOrigin(spriteA1.getBounds().w / 2.f, spriteA1.getBounds().h / 2.f);
+        spriteA1.rotate(3.14f / 2.f);
         //spriteA1.setRotation(90.f/180.f*(float)Math.PI);
 
         window2.setActive();
@@ -43,6 +47,7 @@ public class TestGLFWWindow {
         RectangleShape shapeB2 = new RectangleShape(10,100, 50,50);
         shapeB2.setFillColor(Color.Yellow);
         Sprite spriteB1 = new Sprite(texture);
+        spriteB1.setOrigin(spriteB1.getBounds().w / 2.f, spriteB1.getBounds().h / 2.f);
         //sprite.setOrigin(sprite.getBounds().w/2.f, sprite.getBounds().h/2.f);
         spriteB1.setRotation(10.f/180.f*(float)Math.PI);
 

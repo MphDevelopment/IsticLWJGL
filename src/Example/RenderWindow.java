@@ -70,6 +70,7 @@ public class RenderWindow {
         Sprite transptransp = new Sprite(transp);
         transptransp.setFillColor(new Color(1,1,1,0.5f));
 
+
         RectangleShape shape = new RectangleShape(10,10, 10,10);
         shape.setOrigin(5,5);
         shape.setFillColor(Color.Red);
@@ -80,6 +81,7 @@ public class RenderWindow {
         RectangleShape fullBackground = new RectangleShape(500,500);
         fullBackground.move(-300,-300);
         fullBackground.setFillColor(Color.Red);
+
 
         Sprite sprite = new Sprite(texture);
         sprite.move(50, 50);
