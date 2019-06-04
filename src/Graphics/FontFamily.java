@@ -105,7 +105,7 @@ public class FontFamily extends GlObject {
 
         // draw every CHAR by line...
         imageGraphics.setColor(java.awt.Color.WHITE);
-        CHARS.keySet().stream().forEach(i -> imageGraphics.drawString(CHARS.get(i), 0, fontMetrics.getMaxAscent() + (this.getCharHeight() * i)));
+        CHARS.keySet().forEach(i -> imageGraphics.drawString(CHARS.get(i), 0, fontMetrics.getMaxAscent() + (this.getCharHeight() * i)));
 
         //Generate texture data
         int[] pixels = new int[bufferedImage.getWidth() * bufferedImage.getHeight()];
