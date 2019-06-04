@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="lwjgl3" level="project" />
     <orderEntry type="library" name="lwjgl_util" level="project" />
+    <orderEntry type="library" name="lwjgl3 (2)" level="project" />
   </component>
 </module>
