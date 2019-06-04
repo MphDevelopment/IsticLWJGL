@@ -67,17 +67,6 @@ public final class Mouse {
         double ypos[] = new double[1];
         glfwGetCursorPos(window.getGlId(), xpos, ypos);
 
-        int[] pLeft = new int[1]; // int*
-        int[] pTop = new int[1]; // int*
-        int[] pRight = new int[1]; // int*
-        int[] pBottom = new int[1]; // int*
-
-        // Get the window border sizes
-        glfwGetWindowFrameSize(window.getGlId(), pLeft, pTop, pRight, pBottom);
-
-        xpos[0] -= pLeft[0] - pRight[0];
-        ypos[0] += pTop[0] - pBottom[0];
-
         return new Vector2f((float)xpos[0], (float)ypos[0]);
     }
 
