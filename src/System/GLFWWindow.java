@@ -64,7 +64,6 @@ public class GLFWWindow extends RenderTarget {
     private boolean focusEvent = false;
     private boolean focus;
 
-    private static int OVERSIZED_WINDOW_TITLE_BAR_DELTA = -30;
     // auto share
     private static GLFWWindow lastCreated = null;
 
@@ -267,7 +266,8 @@ public class GLFWWindow extends RenderTarget {
         GLFWContext.createContext();
 
         this.width = Math.min(videoMode.width, VideoMode.getDesktopMode().width);
-        this.height = Math.min(videoMode.height, VideoMode.getDesktopMode().height + (((WindowStyle.TITLEBAR.bits & style.bits) == WindowStyle.TITLEBAR.bits) ? (OVERSIZED_WINDOW_TITLE_BAR_DELTA) : (0)));
+        //int OVERSIZE_OFFSET = (((WindowStyle.TITLEBAR.bits & style.bits) == WindowStyle.TITLEBAR.bits) ? (OVERSIZED_WINDOW_TITLE_BAR_DELTA) : (0));
+        this.height = Math.min(videoMode.height, VideoMode.getDesktopMode().height/* - OVERSIZE_OFFSET*/);
         this.title = title;
         this.style = style.clone();
         this.mode = modes.clone();
@@ -295,19 +295,6 @@ public class GLFWWindow extends RenderTarget {
         this.initCallbacks(modes);
 
         /////////////////////  Set up params ////////////////////
-        // Get the resolution of the primary monitor
-        VideoMode desktopMode = VideoMode.getDesktopMode();
-        // Center our window
-        posx = (desktopMode.width - this.width) / 2;
-        posy = (desktopMode.height - this.height) / 2;
-        // Get the window border sizes
-        int[] pLeft = new int[1];
-        int[] pTop = new int[1]; // titlebar
-        int[] pRight = new int[1];
-        int[] pBottom = new int[1];
-        glfwGetWindowFrameSize(this.getGlId(), pLeft, pTop, pRight, pBottom);
-        glfwSetWindowPos(this.glId, posx, posy + pTop[0]);
-
         // Enable v-sync
         glfwSwapInterval(((style.bits & WindowStyle.VSYNC.bits) == WindowStyle.VSYNC.bits) ? 1 : 0);
 
@@ -332,6 +319,31 @@ public class GLFWWindow extends RenderTarget {
 
         //first clear
         clear();
+
+        // Checks window oversize
+        int[] left = new int[1];
+        int[] top = new int[1];
+        int[] right = new int[1];
+        int[] bottom = new int[1];
+        glfwGetWindowFrameSize(this.glId, left, top, right, bottom);
+        if (top[0] + bottom[0] + this.height >= VideoMode.getDesktopMode().height) {//only height
+            this.setDimension(new VideoMode(this.width, this.height - top[0] - bottom[0]));
+        }
+
+        // Get the resolution of the primary monitor
+        VideoMode desktopMode = VideoMode.getDesktopMode();
+        // Center our window
+        posx = (desktopMode.width - this.width) / 2;
+        posy = (desktopMode.height - this.height) / 2;
+        if (posx < 0) posx = 0;
+        if (posy < top[0]) posy = top[0];
+        if (posx > desktopMode.width) posx = top[0];
+        if (posy > desktopMode.height) posy = top[0];
+        glfwSetWindowPos(this.getGlId(), posx, posy);
+
+        // maximized or not
+        if ((style.bits & WindowStyle.MAXIMIZED.bits) == WindowStyle.MAXIMIZED.bits)
+            glfwMaximizeWindow(this.getGlId());
     }
 
     /**
