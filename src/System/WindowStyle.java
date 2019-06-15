@@ -17,7 +17,6 @@ public class WindowStyle {
     /** RESIZABLE : The displayed window will be resizable, if not the maximize button from title bar will be removed */
     public static final WindowStyle RESIZABLE = new WindowStyle(1 << 3);
     /** MAXIMIZED : The displayed window will be maximized when created */
-    @Deprecated
     public static final WindowStyle MAXIMIZED = new WindowStyle(1 << 4);
     /** MAXIMIZED : The displayed window will enable vsync */
     public static final WindowStyle VSYNC = new WindowStyle(1 << 6);
