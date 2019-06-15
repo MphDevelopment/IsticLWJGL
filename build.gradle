@@ -1,0 +1,44 @@
+plugins {
+    id'java'
+    id'application'
+    id'com.github.johnrengelman.shadow' version '5.0.0'
+}
+
+compileJava {
+	options.fork = true
+	options.forkOptions.executable = 'javac'
+	options.compilerArgs << "-XDignore.symbol.file"
+}
+
+version '1.0'
+mainClassName = 'Example.Example2D'
+
+sourceCompatibility = 1.8
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        
+    }
+}
+
+repositories {
+	mavenLocal()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven { url "http://clojars.org/repo/" }
+}
+
+dependencies {
+	compile files('lib/lwjgl3/lwjgl-glfw/lwjgl-glfw.jar')
+	compile files('lib/lwjgl3/lwjgl-openal/lwjgl-openal.jar')
+	compile files('lib/lwjgl3/lwjgl-opengl/lwjgl-opengl.jar')
+	compile files('lib/lwjgl3/lwjgl-stb/lwjgl-stb.jar')
+	compile files('lib/lwjgl3/lwjgl/lwjgl.jar')
+	compile files('lib/alternative/lwjgl_util.jar')
+}
+
+
+compileJava.options.encoding = 'UTF-8'
