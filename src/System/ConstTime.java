@@ -50,6 +50,17 @@ public abstract class ConstTime implements Comparable<ConstTime> {
     @Deprecated
     public abstract double asNanoseconds();
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof ConstTime) {
+            ConstTime time = (ConstTime)o;
+            return time.asNanoseconds() == asNanoseconds();
+        }
+
+        return false;
+    }
+
     /**
      * Checks if 'this' is greater/lower than an other time or equal
      * @param o compared to

@@ -73,8 +73,6 @@ public enum QWERTYLayout implements KeyboardLayout {
     NUM_8(GLFW_KEY_8),
     NUM_9(GLFW_KEY_9),
     NUM_0(GLFW_KEY_0),
-    LEFT_PARENTHESIS(GLFW_KEY_MINUS),
-    EQUAL(GLFW_KEY_EQUAL),
 
     NUM_LOCK(GLFW_KEY_NUM_LOCK),
     PAD_1(GLFW_KEY_KP_1),

@@ -26,6 +26,10 @@ public final class Mouse {
         Button(int buttonId) {
             this.id = buttonId;
         }
+
+        public int getButtonID() {
+            return id;
+        }
     }
 
     private boolean hidden = false;
@@ -46,6 +50,8 @@ public final class Mouse {
      * @return true if mouse is currently pressed on the GLFWWindow
      */
     public boolean isButtonPressed(Button button) {
+        if (!isAvailable()) return false;
+
         int state = glfwGetMouseButton(window.getGlId(), button.id);
         return (state == GLFW_PRESS);
     }
@@ -55,40 +61,64 @@ public final class Mouse {
      * @return local mouse position into the GLFWWindow
      */
     public Vector2f getRelativePosition() {
+        if (!isAvailable()) return new Vector2f();
+
         double xpos[] = new double[1];
         double ypos[] = new double[1];
         glfwGetCursorPos(window.getGlId(), xpos, ypos);
+
         return new Vector2f((float)xpos[0], (float)ypos[0]);
     }
 
     /**
      * Gives mouse position into the Desktop.
-     * @return local mouse position into the GLFWWindow
+     * @return global mouse position
      */
     public Vector2f getAbsolutePosition() {
         return getRelativePosition().add(new Vector2f(window.getPosition()));
     }
 
+    /**
+     * Gives mouse position into the viewport into the GLFWWindow
+     * @param viewport specified viewport
+     * @return mouse position
+     */
     public Vector2f getRelativePositionUsingViewport(Viewport viewport) {
         return (this.getRelativePosition()).add(viewport.getTopLeftCorner().neg());
     }
 
+    /**
+     * Gives mouse position into the viewport using Camera2D point of view into the GLFWWindow
+     * @param viewport specified viewport
+     * @return mouse position
+     */
     public Vector2f getRelativePositionUsingCamera2D(Viewport viewport, Camera2D camera) {
         return getRelativePositionUsingViewport(viewport).add(camera.getCenter().add(camera.getDimension().fact(-0.5f)));
     }
 
     public void setPosition(Vector2f position){
+        if (!isAvailable()) return ;
         glfwSetCursorPos(window.getGlId(), position.x, position.y);
     }
 
     public void setMouseCursorVisible(boolean state){
+        if (!isAvailable()) return ;
         hidden = state;
         glfwSetInputMode(window.getGlId(), GLFW_CURSOR, state ? (grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL) : GLFW_CURSOR_HIDDEN);
     }
 
     public void setMouseCursorGrabbed(boolean state){
+        if (!isAvailable()) return ;
         grabbed = state;
         glfwSetInputMode(window.getGlId(), GLFW_CURSOR, !state ? (hidden ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL) : GLFW_CURSOR_DISABLED);
+    }
+
+    /**
+     * Checks if mouse operation can be executed.
+     * @return true if mouse operation can be executed else false.
+     */
+    private boolean isAvailable() {
+        return window.getGlId() != 0;
     }
 
 }

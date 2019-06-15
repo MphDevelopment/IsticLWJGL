@@ -43,13 +43,13 @@ public class VertexDisplayList implements Drawable {
         this.positions[i] = new Vector3f(position.x, position.y, 0);
     }
     public void setVertexPosition(int i, Vector3f position) {
-        this.positions[i] = position;
+        this.positions[i] = position.clone();
     }
-    public void setVertexColor(int i, Color color) {
-        this.colors[i] = color;
+    public void setVertexColor(int i, ConstColor color) {
+        this.colors[i] = new Color(color.getR(), color.getG(), color.getB(), color.getA());
     }
     public void setVertexTexCoord(int i, Vector2f coords) {
-        this.coords[i] = coords;
+        this.coords[i] = coords.clone();
     }
 
     public void resize(int count, Mode mode) {
@@ -69,7 +69,7 @@ public class VertexDisplayList implements Drawable {
         for (int i = 0 ; i < count ; ++i) {
             glColor4f(colors[i].r, colors[i].g, colors[i].b, colors[i].a);
             glTexCoord2f(coords[i].x, coords[i].y);
-            glVertex2f(positions[i].x, positions[i].y);
+            glVertex3f(positions[i].x, positions[i].y, positions[i].z);
         }
 
         glEnd();

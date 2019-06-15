@@ -10,7 +10,6 @@ public abstract class Transformable {
     protected float radian = 0; // rotation angle
     protected float cos = 1; // precomputed cosines
     protected float sin = 0; // precomputed sinus
-    private boolean needUpdate = false;
 
 
     public void setPosition(float x, float y) {

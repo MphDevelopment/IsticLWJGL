@@ -7,7 +7,7 @@ public class FloatRect {
     public float l, t, w, h;
 
     /**
-     *
+     * Generates a rectangle
      * @param l left coordinate
      * @param t top coordinate
      * @param w width
@@ -18,6 +18,16 @@ public class FloatRect {
         this.t = t;
         this.w = w;
         this.h = h;
+    }
+
+    /**
+     * Checks if point if inside rectangle
+     * @param x x coordinates
+     * @param y y coordinates
+     * @return true if point if inside rectangle else false
+     */
+    public boolean contains(float x, float y) {
+        return x >= l && x <= l + w && y >= t && y <= t + h;
     }
 
 }

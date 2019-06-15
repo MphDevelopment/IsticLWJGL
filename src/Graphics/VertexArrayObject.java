@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL30;
 /**
  * Interface that handle VBO structure and CPU to GPU stream
  */
-public class VertexBuffer extends GlObject implements Drawable {
+public class VertexArrayObject extends GlObject implements Drawable {
     public enum Mode {
         TRIANGLES(GL_TRIANGLES, 3),
         TRIANGLES_FAN(GL_TRIANGLE_FAN, 3),
@@ -54,21 +54,21 @@ public class VertexBuffer extends GlObject implements Drawable {
      * Creates a Vertex Buffer Object with a specific Usage.
      * @param usage specified usage.
      */
-    public VertexBuffer(Usage usage) {
+    public VertexArrayObject(Usage usage) {
         this.usage = usage;
     }
 
     /**
      * Creates a Vertex Buffer Object with a specific Usage.
      * @param verticesCount vertices count.
-     * @param vaoCount Number of VAO. (positions, colors, texture coords)
-     * @param vaoSampleSize For each VAO each vertices requires how many floats per sample. (0 < vaoSampleSize.length <= vaoCount)
+     * @param vboCount Number of VAO. (positions, colors, texture coords)
+     * @param vboSampleSize For each VAO each vertices requires how many floats per sample. (0 < vaoSampleSize.length <= vaoCount)
      * @param mode draw mode.
      * @param usage usage specified usage.
      */
-    public VertexBuffer(int verticesCount, int vaoCount, int[] vaoSampleSize, Mode mode, Usage usage) {
+    public VertexArrayObject(int verticesCount, int vboCount, int[] vboSampleSize, Mode mode, Usage usage) {
         this.usage = usage;
-        this.create(verticesCount, vaoCount, vaoSampleSize, mode);
+        this.create(verticesCount, vboCount, vboSampleSize, mode);
     }
 
 
@@ -80,11 +80,11 @@ public class VertexBuffer extends GlObject implements Drawable {
      * Creates a VBO.
      * If was already created it frees it before creating it a new time.
      * @param verticesCount number of vertices
-     * @param vaoCount number of vao.For example: [count=2](positions = 3, colors = 4) ou [count=3](positions = 3, colors = 4, texCoords = 2)
-     * @param vaoSampleSize each vao has it's own number of float values per sample
+     * @param vboCount number of vao.For example: [count=2](positions = 3, colors = 4) ou [count=3](positions = 3, colors = 4, texCoords = 2)
+     * @param vboSampleSize each vao has it's own number of float values per sample
      * @param mode primitive type
      */
-    public void create(int verticesCount, int vaoCount, int[] vaoSampleSize, Mode mode) {
+    public void create(int verticesCount, int vboCount, int[] vboSampleSize, Mode mode) {
         this.free();
 
         //each draw mode needs a specified amount of vertices data
@@ -95,18 +95,18 @@ public class VertexBuffer extends GlObject implements Drawable {
 
 
         this.count = verticesCount;
-        this.vboArrayId = new int[vaoCount];
-        this.vboArraySampleSize = new int[vaoCount];
+        this.vboArrayId = new int[vboCount];
+        this.vboArraySampleSize = new int[vboCount];
 
 
 
         // create VBOs
-        for (int i=0 ; i < vaoCount ; ++i) {
+        for (int i=0 ; i < vboCount ; ++i) {
             // create vertex buffer object (VBO) for vao[i] kind (positions, colors, texCoods, ...)
             this.vboArrayId[i] = GL15.glGenBuffers();
-            this.vboArraySampleSize[i] = vaoSampleSize[i];
+            this.vboArraySampleSize[i] = vboSampleSize[i];
             glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vboArrayId[i]);
-            glBufferData(GL15.GL_ARRAY_BUFFER, vaoSampleSize[i]*verticesCount, usage.usage);
+            glBufferData(GL15.GL_ARRAY_BUFFER, vboSampleSize[i]*verticesCount, usage.usage);
         }
         // unbind VBO
         glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
@@ -117,12 +117,12 @@ public class VertexBuffer extends GlObject implements Drawable {
         super.glId = GL30.glGenVertexArrays(); //TODO context can't share VAO
         glBindVertexArray((int)super.glId);
 
-        for (int i=0 ; i < vaoCount ; ++i) {
+        for (int i=0 ; i < vboCount ; ++i) {
             glEnableVertexAttribArray(i);
 
             // assign vertex VBO to slot 'i' of VAO
             glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vboArrayId[i]);
-            glVertexAttribPointer(i, vaoSampleSize[i], GL11.GL_FLOAT, false, 0, 0);
+            glVertexAttribPointer(i, vboSampleSize[i], GL11.GL_FLOAT, false, 0, 0);
         }
         // unbind VBO
         glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);

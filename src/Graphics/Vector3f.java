@@ -168,14 +168,6 @@ public class Vector3f extends org.lwjgl.util.vector.Vector3f implements Comparab
     }
 
     /**
-     * Converts to native LWJGL vector
-     * @return vector conversion
-     */
-    public org.lwjgl.util.vector.Vector3f toLwjgl() {
-        return new org.lwjgl.util.vector.Vector3f(x,y,z);
-    }
-
-    /**
      * Copy vector coordinates
      * @return vector copy
      */
@@ -191,6 +183,7 @@ public class Vector3f extends org.lwjgl.util.vector.Vector3f implements Comparab
      */
     @Override
     public boolean equals(Object o) {
+        if (o == this) return true;
         if (o instanceof Vector3f) {
             Vector3f v = (Vector3f)o;
             return x == v.x && y == v.y && z == v.z;
@@ -219,5 +212,10 @@ public class Vector3f extends org.lwjgl.util.vector.Vector3f implements Comparab
                 }
             }
         }
+    }
+
+    @Override
+    public String toString(){
+        return "(" + x + ", " + y + ", " + z + ")";
     }
 }

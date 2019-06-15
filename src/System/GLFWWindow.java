@@ -5,11 +5,11 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL;
 
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowFrameSize;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -137,7 +137,7 @@ public class GLFWWindow extends RenderTarget {
 
         // Callback window
         if (modes.enable(CallbackMode.RESIZE))
-            glfwSetWindowSizeCallback(this.glId, (window, w, h) -> {
+            glfwSetFramebufferSizeCallback(this.glId, (window, w, h) -> {
             resizeEvent = true;
             resizex = w;
             resizey = h;
@@ -168,7 +168,7 @@ public class GLFWWindow extends RenderTarget {
         glfwWindowHint(GLFW_RESIZABLE, ((styles.bits & WindowStyle.RESIZABLE.bits) == WindowStyle.RESIZABLE.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will be resizable
         glfwWindowHint(GLFW_DECORATED, ((styles.bits & WindowStyle.TITLEBAR.bits) == WindowStyle.TITLEBAR.bits) ? GLFW_TRUE : GLFW_FALSE); // the window will have title bar
         glfwWindowHint(GLFW_FLOATING, ((styles.bits & WindowStyle.TOPMOST.bits) == WindowStyle.TOPMOST.bits) ? GLFW_TRUE : GLFW_FALSE);
-        glfwWindowHint(GLFW_MAXIMIZED, ((styles.bits & WindowStyle.MAXIMIZED.bits) == WindowStyle.MAXIMIZED.bits) ? GLFW_TRUE : GLFW_FALSE);
+        //glfwWindowHint(GLFW_MAXIMIZED, ((styles.bits & WindowStyle.MAXIMIZED.bits) == WindowStyle.MAXIMIZED.bits) ? GLFW_TRUE : GLFW_FALSE);
     }
 
     /**
@@ -179,12 +179,14 @@ public class GLFWWindow extends RenderTarget {
     protected void initGl() {
         defaultCamera = new Camera2D(new Vector2f(width, height));
         camera = defaultCamera;
+
         defaultViewport = new Viewport(new FloatRect(0,0, width, height));
         viewport = defaultViewport;
 
         camera.apply();
         viewport.apply(this);
 
+        glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -263,8 +265,9 @@ public class GLFWWindow extends RenderTarget {
         // initialized glfw if glfw is not initialized
         GLFWContext.createContext();
 
-        this.width = videoMode.width;
-        this.height = videoMode.height;
+        this.width = Math.min(videoMode.width, VideoMode.getDesktopMode().width);
+        //int OVERSIZE_OFFSET = (((WindowStyle.TITLEBAR.bits & style.bits) == WindowStyle.TITLEBAR.bits) ? (OVERSIZED_WINDOW_TITLE_BAR_DELTA) : (0));
+        this.height = Math.min(videoMode.height, VideoMode.getDesktopMode().height/* - OVERSIZE_OFFSET*/);
         this.title = title;
         this.style = style.clone();
         this.mode = modes.clone();
@@ -292,17 +295,8 @@ public class GLFWWindow extends RenderTarget {
         this.initCallbacks(modes);
 
         /////////////////////  Set up params ////////////////////
-        // Get the resolution of the primary monitor
-        VideoMode videomode = VideoMode.getDesktopMode();
-        // Center our window
-        posx = (videomode.width - this.width) / 2;
-        posy = (videomode.height - this.height) / 2;
-        glfwSetWindowPos(this.glId, posx, posy);
-
-
         // Enable v-sync
         glfwSwapInterval(((style.bits & WindowStyle.VSYNC.bits) == WindowStyle.VSYNC.bits) ? 1 : 0);
-        //glfwSwapInterval(1);
 
         // Make the window visible
         glfwShowWindow(this.glId);
@@ -325,6 +319,31 @@ public class GLFWWindow extends RenderTarget {
 
         //first clear
         clear();
+
+        // Checks window oversize
+        int[] left = new int[1];
+        int[] top = new int[1];
+        int[] right = new int[1];
+        int[] bottom = new int[1];
+        glfwGetWindowFrameSize(this.glId, left, top, right, bottom);
+        if (top[0] + bottom[0] + this.height >= VideoMode.getDesktopMode().height) {//only height
+            this.setDimension(new VideoMode(this.width, this.height - top[0] - bottom[0]));
+        }
+
+        // Get the resolution of the primary monitor
+        VideoMode desktopMode = VideoMode.getDesktopMode();
+        // Center our window
+        posx = (desktopMode.width - this.width) / 2;
+        posy = (desktopMode.height - this.height) / 2;
+        if (posx < 0) posx = 0;
+        if (posy < top[0]) posy = top[0];
+        if (posx > desktopMode.width) posx = top[0];
+        if (posy > desktopMode.height) posy = top[0];
+        glfwSetWindowPos(this.getGlId(), posx, posy);
+
+        // maximized or not
+        if ((style.bits & WindowStyle.MAXIMIZED.bits) == WindowStyle.MAXIMIZED.bits)
+            glfwMaximizeWindow(this.getGlId());
     }
 
     /**
@@ -486,7 +505,7 @@ public class GLFWWindow extends RenderTarget {
         }
 
         glClearColor(color.getR(),color.getG(),color.getB(),color.getA());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     /**

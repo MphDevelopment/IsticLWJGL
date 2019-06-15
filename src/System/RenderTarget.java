@@ -37,10 +37,8 @@ public abstract class RenderTarget extends GlObject {
      * Change current RenderTarget to 'this' and change view to 'this' view
      */
     public final void setActive(){
-        //currentTarget = this;
         currentTarget.set(this);
         this.bind(); // on souhaite modifier ce RenderTarget seulement
-        //this.applyView(); // on applique sa vue et ses paramètres
     }
 
     /**
@@ -52,7 +50,6 @@ public abstract class RenderTarget extends GlObject {
      * Updates current RenderTarget View using Camera and Viewport
      */
     protected final void applyView() {
-        camera.setUniformMVP(0);
         camera.apply();
         viewport.apply(this);
     }
@@ -74,8 +71,6 @@ public abstract class RenderTarget extends GlObject {
      * Setting a camera obliges the User to update camera settings when the GLFWWindow is resizing.
      * @param cam specified camera
      */
-    //TODO changer de la camera pendant un affichage ne va pas remettre a jour la vue du RenderTarget
-    //TODO changer les paramètres de la camera utilisée pendant un affichage ne va pas remettre a jour la vue du RenderTarget
     public final void setCamera(@NotNull Camera cam){
         this.camera = cam;
         if (isActive()) {
