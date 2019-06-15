@@ -128,6 +128,14 @@ public class Text extends Shape {
 
     }
 
+    public int getStyle(){
+        return style;
+    }
+
+    public FontFamily getFont(){
+        return font;
+    }
+
     @Override
     public FloatRect getBounds() {
         return new FloatRect(x - ox, y - oy, width, height);
