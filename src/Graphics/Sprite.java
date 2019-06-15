@@ -22,6 +22,10 @@ public class Sprite extends Shape {
         this.setTexture(texture, true);
     }
 
+    public void setTexture(ConstTexture texture) {
+        this.setTexture(texture, true);
+    }
+
     public void setTexture(ConstTexture texture, boolean resize){
         this.texture = texture;
         if (texture != null && resize) {
@@ -98,6 +102,10 @@ public class Sprite extends Shape {
 
     public ConstTexture getTexture(){
         return texture;
+    }
+
+    public FloatRect getTextureRect() {
+        return new FloatRect(tx * texture.getWidth(),ty * texture.getHeight(),tw * texture.getWidth(),th * texture.getHeight());
     }
 
     @Override
